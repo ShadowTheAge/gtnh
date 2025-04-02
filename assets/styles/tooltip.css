@@ -1,0 +1,55 @@
+#tooltip {
+    max-width: 500px;
+    border-style: solid;
+    border-width: 4px;
+    border-image: url('./../images/Tooltip.png') fill 2;
+    text-shadow: 2px 2px #342C34;
+    display: table;
+    padding: 2px 10px 0px;
+    position: absolute;
+    display: none;
+    z-index: 2000;
+}
+
+#tooltip::after
+{
+    border-style: solid;
+    border-width: 4px;
+    border-image: url('./../images/Tooltip_Bevel.png') 2;
+    content: "";
+    position: absolute;
+    top: -4px; left: -4px; right: -4px; bottom: -4px;
+}
+
+#tooltip-header
+{
+    color: white;
+}
+
+#tooltip-debug
+{
+    color: #FFFFFF69;
+    font-size: 8px;
+    word-spacing: 1px;
+    text-shadow: 1px 1px #342C34;
+    line-height: 16px;
+    white-space: pre-line;
+}
+
+#tooltip-text
+{
+    color: #ACA1AB;
+    white-space: pre-line;
+}
+
+#tooltip-action
+{
+    color: #cecf76;
+    white-space: pre-line;
+}
+
+#tooltip-mod
+{
+    color: #5457FA;
+    line-height: 1;
+}

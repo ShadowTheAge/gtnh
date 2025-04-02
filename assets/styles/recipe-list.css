@@ -1,0 +1,366 @@
+/* Main layout */
+#recipe-list {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background-color: #2C2C2C;
+    z-index: 1;
+    display: flex;
+    padding: 20px;
+    gap: 20px;
+    overflow: hidden;
+    box-sizing: border-box;
+}
+
+/* Product list styles */
+.product-list {
+    width: 400px;
+    background-color: #363636;
+    border-radius: 8px;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    height: calc(100vh - 40px);
+    box-sizing: border-box;
+}
+
+.product-list-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-shrink: 0;
+}
+
+.product-list-header h2 {
+    margin: 0;
+    color: #ffffff;
+}
+
+.product-items {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.product-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px;
+    background-color: #2a2a2a;
+    border-radius: 4px;
+}
+
+.product-item item-icon {
+    width: 32px;
+    height: 32px;
+    flex-shrink: 0;
+    position: static;
+    display: block;
+}
+
+.product-item .amount-container {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.product-item .amount {
+    width: 80px;
+    background-color: #2C2C2C;
+    border: 1px solid #505050;
+    border-radius: 2px;
+    color: #ffffff;
+    padding: 2px 4px;
+    text-align: right;
+    -moz-appearance: textfield;
+}
+
+.product-item .amount::-webkit-outer-spin-button,
+.product-item .amount::-webkit-inner-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+.product-item .amount:focus {
+    outline: none;
+    border-color: #4CAF50;
+}
+
+.product-item .amount-unit {
+    font-size: 8px;
+    color: #ffffff;
+}
+
+.product-item .name {
+    flex: 1;
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    color: #ffffff;
+    font-size: 16px;
+}
+
+/* Recipe list styles */
+.recipe-list {
+    flex: 1;
+    background-color: #363636;
+    border-radius: 8px;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    height: calc(100vh - 40px);
+    box-sizing: border-box;
+    overflow-y: auto;
+}
+
+.recipe-list-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-shrink: 0;
+}
+
+.recipe-list-header h2 {
+    margin: 0;
+    color: #ffffff;
+}
+
+/* Base grid layout for all items */
+.recipe-item, .recipe-group:not(.root-group), .recipe-group.collapsed:not(.root-group) {
+    background-color: #2a2a2a;
+    border: 1px solid #404040;
+    border-radius: 4px;
+    padding: 4px;
+}
+
+.grid-row {
+    display: grid;
+    grid-template-columns: 36px calc(300px - var(--nest-level, 0) * 4px) 60px 1fr 1fr 36px;
+    gap: 10px;
+    align-items: center;
+}
+
+/* Common grid column assignments */
+.collapse-btn {
+    grid-column: 1;
+    padding: 0;
+    width: 22px;
+    height: 22px;
+    background-image: url('./../images/Arrow_Small_Down.png');
+    background-size: 22px 22px;
+}
+
+.expand-btn {
+    grid-column: 1;
+    padding: 0;
+    width: 22px;
+    height: 22px;
+    background-image: url('./../images/Arrow_Small_Right.png');
+    background-size: 22px 22px;
+}
+
+.short-info {
+    grid-column: 2;
+    color: #ffffff;
+    font-size: 16px;
+}
+
+.io-label {
+    color: #888888;
+    font-size: 16px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 4px;
+}
+
+.io-items {
+    display: flex;
+    flex-wrap: wrap;
+    flex-direction: row;
+    gap: 4px;
+    min-height: 32px;
+    pointer-events: none;
+    flex: 1;
+    min-width: 0;
+}
+
+.white-text {
+    color: #ffffff;
+}
+
+.delete-btn {
+    width: 28px;
+    height: 28px;
+    padding: 0;
+    cursor: pointer;
+    background-image: url('./../images/Button_Close.png');
+    background-size: 28px 28px;
+    border: none;
+}
+
+.delete-btn:hover {
+    background-image: url('./../images/Button_Close_Hover.png');
+    border: none;
+}
+
+.notification {
+    width: 16px;
+    height: 16px;
+    padding: 0;
+    cursor: pointer;
+    background-image: url('./../images/Notification.png');
+    background-size: 16px 16px;
+    border: none;
+}
+
+/* Root group specific styles */
+.root-group {
+    background-color: #363636;
+}
+
+
+.root-group .group-buttons {
+    grid-column: 2;
+    display: flex;
+    gap: 8px;
+    justify-content: flex-start;
+}
+
+/* Expanded group specific styles */
+.recipe-group:not(.collapsed):not(.root-group) .group-buttons {
+    grid-column: 5;
+    display: flex;
+    gap: 8px;
+    justify-content: flex-end;
+}
+
+/* Input styles */
+.group-name-input {
+    background: none;
+    border: none;
+    color: #ffffff;
+    font-size: 16px;
+    padding: 0;
+    pointer-events: none;
+}
+
+.recipe-group:not(.collapsed) .group-name-input {
+    pointer-events: auto;
+    border: 1px solid #404040;
+    border-radius: 2px;
+    padding: 2px 4px;
+    background-color: #363636;
+}
+
+.group-name-input:focus {
+    outline: none;
+    border-color: #4CAF50;
+    background-color: #404040;
+}
+
+.group-name {
+    color: #ffffff;
+    font-size: 16px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* Group content styles */
+.group-content {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 0;
+    margin-top: 10px;
+}
+
+.links-label {
+    display: block;
+    color: #ffffff;
+    font-size: 16px;
+}
+
+.links-grid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.links-grid item-icon {
+    width: 32px;
+    height: 32px;
+    flex-shrink: 0;
+}
+
+/* Drag and drop styles */
+.recipe-item.dragging, .recipe-group.collapsed.dragging {
+    opacity: 0.5;
+    background-color: #404040;
+}
+
+.recipe-item.drag-over, .recipe-group.drag-over {
+    border: 2px dashed #4CAF50;
+}
+
+.recipe-item.drag-over::before, .recipe-group.drag-over::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background-color: #4CAF50;
+}
+
+.recipe-item.drag-over::before {
+    top: -2px;
+}
+
+.recipe-group.drag-over::before {
+    top: -2px;
+}
+
+.group-content.drag-over {
+    background-color: #404040;
+    border: 2px dashed #4CAF50;
+    border-radius: 4px;
+    padding: 8px;
+    min-height: 20px;
+}
+
+.voltage-tier-select {
+    font-family: Minecraftia;
+    font-size: 16px;
+    color: white;
+    background-color: #2b2b2b;
+    border: 1px solid #404040;
+    padding: 2px 4px;
+    margin-right: 8px;
+    cursor: pointer;
+}
+
+.voltage-tier-select option {
+    font-family: Minecraftia;
+    font-size: 16px;
+    color: white;
+    background-color: #2b2b2b;
+}
+
+.voltage-tier-select:focus {
+    outline: none;
+    border-color: #606060;
+}
+
+.voltage-tier-select:hover {
+    border-color: #606060;
+}
+
+#dropdown {
+    font-family: Minecraftia;
+}

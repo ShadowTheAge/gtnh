@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GTNH Calculator</title>
+    <link rel="stylesheet" href="./assets/styles/general.css">
+    <link rel="stylesheet" href="./assets/styles/nei.css">
+    <link rel="stylesheet" href="./assets/styles/tabs.css">
+    <link rel="stylesheet" href="./assets/styles/tooltip.css">
+    <link rel="stylesheet" href="./assets/styles/recipe-list.css">
+</head>
+<body>
+    <script src="https://unpkg.com/javascript-lp-solver/prod/solver.js"></script>
+    <script type="module" src="./dist/index.js"></script>
+
+    <!-- Recipe List Panel -->
+    <div id="recipe-list">
+        <div class="product-list">
+            <div class="product-list-header">
+                <h2>Products</h2>
+                <button class="add-product-btn" data-action="add_product" data-iid="0">Add Product</button>
+            </div>
+            <div class="product-items"></div>
+        </div>
+
+        <div class="recipe-list">
+        </div>
+    </div>
+
+    <div id="panels">
+        <div id="loading" class="panel">LOADING...</div>
+
+<!--               NEI               -->
+
+        <div id="nei" class="panel hidden with-tabs">
+            <div class="panel-tab-bar">
+                <div id="nei-tabs" class="panel-tabs"></div>
+            </div>
+            <div class="hgroup">
+                Search:
+                <input id="nei-search" placeholder="Start typing for search">
+            </div>
+            <div class="scroll-area" id="nei-scroll">
+                <div id="nei-content"></div>
+            </div>
+        </div>
+
+    </div>
+
+    <div id="tooltip">
+        <p id="tooltip-header">Header</p>
+        <p id="tooltip-debug">Debug</p>
+        <p id="tooltip-text">Text</p>
+        <p id="tooltip-action">Action</p>
+        <p id="tooltip-mod">Mod</p>
+    </div>
+</body>
+</html>

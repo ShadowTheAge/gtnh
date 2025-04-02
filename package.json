@@ -1,0 +1,22 @@
+{
+  "name": "gtnh-calc",
+  "version": "1.0.0",
+  "description": "GregTech: New Horizons calculator",
+  "main": "index.js",
+  "scripts": {
+    "start": "tsc --watch",
+    "build": "tsc",
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d ."
+  },
+  "keywords": ["gregtech", "minecraft", "calculator"],
+  "author": "ShadowTheAge",
+  "license": "MIT",
+  "devDependencies": {
+    "typescript": "^5.8.2",
+    "gh-pages": "^6.1.1"
+  },
+  "dependencies": {
+    "javascript-lp-solver": "^0.4.24"
+  }
+}

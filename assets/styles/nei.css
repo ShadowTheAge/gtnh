@@ -1,0 +1,77 @@
+#nei-content
+{
+    width: 100%;
+    position: relative;
+}
+
+#nei-search
+{
+    border-style: solid;
+    border-width: 6px;
+    border-image: url('./../images/InputBox.png') 3 fill;
+    height: 16;
+    flex:1;
+}
+
+.nei-recipe-box
+{
+    border-style: solid;
+    border-width: 2px;
+    border-image: url('./../images/Panel_Small.png') 1 fill;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    position: absolute;
+    background: none;
+    padding: 0;
+}
+
+.nei-recipe-box:focus {
+    outline: none;
+}
+
+.nei-recipe-items
+{
+    display: flex;
+    height: 100%;
+    align-items: center; 
+    flex-direction: column;
+    justify-content: center;
+    gap: 10px;
+}
+
+.nei-recipe-io
+{
+    display: flex;
+    height: 100%;
+    align-items: center; 
+    flex-direction: row;
+    gap: 20px;
+    flex:0;
+}
+
+.arrow
+{
+    position: relative;
+    width: 48px;
+    height: 32px;
+    background-size: 48px;
+    background-image: url('./../images/Arrow.png')
+}
+
+.nei-items-row
+{
+    --grid-height: 1;
+    position: absolute !important;
+}
+
+.arrow-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+}

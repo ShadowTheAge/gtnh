@@ -1,0 +1,209 @@
+@font-face {
+    font-family:'Minecraftia';
+    src: url('./../fonts/F77MinecraftRegular-0VYv.ttf');
+}
+
+body {
+    font-family:'Minecraftia', sans-serif;
+    -webkit-font-smoothing: never;
+    font-smooth: never;
+    font-kerning: none;
+    image-rendering: pixelated;
+    text-rendering: geometricPrecision;
+    font-size: 16px;
+    line-height: 22px;
+    overflow: hidden;
+    color: #3F3F3F;
+    word-break: break-word;
+}
+
+.text-small
+{
+    font-size: 8px;
+    line-height: 8px;
+    word-spacing: 1px;
+}
+
+button {
+    font-family:'Minecraftia', sans-serif;
+    font-size: 16px;
+    line-height: 22px;
+    border-style: solid;
+    border-width: 6px;
+    border-image: url('./../images/Button.png') 3 fill;
+    pointer-events: all;
+    color: white;
+    text-shadow: 2px 2px #342C34;
+    cursor: pointer;
+}
+
+button:hover {
+    border-image: url('./../images/Button_Hover.png') 3 fill;
+}
+
+.icon-button {
+    border: none;
+    border-image: none;
+    background-color: transparent;
+}
+
+.icon-button:hover {
+    border:none;
+    border-image: none;
+    background-color: transparent;
+}
+
+input {
+    font-family:'Minecraftia', sans-serif;
+    font-size: 16px;
+    line-height: 16px;
+    color: white;
+    text-shadow: 2px 2px #342C34;
+}
+
+input:focus {
+    outline: none;
+}
+
+.hgroup
+{
+    display: flex;
+    width: 100%;
+    align-items: center; 
+}
+
+.vgroup
+{
+    display: flex;
+    height: 100%;
+    align-items: center; 
+    flex-direction: column;
+}
+
+input::placeholder {
+    color:#B3B3B3;
+}
+
+.panel {
+    position: absolute;
+    border-style: solid;
+    border-width: 8px;
+    border-image: url('./../images/Panel.png') 4 fill;
+    pointer-events: all;
+}
+
+.icon-grid
+{
+    position: relative;
+    width: calc(var(--grid-width)*36px);
+    height: calc(var(--grid-height)*36px);
+    gap: 0px;
+    background-size: 36px;
+    background-image: url("./../images/Slot.png");
+}
+
+.icon {
+    width: 32px;
+    height: 32px;
+    background-size: 8192px;
+    background-repeat: no-repeat;
+
+    background-image: url('/data/atlas.webp');
+    background-position: 
+        calc(mod(var(--icon-id), 256) * (-32px))
+        calc(round(var(--icon-id)/256 - 0.5) * (-32px));
+}
+
+item-icon {
+    width: 32px;
+    height: 32px;
+    position: relative;
+    background-size: 8192px;
+    background-repeat: no-repeat;
+    pointer-events: auto;
+    background-image: url('/data/atlas.webp');
+    background-position-x: calc(mod(var(--icon-id), 256) * (-32px));
+    background-position-y: calc(round(var(--icon-id)/256 - 0.5) * (-32px));
+}
+
+/* Apply grid positioning when --grid-width is defined */
+item-icon:where(:has(+ [style*="--grid-width"]), [style*="--grid-width"] *) {
+    position: absolute;
+    left: calc(mod(var(--grid-position), var(--grid-width)) * 36px + 2px);
+    top: calc(round(var(--grid-position)/var(--grid-width) - 0.5) * 36px + 2px);
+}
+
+item-icon::after {
+    content: attr(data-amount);
+    position: absolute;
+    bottom: -6px;
+    right: 1px;
+    font-size: 8px;
+    text-shadow: 1px 1px #342C34;
+    color: white;
+    pointer-events: none;
+    white-space: nowrap;
+}
+
+.probability
+{
+    position: absolute;
+    top: -5px;
+    right: 1px;
+    font-size: 8px;
+    color: #FFD700;
+    text-shadow: 1px 1px #342C34;
+    pointer-events: none;
+}
+
+p {
+    margin: 0.5em 0;
+}
+
+#panels
+{
+    position: fixed;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100vw;
+    height: 100vh;
+    margin: 0;
+    padding: 0;
+    z-index: 1000;
+    pointer-events: none;
+    background-color: #B3B3B3;
+    visibility: hidden;
+    top: 0;
+    left: 0;
+}
+
+#panels:has(.panel:not(.hidden)) {
+    visibility: visible;
+}
+
+.scrollbar-measure {
+	width: 100px;
+	height: 100px;
+	overflow: scroll;
+	position: absolute;
+	top: -9999px;
+}
+
+#loading
+{
+    font-size:64px;
+    padding: 100px 200px 50px;
+}
+
+.scroll-area
+{
+    width: 100%;
+    height: 100%;
+    overflow-y: scroll;
+}
+
+.hidden
+{
+    display: none;
+}
