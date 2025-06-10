@@ -177,6 +177,7 @@ machines["Neutron Activator"] = {
         min: 4,
     }},
     info: "Power calculation is not implemented.",
+    overclockDoesNotAffectSpeed: true,
 };
 
 machines["Precise Auto-Assembler MT-3662"] = {
