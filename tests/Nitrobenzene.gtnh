@@ -78,7 +78,12 @@
         "recipeId": "r~Hp4YkdOsNOCRXPcRpH4YRA==",
         "voltageTier": 0,
         "crafter": "i:gregtech:gt.blockmachines:836",
-        "choices": {}
+        "choices": {
+          "saw": 3,
+          "saplings": 0,
+          "leaves": 0,
+          "fruits": 0
+        }
       }
     ],
     "collapsed": false,

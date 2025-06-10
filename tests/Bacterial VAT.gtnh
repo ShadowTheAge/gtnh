@@ -1,0 +1,45 @@
+{
+  "name": "Bacterial VAT",
+  "products": [
+    {
+      "goodsId": "i:gregtech:gt.metaitem.03:32077",
+      "amount": 1
+    }
+  ],
+  "rootGroup": {
+    "type": "recipe_group",
+    "links": {},
+    "elements": [
+      {
+        "type": "recipe",
+        "recipeId": "r~MmaWKPixPHG2DhylGKJfcw==",
+        "voltageTier": 8,
+        "choices": {}
+      },
+      {
+        "type": "recipe",
+        "recipeId": "r~Jsd1qBwqPkqIEuuDH9X1Qg==",
+        "voltageTier": 7,
+        "choices": {}
+      },
+      {
+        "type": "recipe",
+        "recipeId": "r~4HwmQ32AOFqQSUqv40Ag2w==",
+        "voltageTier": 5,
+        "choices": {}
+      },
+      {
+        "type": "recipe",
+        "recipeId": "r~a2F35cTbMZ2ma7-Bv53UqA==",
+        "voltageTier": 7,
+        "choices": {}
+      }
+    ],
+    "collapsed": false,
+    "name": "Group"
+  },
+  "settings": {
+    "minVoltage": 0,
+    "timeUnit": "sec"
+  }
+}

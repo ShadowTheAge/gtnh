@@ -1,5 +1,42 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`Solver Processing Bacterial VAT.gtnh should process without errors 1`] = `
+[
+  {
+    "crafterCount": 0.5,
+    "id": "r~MmaWKPixPHG2DhylGKJfcw==",
+    "overclockFactor": 1,
+    "perfectOverclocks": 0,
+    "powerFactor": 1,
+    "recipesPerMinute": 1,
+  },
+  {
+    "crafterCount": 0.53943218,
+    "id": "r~Jsd1qBwqPkqIEuuDH9X1Qg==",
+    "overclockFactor": 1,
+    "perfectOverclocks": 0,
+    "powerFactor": 1,
+    "recipesPerMinute": 0.53943218,
+  },
+  {
+    "crafterCount": 0.2631440588333333,
+    "id": "r~4HwmQ32AOFqQSUqv40Ag2w==",
+    "overclockFactor": 1,
+    "perfectOverclocks": 0,
+    "powerFactor": 1,
+    "recipesPerMinute": 15.78864353,
+  },
+  {
+    "crafterCount": 0.47318613,
+    "id": "r~a2F35cTbMZ2ma7-Bv53UqA==",
+    "overclockFactor": 1,
+    "perfectOverclocks": 0,
+    "powerFactor": 1,
+    "recipesPerMinute": 0.15772871,
+  },
+]
+`;
+
 exports[`Solver Processing CBD.gtnh should process without errors 1`] = `
 [
   {
@@ -1022,12 +1059,12 @@ exports[`Solver Processing Nitrobenzene.gtnh should process without errors 1`] =
     "recipesPerMinute": 3.9375,
   },
   {
-    "crafterCount": 1,
+    "crafterCount": 0.049999999999999996,
     "id": "r~Hp4YkdOsNOCRXPcRpH4YRA==",
     "overclockFactor": 1,
     "perfectOverclocks": 0,
     "powerFactor": 1,
-    "recipesPerMinute": 12,
+    "recipesPerMinute": 0.6,
   },
 ]
 `;

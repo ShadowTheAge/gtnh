@@ -13,7 +13,7 @@ export type Machine = {
     power: MachineCoefficient;
     parallels: MachineCoefficient;
     recipe?: (recipe:RecipeModel, choices:{[key:string]:number}, items:RecipeInOut[]) => RecipeInOut[];
-    canOverclock?: boolean;
+    overclockDoesNotAffectSpeed?: boolean;
     info?: string;
 }
 
@@ -122,7 +122,17 @@ machines["Bacterial Vat"] = {
     speed: 1,
     power: 1,
     parallels: 1,
-    info: "Speed depends on the fill level of the Output Hatch.",
+    info: "Assumes perfect fill rate (x1001)",
+    recipe: (recipe, choices, items) => {
+        items = createEditableCopy(items);
+        for (let i=0; i<items.length; i++) {
+            let item = items[i];
+            if ((item.type == RecipeIoType.FluidInput || item.type == RecipeIoType.FluidOutput) && item.goods instanceof Fluid) {
+                item.amount = item.amount * 1001;
+            }
+        }
+        return items;
+    },
 };
 
 machines["Circuit Assembly Line"] = {
@@ -919,7 +929,7 @@ let leavesMultipliers = [0, 1, 2, 4];
 let fruitsMultipliers = [0, 1];
 
 machines["Tree Growth Simulator"] = {
-    canOverclock: false,
+    overclockDoesNotAffectSpeed: true,
     perfectOverclock: 0,
     speed: 1,
     recipe: (recipe, choices, items) => {

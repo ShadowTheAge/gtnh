@@ -98,12 +98,13 @@ function PreProcessRecipe(recipeModel:RecipeModel, model:Model, collection:LinkC
         let overclockPower = gtRecipe.amperage;
         let perfectOverclocks = Math.min(GetParameter(machineInfo.perfectOverclock, recipeModel), overclockTiers);
         let normalOverclocks = overclockTiers - perfectOverclocks;
-        if (perfectOverclocks > 0 && machineInfo.canOverclock) {
+        let overclockDoesNotAffectSpeed = machineInfo.overclockDoesNotAffectSpeed;
+        if (perfectOverclocks > 0 && !overclockDoesNotAffectSpeed) {
             overclockSpeed = Math.pow(4, perfectOverclocks);
         }
         if (normalOverclocks > 0) {
             let coef = Math.pow(2, normalOverclocks);
-            if (machineInfo.canOverclock)
+            if (!overclockDoesNotAffectSpeed)
                 overclockSpeed *= coef;
             overclockPower *= coef;
         }
