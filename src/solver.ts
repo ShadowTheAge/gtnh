@@ -279,7 +279,7 @@ export function SolvePage(page:PageModel):void
             variables: {},
         }
         let timeUnit = page.settings.timeUnit;
-        let timeScale = timeUnit === "sec" ? 60 : timeUnit === "tick" ? 20 * 60 : 1;
+        let timeScale = timeUnit === "hour" ? 1/60: timeUnit === "sec" ? 60 : timeUnit === "tick" ? 20 * 60: 1;
         page.timeScale = timeScale;
         let collection:LinkCollection = new LinkCollection();
         for (const product of page.products) {
