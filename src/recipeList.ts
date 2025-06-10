@@ -220,7 +220,7 @@ export class RecipeList {
 
         this.actionHandlers.set("update_time_unit", (obj, event, parent) => {
             if (obj instanceof PageModel && event.type === "change") {
-                obj.settings.timeUnit = (event.target as HTMLSelectElement).value as "min" | "sec" | "tick";
+                obj.settings.timeUnit = (event.target as HTMLSelectElement).value as "hour" | "min" | "sec" | "tick";
                 UpdateProject();
             }
         });
@@ -743,6 +743,7 @@ export class RecipeList {
                 <div class="setting-item">
                     <label>Time unit:</label>
                     <select data-iid="${page.iid}" data-action="update_time_unit">
+                        <option value="hour" ${page.settings.timeUnit === "hour" ? 'selected' : ''}>Hours</option>
                         <option value="min" ${page.settings.timeUnit === "min" ? 'selected' : ''}>Minutes</option>
                         <option value="sec" ${page.settings.timeUnit === "sec" ? 'selected' : ''}>Seconds</option>
                         <option value="tick" ${page.settings.timeUnit === "tick" ? 'selected' : ''}>Ticks</option>

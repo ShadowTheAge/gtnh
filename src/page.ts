@@ -284,7 +284,7 @@ export class ProductModel extends ModelObject
 
 type Settings = {
     minVoltage: number;
-    timeUnit: "min" | "sec" | "tick";
+    timeUnit: "hour" | "min" | "sec" | "tick";
 }
 
 export class PageModel extends ModelObject
@@ -323,7 +323,7 @@ export class PageModel extends ModelObject
                 if (typeof source.settings.minVoltage === "number")
                     this.settings.minVoltage = source.settings.minVoltage;
                 if (typeof source.settings.timeUnit === "string")
-                    this.settings.timeUnit = source.settings.timeUnit as "min" | "sec" | "tick";
+                    this.settings.timeUnit = source.settings.timeUnit as "hour" | "min" | "sec" | "tick";
             }
         }
     }
