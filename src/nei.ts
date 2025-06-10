@@ -152,14 +152,14 @@ class NeiRecipeTypeInfo extends Array implements NeiRowAllocator<Recipe>
         return index;
     }
 
-    BuildRowDom(elements:Recipe[], elementWidth:number, elementHeight:number, rowY:number):string
+    BuildRowDom(elements:Recipe[], elementWidth:number, elementHeight:number, rowY:number, overrideIo?:RecipeInOut[]):string
     {
         let dom:string[] = [];
         const canSelectRecipe = showNeiCallback?.onSelectRecipe != null;
         
         for (let i=0; i<elements.length; i++) {
             let recipe = elements[i];
-            let recipeItems = recipe.items;
+            let recipeItems = overrideIo ? overrideIo : recipe.items;
             dom.push(`<div class="nei-recipe-box" style="left:${Math.round(i * elementWidth * elementSize)}px; top:${rowY*elementSize}px; width:${Math.round(elementWidth*elementSize)}px; height:${elementHeight*elementSize}px">`);
             dom.push(`<div class="nei-recipe-io">`);
             let index = this.BuildRecipeIoDom(dom, recipeItems, 0, RecipeIoType.OreDictInput, RecipeIoType.FluidInput, 0);
@@ -655,13 +655,13 @@ function switchTab(index: number) {
     RefreshNeiContents();
 }
 
-export function GetSingleRecipeDom(recipe:Recipe)
+export function GetSingleRecipeDom(recipe:Recipe, overrideIo?:RecipeInOut[])
 {
     let recipeType = recipe.recipeType;
     let builder = mapRecipeTypeToRecipeList[recipeType.name];
     let width = builder.CalculateWidth();
     let height = builder.CalculateHeight(recipe);
-    let dom = builder.BuildRowDom([recipe], width, height, 0);
+    let dom = builder.BuildRowDom([recipe], width, height, 0, overrideIo);
     return dom;
 }
 

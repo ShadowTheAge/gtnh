@@ -13,6 +13,7 @@ export type Machine = {
     power: MachineCoefficient;
     parallels: MachineCoefficient;
     recipe?: (recipe:RecipeModel, choices:{[key:string]:number}, items:RecipeInOut[]) => RecipeInOut[];
+    canOverclock?: boolean;
     info?: string;
 }
 
@@ -912,7 +913,43 @@ machines["Sparge Tower Controller"] = {
     parallels: 1,
 };
 
-machines["Tree Growth Simulator"] = notImplementedMachine;
+let sawMultipliers = [0, 1, 2, 4];
+let saplingsMultipliers = [0, 1, 4];
+let leavesMultipliers = [0, 1, 2, 4];
+let fruitsMultipliers = [0, 1];
+
+machines["Tree Growth Simulator"] = {
+    canOverclock: false,
+    perfectOverclock: 0,
+    speed: 1,
+    recipe: (recipe, choices, items) => {
+        items = createEditableCopy(items);
+        let tier = recipe.voltageTier + 1;
+        let multiplier = (2 * tier * tier - 2 * tier + 5);
+        for (let i=0; i<items.length; i++) {
+            let item = items[i];
+            if (item.type == RecipeIoType.ItemOutput && item.goods instanceof Item) {
+                if (item.slot == 0)
+                    item.amount = item.amount * sawMultipliers[choices.saw] * multiplier;
+                if (item.slot == 1)
+                    item.amount = item.amount * saplingsMultipliers[choices.saplings] * multiplier;
+                if (item.slot == 2)
+                    item.amount = item.amount * leavesMultipliers[choices.leaves] * multiplier;
+                if (item.slot == 3)
+                    item.amount = item.amount * fruitsMultipliers[choices.fruits] * multiplier;
+            }
+        }
+        return items;
+    },
+    choices: {
+        saw: {description: "Saw", choices: ["No saw", "Saw (x1)", "Buzzsaw (x2)", "Chainsaw (x4)"]},
+        saplings: {description: "Saplings", choices: ["No grafter", "Branch cutter (x1)", "Grafter (x4)"]},
+        leaves: {description: "Leaves", choices: ["No shears", "Shears (x1)", "Wire Cutter (x2)", "Automatic Snips (x4)"]},
+        fruits: {description: "Fruits", choices: ["No knife", "Knife (x1)"]}
+    },
+    power: 1,
+    parallels: 1,
+};
 
 machines["Draconic Evolution Fusion Crafter"] = {
     perfectOverclock: 0,

@@ -1,5 +1,5 @@
 import { GetSingleRecipeDom } from "./nei.js";
-import { Goods, Recipe } from "./repository.js";
+import { Goods, Recipe, RecipeInOut } from "./repository.js";
 
 export var currentTooltipElement:HTMLElement | undefined;
 const tooltip = document.getElementById("tooltip")!;
@@ -15,6 +15,7 @@ interface TooltipData {
     action?: string | null;
     goods?: Goods;
     recipe?: Recipe | null;
+    overrideIo?: RecipeInOut[];
 }
 
 export function ShowTooltip(target: HTMLElement, data: TooltipData): void {
@@ -27,7 +28,8 @@ export function ShowTooltip(target: HTMLElement, data: TooltipData): void {
     const mod = data.goods?.mod ?? null;
     const action = data.action ?? null;
     const recipe = data.recipe ?? null;
-    ShowTooltipRaw(target, header, debug, text, mod, action, recipe);
+    const overrideIo = data.overrideIo;
+    ShowTooltipRaw(target, header, debug, text, mod, action, recipe, overrideIo);
     target.addEventListener("mouseleave", () => HideTooltip(target), { once: true });
 }
 
@@ -44,7 +46,7 @@ function SetTextOptional(element:HTMLElement, data: string | null, html: boolean
     }
 }
 
-function ShowTooltipRaw(target:HTMLElement, header:string, debug:string|null, description:string|null, mod:string|null, action:string|null, recipe:Recipe|null)
+function ShowTooltipRaw(target:HTMLElement, header:string, debug:string|null, description:string|null, mod:string|null, action:string|null, recipe:Recipe|null, overrideIo?:RecipeInOut[])
 {
     tooltip.style.display = "block";
     currentTooltipElement = target;
@@ -57,7 +59,7 @@ function ShowTooltipRaw(target:HTMLElement, header:string, debug:string|null, de
     tooltipRecipe.style.display = "none";
     if (recipe) {
         tooltipRecipe.style.display = "block";
-        tooltipRecipe.innerHTML = GetSingleRecipeDom(recipe);
+        tooltipRecipe.innerHTML = GetSingleRecipeDom(recipe, overrideIo);
     }
 
     const targetRect = target.getBoundingClientRect();

@@ -98,21 +98,22 @@ function PreProcessRecipe(recipeModel:RecipeModel, model:Model, collection:LinkC
         let overclockPower = gtRecipe.amperage;
         let perfectOverclocks = Math.min(GetParameter(machineInfo.perfectOverclock, recipeModel), overclockTiers);
         let normalOverclocks = overclockTiers - perfectOverclocks;
-        if (perfectOverclocks > 0) {
+        if (perfectOverclocks > 0 && machineInfo.canOverclock) {
             overclockSpeed = Math.pow(4, perfectOverclocks);
         }
         if (normalOverclocks > 0) {
             let coef = Math.pow(2, normalOverclocks);
-            overclockSpeed *= coef;
+            if (machineInfo.canOverclock)
+                overclockSpeed *= coef;
             overclockPower *= coef;
         }
         let speedModifier = GetParameter(machineInfo.speed, recipeModel);
         //console.log({machineParallels, maxParallels, parallels, overclockTiers, overclockSpeed, overclockPower, energyModifier, speedModifier});
         recipeModel.overclockFactor = overclockSpeed * speedModifier * parallels;
         recipeModel.powerFactor = overclockPower * energyModifier / speedModifier;
-        recipeModel.parallels = parallels;
         recipeModel.overclockTiers = overclockTiers;
         recipeModel.perfectOverclocks = perfectOverclocks;
+        recipeModel.parallels = parallels;
 
         if (recipeModel.fixedCrafterCount) {
             let crafterName = `fixed_${recipeModel.iid}`;

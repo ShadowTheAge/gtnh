@@ -333,7 +333,8 @@ export class RecipeList {
                             ShowTooltip(element as HTMLElement, {
                                 header: recipe?.recipeType.name + " recipe",
                                 text: text,
-                                recipe: recipe
+                                recipe: recipe,
+                                overrideIo: obj.recipeItems
                             });
                         }
                         break;
