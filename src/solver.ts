@@ -73,40 +73,18 @@ function PreProcessRecipe(recipeModel:RecipeModel, model:Model, collection:LinkC
     recipeModel.recipe = recipe;
     let varName = `recipe_${recipeModel.iid}`;
     model.variables[varName] = {"obj":1};
-    for (const slot of recipe.items) {
-        const goods = slot.goods;
-        let amount = slot.amount * slot.probability;
-        let container = goods instanceof Item && goods.container;
-
-        if (slot.type == RecipeIoType.OreDictInput) {
-            collection.AddInputOreDict(goods, amount, varName, recipeModel);
-        } else if (container) {
-            if (slot.type == RecipeIoType.ItemOutput) {
-                collection.AddOutput(container.fluid, amount * container.amount, varName);
-                collection.AddOutput(container.empty, amount, varName);
-            } else if (slot.type == RecipeIoType.ItemInput) {
-                collection.AddInput(container.fluid, amount * container.amount, varName);
-                collection.AddInput(container.empty, amount, varName);
-            }
-        } else {
-            if (slot.type == RecipeIoType.ItemOutput || slot.type == RecipeIoType.FluidOutput) {
-                collection.AddOutput(goods, amount, varName);
-            } else if (slot.type == RecipeIoType.ItemInput || slot.type == RecipeIoType.FluidInput) {
-                collection.AddInput(goods, amount, varName);
-            }
-        }
-    }
 
     recipeModel.overclockFactor = 1;
 
     let gtRecipe = recipe.gtRecipe;
+    let machineInfo = null;
     if (gtRecipe && gtRecipe.durationTicks > 0) {
         let crafter = recipeModel.crafter ? Repository.current.GetById<Item>(recipeModel.crafter) : null;
         if (crafter != null && !recipe.recipeType.multiblocks.includes(crafter))
             crafter = null;
         if (crafter === null && recipe.recipeType.singleblocks.length == 0)
             crafter = recipe.recipeType.defaultCrafter;
-        let machineInfo = crafter ? (machines[crafter.name] || notImplementedMachine) : singleBlockMachine;
+        machineInfo = crafter ? (machines[crafter.name] || notImplementedMachine) : singleBlockMachine;
         recipeModel.multiblockCrafter = crafter;
         recipeModel.machineInfo = machineInfo;
         recipeModel.ValidateChoices(machineInfo);
@@ -141,6 +119,33 @@ function PreProcessRecipe(recipeModel:RecipeModel, model:Model, collection:LinkC
             let fixedRecipesPerMinute = recipeModel.fixedCrafterCount * recipeModel.overclockFactor / recipe.gtRecipe.durationMinutes;
             model.variables[varName][crafterName] = 1;
             model.constraints[crafterName] = {equal:fixedRecipesPerMinute};
+        }
+    }
+
+    let recipeItems = machineInfo?.recipe ? machineInfo.recipe(recipeModel, recipeModel.choices, recipe.items) : recipe.items;
+    recipeModel.recipeItems = recipeItems;
+
+    for (const slot of recipeItems) {
+        const goods = slot.goods;
+        let amount = slot.amount * slot.probability;
+        let container = goods instanceof Item && goods.container;
+
+        if (slot.type == RecipeIoType.OreDictInput) {
+            collection.AddInputOreDict(goods, amount, varName, recipeModel);
+        } else if (container) {
+            if (slot.type == RecipeIoType.ItemOutput) {
+                collection.AddOutput(container.fluid, amount * container.amount, varName);
+                collection.AddOutput(container.empty, amount, varName);
+            } else if (slot.type == RecipeIoType.ItemInput) {
+                collection.AddInput(container.fluid, amount * container.amount, varName);
+                collection.AddInput(container.empty, amount, varName);
+            }
+        } else {
+            if (slot.type == RecipeIoType.ItemOutput || slot.type == RecipeIoType.FluidOutput) {
+                collection.AddOutput(goods, amount, varName);
+            } else if (slot.type == RecipeIoType.ItemInput || slot.type == RecipeIoType.FluidInput) {
+                collection.AddInput(goods, amount, varName);
+            }
         }
     }
 }
@@ -214,7 +219,7 @@ function ApplySolutionRecipe(recipeModel:RecipeModel, solution:Solution):void
     let solutionValue = (solution[name] || 0) as number;
     recipeModel.recipesPerMinute = solutionValue;
     recipeModel.crafterCount = 0;
-    for (const item of recipe.items) {
+    for (const item of recipeModel.recipeItems) {
         var goods:RecipeObject = item.goods;
         if (item.type == RecipeIoType.OreDictInput && recipeModel.selectedOreDicts[item.goods.id])
             goods = recipeModel.selectedOreDicts[item.goods.id];

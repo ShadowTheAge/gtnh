@@ -1,4 +1,4 @@
-import { Goods, Item, Recipe, RecipeObject } from "./repository.js";
+import { Goods, Item, Recipe, RecipeInOut, RecipeObject } from "./repository.js";
 import { SolvePage } from "./solver.js";
 import { showConfirmDialog } from './dialogues.js';
 import { Machine, singleBlockMachine } from "./machines.js";
@@ -208,7 +208,7 @@ export class RecipeModel extends RecipeGroupEntry
     selectedOreDicts:{[key:string]:Item} = {};
     machineInfo:Machine = singleBlockMachine;
     multiblockCrafter:Item | null = null;
-
+    recipeItems:RecipeInOut[] = [];
 
     Visit(visitor: ModelObjectVisitor): void {
         visitor.VisitData(this, "type", this.type);

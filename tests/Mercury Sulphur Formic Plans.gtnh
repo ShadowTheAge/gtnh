@@ -188,7 +188,8 @@
         "voltageTier": 2,
         "crafter": "i:gregtech:gt.blockmachines:1000",
         "choices": {
-          "coilTier": 2
+          "coilTier": 2,
+          "muffler": 4
         }
       },
       {
@@ -197,7 +198,8 @@
         "voltageTier": 2,
         "crafter": "i:gregtech:gt.blockmachines:1000",
         "choices": {
-          "coilTier": 0
+          "coilTier": 0,
+          "muffler": 4
         }
       },
       {

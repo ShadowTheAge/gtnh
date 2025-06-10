@@ -1,5 +1,5 @@
 import { RecipeModel } from "./page.js";
-import { Goods, Item, Recipe, Repository } from "./repository.js";
+import { Fluid, Goods, Item, Recipe, RecipeInOut, RecipeIoType, Repository } from "./repository.js";
 import { TIER_LV, TIER_UEV } from "./utils.js";
 
 export type MachineCoefficient = number | ((recipe:RecipeModel, choices:{[key:string]:number}) => number);
@@ -12,6 +12,7 @@ export type Machine = {
     speed: MachineCoefficient;
     power: MachineCoefficient;
     parallels: MachineCoefficient;
+    recipe?: (recipe:RecipeModel, choices:{[key:string]:number}, items:RecipeInOut[]) => RecipeInOut[];
     info?: string;
 }
 
@@ -20,6 +21,10 @@ export type Choice = {
     choices?: string[];
     min?: number;
     max?: number;
+}
+
+function createEditableCopy(items: RecipeInOut[]): RecipeInOut[] {
+    return items.map(item => ({ ...item }));
 }
 
 let CoilTierChoice:Choice = {
@@ -271,7 +276,19 @@ machines["Electric Blast Furnace"] = {
     speed: 1,
     power: ebfPower,
     parallels: 1,
-    choices: {coilTier: CoilTierChoice},
+    recipe: (recipe, choices, items) => {   
+        for (let i=0; i<items.length; i++) {
+            let item = items[i];
+            if (item.type == RecipeIoType.FluidOutput && item.goods instanceof Fluid && 
+                (item.goods.name == "CO2 gas" || item.goods.name == "Sulfur Dioxide" || item.goods.name == "Carbon Monoxide")) {
+                items = createEditableCopy(items);
+                items[i].amount = choices.muffler * item.amount * 0.125;
+                break;
+            }
+        }
+        return items;
+    },
+    choices: {coilTier: CoilTierChoice, muffler: {description: "Muffler hatch", choices: ["LV (0%)", "MV (12.5%)", "HV (25%)", "EV (37.5%)", "IV (50%)", "LuV (62.5%)", "ZPM (75%)", "UV (87.5%)", "UHV (100%)"]}},
 };
 
 machines["Volcanus"] = {
