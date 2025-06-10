@@ -1,0 +1,187 @@
+{
+  "name": "UHV naqfuel mk3 chromatic glass",
+  "products": [
+    {
+      "goodsId": "f:bartworks:naquadah based liquid fuel mkiii",
+      "amount": 240
+    }
+  ],
+  "rootGroup": {
+    "type": "recipe_group",
+    "links": {},
+    "elements": [
+      {
+        "type": "recipe",
+        "recipeId": "r~QhS4wt8yPZKMmptzObghdg==",
+        "voltageTier": 9,
+        "choices": {
+          "coils": 0
+        }
+      },
+      {
+        "type": "recipe",
+        "recipeId": "r~ijHNmNlMNnWYUN95maIY5Q==",
+        "voltageTier": 10,
+        "crafter": "i:gregtech:gt.blockmachines:3004",
+        "choices": {
+          "laserAmperage": 1024
+        }
+      },
+      {
+        "type": "recipe",
+        "recipeId": "r~zkQq1R-lP2GrcbCcrJ7hWQ==",
+        "voltageTier": 3,
+        "crafter": "i:gregtech:gt.blockmachines:797",
+        "choices": {
+          "upgradeChip": 1
+        }
+      },
+      {
+        "type": "recipe",
+        "recipeId": "r~JR19rEADNcaWj0lcKKv9KQ==",
+        "voltageTier": 9,
+        "choices": {
+          "containmentBlockTier": 0
+        }
+      },
+      {
+        "type": "recipe",
+        "recipeId": "r~0FNN_JKBPHGNHsLUmB45Gw==",
+        "voltageTier": 9,
+        "choices": {
+          "containmentBlockTier": 0
+        }
+      },
+      {
+        "type": "recipe",
+        "recipeId": "r~z5a6-VooOteVR4Oj6wwTlQ==",
+        "voltageTier": 9,
+        "choices": {
+          "containmentBlockTier": 0
+        }
+      },
+      {
+        "type": "recipe",
+        "recipeId": "r~GO7_KDOqPemW2w7ouD12hg==",
+        "voltageTier": 9,
+        "choices": {
+          "containmentBlockTier": 0
+        }
+      },
+      {
+        "type": "recipe",
+        "recipeId": "r~NhtaQxslPG2tGdadkgikKA==",
+        "voltageTier": 6,
+        "crafter": "i:gregtech:gt.blockmachines:876",
+        "choices": {}
+      },
+      {
+        "type": "recipe",
+        "recipeId": "r~S-R_2H6ANTCI4lSl9Yq_cQ==",
+        "voltageTier": 6,
+        "crafter": "i:gregtech:gt.blockmachines:876",
+        "choices": {}
+      },
+      {
+        "type": "recipe",
+        "recipeId": "r~ECtNdjKWNSOzBEumemkhBw==",
+        "voltageTier": 0,
+        "choices": {}
+      },
+      {
+        "type": "recipe",
+        "recipeId": "r~ZXx8BsKdMI6paBkbIlO79A==",
+        "voltageTier": 0,
+        "choices": {}
+      },
+      {
+        "type": "recipe",
+        "recipeId": "r~AOpvnEuBOZySKTAMP_X4qg==",
+        "voltageTier": 2,
+        "choices": {}
+      },
+      {
+        "type": "recipe",
+        "recipeId": "r~mpOYUZvyOmmgoWz8VPDqmw==",
+        "voltageTier": 2,
+        "choices": {}
+      },
+      {
+        "type": "recipe",
+        "recipeId": "r~3hB9NLQJOrunJOvXI7KujQ==",
+        "voltageTier": 6,
+        "choices": {}
+      },
+      {
+        "type": "recipe",
+        "recipeId": "r~kkvnKebyO6KaoKKY2GCHXA==",
+        "voltageTier": 6,
+        "choices": {}
+      },
+      {
+        "type": "recipe",
+        "recipeId": "r~KcV7Okx_PX2io84jpBy7Qg==",
+        "voltageTier": 6,
+        "crafter": "i:gregtech:gt.blockmachines:963",
+        "choices": {
+          "coilTier": 9
+        }
+      },
+      {
+        "type": "recipe",
+        "recipeId": "r~cXEm-XdKOxyUAWAJTlI7zA==",
+        "voltageTier": 6,
+        "crafter": "i:gregtech:gt.blockmachines:963",
+        "choices": {
+          "coilTier": 9
+        }
+      },
+      {
+        "type": "recipe",
+        "recipeId": "r~ARBcMgYAP6eAIwsaG47tRQ==",
+        "voltageTier": 2,
+        "choices": {}
+      },
+      {
+        "type": "recipe",
+        "recipeId": "r~QAUR6L3pP7OpA6j1OJ_PbA==",
+        "voltageTier": 4,
+        "choices": {}
+      },
+      {
+        "type": "recipe",
+        "recipeId": "r~KqTT3JwJOjGRJzmt8-sJtg==",
+        "voltageTier": 3,
+        "choices": {}
+      },
+      {
+        "type": "recipe",
+        "recipeId": "r~RAwtmlsAMCmmaqGe27A2PA==",
+        "voltageTier": 3,
+        "choices": {}
+      },
+      {
+        "type": "recipe",
+        "recipeId": "r~PAzUxVKGPJGf7DmSbhrnEA==",
+        "voltageTier": 0,
+        "choices": {}
+      },
+      {
+        "type": "recipe",
+        "recipeId": "r~rcPNnvRDNmyj6qmxnD66iQ==",
+        "voltageTier": 4,
+        "crafter": "i:gregtech:gt.blockmachines:1000",
+        "choices": {
+          "coilTier": 9,
+          "muffler": 0
+        }
+      }
+    ],
+    "collapsed": false,
+    "name": "Group"
+  },
+  "settings": {
+    "minVoltage": 0,
+    "timeUnit": "sec"
+  }
+}
