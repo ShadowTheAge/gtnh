@@ -838,7 +838,17 @@ machines["ExxonMobil Chemical Plant"] = {
     power: 1,
     parallels: (recipe, choices) => (choices.pipeCasingTier + 1) * 2,
     choices: {coilTier: CoilTierChoice, pipeCasingTier: {description: "Pipe Casing Tier", choices: ["T1: Bronze", "T2: Steel", "T3: Titanium", "T4: Tungstensteel"]}},
-    info: "Catalyst logic not implemented.",
+    recipe: (recipe, choices, items) => {
+        if (choices.coilTier >= 10 && choices.pipeCasingTier >= 3)
+            return items;
+        let catalystNumber = items.findIndex(item => item.type == RecipeIoType.ItemInput && item.goods instanceof Item && item.goods.name.endsWith("Catalyst"));
+        if (catalystNumber == -1)
+            return items;
+        let catalystUsage = (1 - 0.2 * choices.pipeCasingTier) / 50;
+        items = createEditableCopy(items);
+        items[catalystNumber].amount = catalystUsage;
+        return items;
+    }
 };
 
 machines["Thorium Reactor [LFTR]"] = {

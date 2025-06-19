@@ -1,0 +1,36 @@
+{
+  "name": "Catalyst",
+  "products": [
+    {
+      "goodsId": "i:miscutils:oreFluoriteF:0",
+      "amount": 100
+    }
+  ],
+  "rootGroup": {
+    "type": "recipe_group",
+    "links": {},
+    "elements": [
+      {
+        "type": "recipe",
+        "recipeId": "r~ruDnThbAMPecWrP1xC62-A==",
+        "voltageTier": 3,
+        "choices": {
+          "coilTier": 0,
+          "pipeCasingTier": 3
+        }
+      },
+      {
+        "type": "recipe",
+        "recipeId": "r~TfozukvLNvOSEiUJuxoQxA==",
+        "voltageTier": 4,
+        "choices": {}
+      }
+    ],
+    "collapsed": false,
+    "name": "Group"
+  },
+  "settings": {
+    "minVoltage": 0,
+    "timeUnit": "min"
+  }
+}

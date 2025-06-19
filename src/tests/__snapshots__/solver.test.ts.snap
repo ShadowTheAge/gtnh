@@ -170,6 +170,27 @@ exports[`Solver Processing CBD.gtnh should process without errors 1`] = `
 ]
 `;
 
+exports[`Solver Processing Catalyst.gtnh should process without errors 1`] = `
+[
+  {
+    "crafterCount": 0.41666666666666663,
+    "id": "r~ruDnThbAMPecWrP1xC62-A==",
+    "overclockFactor": 2,
+    "perfectOverclocks": 0,
+    "powerFactor": 1,
+    "recipesPerMinute": 5,
+  },
+  {
+    "crafterCount": 0.008,
+    "id": "r~TfozukvLNvOSEiUJuxoQxA==",
+    "overclockFactor": 1,
+    "perfectOverclocks": 0,
+    "powerFactor": 1,
+    "recipesPerMinute": 0.004,
+  },
+]
+`;
+
 exports[`Solver Processing EG+CBD.gtnh should process without errors 1`] = `
 [
   {
