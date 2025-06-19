@@ -57,17 +57,21 @@ export const TIER_MAX = 13;
 
 
 export function formatAmount(amount: number): string {
-    if (amount === 0) {
-        return "0";
+    if (amount < 0.001) {
+        if (amount === 0)
+            return "0";
+        if (amount < 0)
+            return "-" + formatAmount(-amount);
+        return "<0.001";
     }
     
     let suffix = '';
     let divisor = 1;
     
-    if (amount >= 1e11) {
+    if (amount >= 1e10) {
         suffix = 'G';
         divisor = 1e9;
-    } else if (amount >= 1e8) {
+    } else if (amount >= 1e7) {
         suffix = 'M';
         divisor = 1e6;
     } else if (amount >= 1e5) {
