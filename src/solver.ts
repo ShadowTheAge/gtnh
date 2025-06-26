@@ -1,7 +1,7 @@
 import { Model, Solution } from "./types/javascript-lp-solver.js";
 import { PageModel, RecipeGroupModel, RecipeModel, ProductModel, FlowInformation, LinkAlgorithm } from './page.js';
 import { Goods, Item, OreDict, Recipe, RecipeIoType, RecipeObject, Repository } from "./repository.js";
-import { singleBlockMachine, MachineCoefficient, machines, notImplementedMachine } from "./machines.js";
+import { singleBlockMachine, MachineCoefficient, machines, notImplementedMachine, GetSingleBlockMachine } from "./machines.js";
 import { voltageTier } from "./utils.js";
 
 class LinkCollection {
@@ -84,7 +84,8 @@ function PreProcessRecipe(recipeModel:RecipeModel, model:Model, collection:LinkC
             crafter = null;
         if (crafter === null && recipe.recipeType.singleblocks.length == 0)
             crafter = recipe.recipeType.defaultCrafter;
-        machineInfo = crafter ? (machines[crafter.name] || notImplementedMachine) : singleBlockMachine;
+        let isSingleblock = !crafter;
+        machineInfo = crafter ? (machines[crafter.name] || notImplementedMachine) : GetSingleBlockMachine(recipe.recipeType);
         recipeModel.multiblockCrafter = crafter;
         recipeModel.machineInfo = machineInfo;
         recipeModel.ValidateChoices(machineInfo);
@@ -93,7 +94,8 @@ function PreProcessRecipe(recipeModel:RecipeModel, model:Model, collection:LinkC
         let energyModifier = GetParameter(machineInfo.power, recipeModel);
         let maxParallels = Math.max(1, Math.floor(actualVoltage / (gtRecipe.voltage * energyModifier * gtRecipe.amperage)));
         let parallels = Math.min(maxParallels, machineParallels);
-        let overclockTiers = Math.min(recipeModel.voltageTier - gtRecipe.voltageTier, Math.floor(Math.log2(maxParallels / parallels) / 2));
+        let tierDifference = recipeModel.voltageTier - gtRecipe.voltageTier;
+        let overclockTiers = isSingleblock ? tierDifference : Math.min(tierDifference, Math.floor(Math.log2(maxParallels / parallels) / 2));
         let overclockSpeed = 1;
         let overclockPower = gtRecipe.amperage;
         let perfectOverclocks = Math.min(GetParameter(machineInfo.perfectOverclock, recipeModel), overclockTiers);

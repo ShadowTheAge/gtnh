@@ -1,5 +1,5 @@
 import { RecipeModel } from "./page.js";
-import { Fluid, Goods, Item, Recipe, RecipeInOut, RecipeIoType, Repository } from "./repository.js";
+import { Fluid, Goods, Item, Recipe, RecipeInOut, RecipeIoType, RecipeType, Repository } from "./repository.js";
 import { TIER_LV, TIER_UEV } from "./utils.js";
 
 export type MachineCoefficient = number | ((recipe:RecipeModel, choices:{[key:string]:number}) => number);
@@ -45,6 +45,21 @@ export const singleBlockMachine:Machine = {
     power: 1,
     parallels: 1,
 };
+
+const singleBlockMachineWith22Overclock:Machine = {
+    perfectOverclock: 0,
+    speed: 1,
+    power: (recipe, choices) => {
+        return Math.pow(0.5, recipe.voltageTier);
+    },
+    parallels: 1,
+};
+
+export function GetSingleBlockMachine(recipeType:RecipeType):Machine {
+    if (recipeType.name == "Mass Fabrication")
+        return singleBlockMachineWith22Overclock;
+    return singleBlockMachine;
+}
 
 function IsRecipeType(recipe:RecipeModel, type:string):boolean {
     return recipe.recipe ? recipe.recipe.recipeType.name == type : false;

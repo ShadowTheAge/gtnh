@@ -2152,6 +2152,19 @@ exports[`Solver Processing UHV naqfuel mk3 chromatic glass.gtnh should process w
 ]
 `;
 
+exports[`Solver Processing UUM.gtnh should process without errors 1`] = `
+[
+  {
+    "crafterCount": 83.64583333333334,
+    "id": "r~ptA6HcXEOHe98CzXBlwiuA==",
+    "overclockFactor": 8,
+    "perfectOverclocks": 0,
+    "powerFactor": 8,
+    "recipesPerMinute": 1000,
+  },
+]
+`;
+
 exports[`Solver Processing Vinyl chloride.gtnh should process without errors 1`] = `
 [
   {

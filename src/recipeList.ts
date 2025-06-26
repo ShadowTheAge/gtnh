@@ -328,7 +328,7 @@ export class RecipeList {
                                 text = `${obj.parallels} parallels\n` +
                                        `${overclocksText} ${initialTier == finalTier ? `(${initialTierName})` : `(${initialTierName} → ${finalTierName})`}\n` +
                                        text + `\n${formatAmount(obj.overclockFactor)}x machine speed\n` +
-                                       `${formatAmount(obj.powerFactor)}x eu per recipe`;
+                                       `${formatAmount(obj.powerFactor/(obj.recipe?.gtRecipe?.amperage ?? 1))}x eu per recipe`;
                             }
                             ShowTooltip(element as HTMLElement, {
                                 header: recipe?.recipeType.name + " recipe",

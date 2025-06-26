@@ -1,0 +1,27 @@
+{
+  "name": "UUM",
+  "products": [
+    {
+      "goodsId": "f:IC2:ic2uumatter",
+      "amount": 1000
+    }
+  ],
+  "rootGroup": {
+    "type": "recipe_group",
+    "links": {},
+    "elements": [
+      {
+        "type": "recipe",
+        "recipeId": "r~ptA6HcXEOHe98CzXBlwiuA==",
+        "voltageTier": 3,
+        "choices": {}
+      }
+    ],
+    "collapsed": false,
+    "name": "Group"
+  },
+  "settings": {
+    "minVoltage": 0,
+    "timeUnit": "min"
+  }
+}
