@@ -252,6 +252,10 @@ a {
     text-decoration-thickness: 2px;
 }
 
+.text-small a {
+    text-decoration: none;
+}
+
 a:hover {
     color: #FFD700;
     text-decoration: underline;
