@@ -12,7 +12,7 @@
     gap: 12px;
     flex-shrink: 0;
     overflow-y: auto;
-    background-color: #C6C6C6;
+    background-color: rgba(198, 198, 198);
     color: #3F3F3F;
     transition: transform 0.15s ease;
 }
@@ -27,19 +27,9 @@
 }
 
 .menu-header {
-    padding-bottom: 16px;
-    border-bottom: 1px solid #ddd;
-}
-
-.logo {
     position: relative;
     font-size: 24px;
     font-weight: bold;
-    height: 200px;
-    background-image: url("https://www.gtnewhorizons.com/images/big_gnd.webp");
-    background-repeat: no-repeat;
-    background-size: auto 200px;
-    background-position: center;
     text-align: center;
 }
 
