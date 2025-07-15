@@ -137,13 +137,13 @@ namespace Source
                 item.tooltip ??= "";
                 var parts = item.tooltip.Split('\n');
                 builder.Clear();
-                for (var i = 2; i < parts.Length; i++)
+                for (var i = 1; i < parts.Length-1; i++)
                 {
                     var part = parts[i];
                     if ((part.Contains("press", StringComparison.OrdinalIgnoreCase) || part.Contains("hold", StringComparison.OrdinalIgnoreCase)) &&
                         (part.Contains("ctrl", StringComparison.OrdinalIgnoreCase) || part.Contains("shift", StringComparison.OrdinalIgnoreCase) || part.Contains("control", StringComparison.OrdinalIgnoreCase)))
                         continue;
-                    if (i == 2 && part == "")
+                    if (i == 1 && part == "")
                         continue;
 
                     builder.Append(part).Append('\n');
