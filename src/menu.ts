@@ -1,6 +1,20 @@
-import { PageModel, serializer, SetCurrentPage, addProjectChangeListener, page, UpdateProject } from './page.js';
+import { PageModel, serializer, SetCurrentPage, addProjectChangeListener, page, UpdateProject, ModelObjectValidator } from './page.js';
 import { showConfirmDialog } from './dialogues.js';
 import { ShowNei, ShowNeiMode } from "./nei.js";
+
+async function ValidateAndNotify(page: PageModel): Promise<void> {
+    const validator = new ModelObjectValidator();
+    const errors = validator.Validate(page);
+    
+    if (errors.missingRecipe) {
+        await showConfirmDialog(
+            `The page you are about to load contains ${errors.missingRecipe} missing recipe(s). This was probably caused by changes to recipe ingredients or circuits. Replace or delete the missing recipes.`,
+            "OK",
+            null,
+            null
+        );
+    }
+}
 
 export class PageManager {
     private pages: string[] = [];
@@ -161,6 +175,7 @@ export class PageManager {
             const stored = localStorage.getItem(`p:${pageName}`);
             if (stored) {
                 page = new PageModel(JSON.parse(stored));
+                ValidateAndNotify(page);
                 page.name = pageName;
                 this.pageCache.set(pageName, page);
                 // Initialize history with the loaded state
@@ -238,6 +253,7 @@ export class PageManager {
             const json = new TextDecoder().decode(decompressed);
             console.log("Loaded page", json);
             const importedPage = new PageModel(JSON.parse(json));
+            await ValidateAndNotify(importedPage);
             window.location.hash = "";
             this.importPage(importedPage);
         } catch (e) {
@@ -352,6 +368,7 @@ export class PageManager {
                     const text = await file.text();
                     const json = JSON.parse(text);
                     const pageModel = new PageModel(json);
+                    await ValidateAndNotify(pageModel);
                     this.importPage(pageModel);
                 } catch (error) {
                     console.error('Failed to load file:', error);

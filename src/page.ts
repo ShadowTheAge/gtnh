@@ -1,4 +1,4 @@
-import { Goods, Item, Recipe, RecipeInOut, RecipeObject } from "./repository.js";
+import { Goods, Item, Recipe, RecipeInOut, RecipeObject, Repository } from "./repository.js";
 import { SolvePage } from "./solver.js";
 import { showConfirmDialog } from './dialogues.js';
 import { Machine, singleBlockMachine } from "./machines.js";
@@ -54,6 +54,35 @@ class ModelObjectSerializer extends ModelObjectVisitor
         this.current = {};
         obj.Visit(this);
         return this.current;
+    }
+}
+
+type ValidationError = {
+    [key: string]: number;
+}
+
+export class ModelObjectValidator extends ModelObjectVisitor {
+    errors: ValidationError = {};
+
+    ValidationError(errorType: string): void {
+        this.errors[errorType] = (this.errors[errorType] || 0) + 1;
+    }
+
+    VisitData(parent: ModelObject, key: string, data: any): void {}
+
+    VisitObject(parent: ModelObject, key: string, obj: ModelObject): void {
+        if (obj instanceof RecipeModel) {
+            if (!Repository.current.GetById(obj.recipeId)) {
+                this.ValidationError("missingRecipe");
+            }
+        }
+        obj.Visit(this);
+    }
+
+    Validate(obj: ModelObject): ValidationError {
+        this.errors = {};
+        obj.Visit(this);
+        return this.errors;
     }
 }
 

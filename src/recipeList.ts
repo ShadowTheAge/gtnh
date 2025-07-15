@@ -282,6 +282,24 @@ export class RecipeList {
                 UpdateProject();
             }
         });
+
+        this.actionHandlers.set("change_recipe", (obj, event, parent) => {
+            if (obj instanceof RecipeModel && event.type === "click") {
+                const callback: ShowNeiCallback = {
+                    onSelectRecipe: (recipe: Recipe) => {
+                        let mustResetCrafter = obj.multiblockCrafter && recipe.recipeType.multiblocks.includes(obj.multiblockCrafter);
+                        obj.recipeId = recipe.id;
+                        obj.voltageTier = Math.max(recipe.gtRecipe?.voltageTier ?? 0, obj.voltageTier);
+                        if (mustResetCrafter) {
+                            obj.crafter = undefined;
+                            obj.choices = {};
+                        }
+                        UpdateProject();
+                    }
+                };
+                ShowNei(null, ShowNeiMode.Production, callback);
+            }
+        });
     }
 
     private setupGlobalEventListeners() {
@@ -337,6 +355,12 @@ export class RecipeList {
                                 overrideIo: obj.recipeItems
                             });
                         }
+                        break;
+                    case "change_recipe":
+                        ShowTooltip(element as HTMLElement, {
+                            header: "Change Recipe",
+                            text: "Click to select a different recipe"
+                        });
                         break;
                     case "link":
                         ShowTooltip(element as HTMLElement, {
@@ -544,7 +568,10 @@ export class RecipeList {
     private renderRecipeShortInfo(recipe: Recipe | null, recipeModel: RecipeModel, group: RecipeGroupModel): string {
         if (recipe === null) {
             return `
-                <td colspan="2">Unknown recipe</td>
+                <td colspan="2">
+                    <span style="color: red;">Missing recipe</span>
+                    <div class="text-small">This recipe was deleted or changed. Replace or remove it.</div>
+                </td>
             `;
         }
         let crafter = recipeModel.multiblockCrafter ?? recipe.recipeType.singleblocks[recipeModel.voltageTier] ?? recipe.recipeType.defaultCrafter;
@@ -648,6 +675,7 @@ export class RecipeList {
                 ${this.renderIoInfo(recipeModel.flow, group)}
                 <td>
                     <div class="icon-container">
+                        <button class="delete-btn" data-iid="${recipeModel.iid}" data-action="change_recipe" data-tooltip="change_recipe">↔</button>
                         <button class="delete-btn" data-iid="${recipeModel.iid}" data-action="delete_recipe">x</button>
                     </div>
                 </td>
