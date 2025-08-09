@@ -283,6 +283,16 @@ export class RecipeList {
             }
         });
 
+        this.actionHandlers.set("accept_recipe_change", (obj, event, parent) => {
+            if (obj instanceof RecipeModel && event.type === "click") {
+                const recipe = Repository.current.GetById<Recipe>(obj.recipeId);
+                if (recipe) {
+                    obj.recipeId = recipe.id;
+                    UpdateProject();
+                }
+            }
+        });
+
         this.actionHandlers.set("change_recipe", (obj, event, parent) => {
             if (obj instanceof RecipeModel && event.type === "click") {
                 const callback: ShowNeiCallback = {
@@ -605,6 +615,10 @@ export class RecipeList {
                 </select>
                 ${shortInfoContent} 
             `;
+        }
+
+        if (recipe.id !== recipeModel.recipeId) {
+            shortInfoContent = `<div><span style="color: orange;">This recipe was changed!</span> <a href="#" data-iid="${recipeModel.iid}" data-action="accept_recipe_change">Accept</a></div>${shortInfoContent}`;
         }
 
         // Render machine choices if they exist

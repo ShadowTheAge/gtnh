@@ -5,10 +5,24 @@ import { ShowNei, ShowNeiMode } from "./nei.js";
 async function ValidateAndNotify(page: PageModel): Promise<void> {
     const validator = new ModelObjectValidator();
     const errors = validator.Validate(page);
-    
-    if (errors.missingRecipe) {
+
+    const missing = errors.missingRecipe || 0;
+    const changed = errors.changedRecipe || 0;
+
+    if (missing > 0 || changed > 0) {
+        let message = "The page you are about to load contains:";
+        if (missing > 0) {
+            message += `\n- ${missing} missing recipe(s)`;
+            message += `\nA missing recipe is a recipe that was deleted or substantially changed. These recipes will be displayed as missing and must be deleted or replaced.\n`;
+        }
+        if (changed > 0) {
+            message += `\n- ${changed} changed recipe(s)`;
+            message += `\nA changed recipe is a recipe that was changed a bit and might break, but uses and produces the same items as before. These recipes were replaced with the best matching recipes.\n`;
+        }
+        message += `This is likely caused by the game version change.`;
+
         await showConfirmDialog(
-            `The page you are about to load contains ${errors.missingRecipe} missing recipe(s). This was probably caused by changes to recipe ingredients or circuits. Replace or delete the missing recipes.`,
+            message,
             "OK",
             null,
             null

@@ -72,8 +72,11 @@ export class ModelObjectValidator extends ModelObjectVisitor {
 
     VisitObject(parent: ModelObject, key: string, obj: ModelObject): void {
         if (obj instanceof RecipeModel) {
-            if (!Repository.current.GetById(obj.recipeId)) {
+            let recipe = Repository.current.GetById(obj.recipeId);
+            if (!recipe) {
                 this.ValidationError("missingRecipe");
+            } else if (obj.recipeId !== recipe.id) {
+                this.ValidationError("changedRecipe");
             }
         }
         obj.Visit(this);
