@@ -307,7 +307,7 @@ machines["Electric Blast Furnace"] = {
         for (let i=0; i<items.length; i++) {
             let item = items[i];
             if (item.type == RecipeIoType.FluidOutput && item.goods instanceof Fluid && 
-                (item.goods.name == "CO2 gas" || item.goods.name == "Sulfur Dioxide" || item.goods.name == "Carbon Monoxide")) {
+                (item.goods.name == "CO2 Gas" || item.goods.name == "Sulfur Dioxide" || item.goods.name == "Carbon Monoxide")) {
                 items = createEditableCopy(items);
                 items[i].amount = choices.muffler * item.amount * 0.125;
                 break;
