@@ -1049,3 +1049,56 @@ machines["FusionTech MK V"] = {
     parallels: 1,
     doesNotNormalOverclock: true,
 };
+
+machines["Compact Fusion Computer MK-I Prototype"] = {
+    perfectOverclock: (recipe) => (Math.max(0, TIER_LUV - (recipe.recipe?.gtRecipe?.voltageTier || 0))),
+    speed: 1,
+    power: 1,
+    parallels: 64,
+    does22Overclocks: true,
+    doesNotNormalOverclock: true,
+};
+
+function getCompactFusionParallel(recipe:RecipeModel, buckets:number[][]) {
+    const startupCost = recipe.getFusionStartupCost();
+    for (const [threshold, parallel] of buckets) {
+        if (startupCost < threshold) {
+            return parallel;
+        }
+    }
+    return 1;
+}
+
+machines["Compact Fusion Computer MK-II"] = {
+    perfectOverclock: (recipe) => (Math.max(0, TIER_ZPM - (recipe.recipe?.gtRecipe?.voltageTier || 0))),
+    speed: 1,
+    power: 1,
+    parallels: (recipe) => getCompactFusionParallel(recipe, [[160_000_000, 128], [Number.POSITIVE_INFINITY, 64]]),
+    does22Overclocks: true,
+    doesNotNormalOverclock: true,
+};
+
+machines["Compact Fusion Computer MK-III"] = {
+    perfectOverclock: (recipe) => (Math.max(0, TIER_UV - (recipe.recipe?.gtRecipe?.voltageTier || 0))),
+    speed: 1,
+    power: 1,
+    parallels: (recipe) => getCompactFusionParallel(recipe, [[160_000_000, 192], [320_000_000, 128], [Number.POSITIVE_INFINITY, 64]]),
+    does22Overclocks: true,
+    doesNotNormalOverclock: true,
+};
+
+machines["Compact Fusion Computer MK-IV Prototype"] = {
+    perfectOverclock: (recipe) => (Math.max(0, TIER_UHV - (recipe.recipe?.gtRecipe?.voltageTier || 0))),
+    speed: 1,
+    power: 1,
+    parallels: (recipe) => getCompactFusionParallel(recipe, [[160_000_000, 256], [320_000_000, 192], [640_000_000, 128], [Number.POSITIVE_INFINITY, 64]]),
+    doesNotNormalOverclock: true,
+};
+
+machines["Compact Fusion Computer MK-V"] = {
+    perfectOverclock: (recipe) => (Math.max(0, TIER_UEV - (recipe.recipe?.gtRecipe?.voltageTier || 0))),
+    speed: 1,
+    power: 1,
+    parallels: (recipe) => getCompactFusionParallel(recipe, [[160_000_000, 320], [320_000_000, 256], [640_000_000, 192], [1_200_000_000, 128], [Number.POSITIVE_INFINITY, 64]]),
+    doesNotNormalOverclock: true,
+};
