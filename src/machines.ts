@@ -727,7 +727,7 @@ machines["Large Thermal Refinery"] = {
 machines["Transcendent Plasma Mixer"] = {
     perfectOverclock: 0,
     speed: 1,
-    power: 1,
+    power: 10, // https://github.com/GTNewHorizons/GT5-Unofficial/blob/6f40a0564b57a104f3fd50a11ebd8002d236e4f2/src/main/java/gregtech/common/tileentities/machines/multi/MTETranscendentPlasmaMixer.java#L191
     parallels: (recipe, choices) => choices.parallels,
     choices: {parallels: {description: "Parallels", min: 1}}
 };
