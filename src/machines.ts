@@ -1,6 +1,6 @@
 import { RecipeModel } from "./page.js";
 import { Fluid, Goods, Item, Recipe, RecipeInOut, RecipeIoType, RecipeType, Repository } from "./repository.js";
-import { TIER_LV, TIER_UEV } from "./utils.js";
+import { TIER_LV, TIER_LUV, TIER_ZPM, TIER_UV, TIER_UHV, TIER_UEV } from "./utils.js";
 
 export type MachineCoefficient = number | ((recipe:RecipeModel, choices:{[key:string]:number}) => number);
 
@@ -14,7 +14,9 @@ export type Machine = {
     parallels: MachineCoefficient;
     recipe?: (recipe:RecipeModel, choices:{[key:string]:number}, items:RecipeInOut[]) => RecipeInOut[];
     overclockDoesNotAffectSpeed?: boolean;
-    doesNotOverclock?: boolean;
+    doesNotPerfectOverclock?: boolean;
+    doesNotNormalOverclock?: boolean;
+    does22Overclocks?: boolean;
     info?: string;
 }
 
@@ -729,7 +731,8 @@ machines["Transcendent Plasma Mixer"] = {
     perfectOverclock: 0,
     speed: 1,
     power: 1,
-    doesNotOverclock: true,
+    doesNotPerfectOverclock: true,
+    doesNotNormalOverclock: true,
     parallels: (recipe, choices) => choices.parallels,
     choices: {parallels: {description: "Parallels", min: 1}}
 };
@@ -1002,4 +1005,47 @@ machines["Large Sifter Control Block"] = {
     speed: 5,
     power: 0.75,
     parallels: (recipe) => (recipe.voltageTier + 1) * 4,
+};
+
+machines["Fusion Control Computer Mark I"] = {
+    perfectOverclock: (recipe) => (Math.max(0, TIER_LUV - (recipe.recipe?.gtRecipe?.voltageTier || 0))),
+    speed: 1,
+    power: 1,
+    parallels: 1,
+    does22Overclocks: true,
+    doesNotNormalOverclock: true,
+};
+
+machines["Fusion Control Computer Mark II"] = {
+    perfectOverclock: (recipe) => (Math.max(0, TIER_ZPM - (recipe.recipe?.gtRecipe?.voltageTier || 0))),
+    speed: 1,
+    power: 1,
+    parallels: 1,
+    does22Overclocks: true,
+    doesNotNormalOverclock: true,
+};
+
+machines["Fusion Control Computer Mark III"] = {
+    perfectOverclock: (recipe) => (Math.max(0, TIER_UV - (recipe.recipe?.gtRecipe?.voltageTier || 0))),
+    speed: 1,
+    power: 1,
+    parallels: 1,
+    does22Overclocks: true,
+    doesNotNormalOverclock: true,
+};
+
+machines["FusionTech MK IV"] = {
+    perfectOverclock: (recipe) => (Math.max(0, TIER_UHV - (recipe.recipe?.gtRecipe?.voltageTier || 0))),
+    speed: 1,
+    power: 1,
+    parallels: 1,
+    doesNotNormalOverclock: true,
+};
+
+machines["FusionTech MK V"] = {
+    perfectOverclock: (recipe) => (Math.max(0, TIER_UEV - (recipe.recipe?.gtRecipe?.voltageTier || 0))),
+    speed: 1,
+    power: 1,
+    parallels: 1,
+    doesNotNormalOverclock: true,
 };
