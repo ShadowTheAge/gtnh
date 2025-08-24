@@ -50,6 +50,7 @@ public class OldRecipesGenerator
     
     public static void PopulateOldRecipes(Repository repository, string oldDataBin)
     {
+        Console.WriteLine("Calculating recipe remaps...");
         using var fs = File.OpenRead(oldDataBin);
         using var unpacked = new MemoryStream();
         using var zip = new GZipStream(fs, CompressionMode.Decompress);
@@ -57,6 +58,7 @@ public class OldRecipesGenerator
         var dataBin = new Span<byte>(unpacked.GetBuffer(), 0, (int)unpacked.Length);
         var intBuffer = MemoryMarshal.Cast<byte, int>(dataBin);
         var allRecipes = ReadSlice(intBuffer, 5);
+        var dataVersion = intBuffer[0];
 
         var recipesById = new Dictionary<string, Recipe>();
         var recipesByHash = new Dictionary<string, Recipe>();
@@ -80,7 +82,8 @@ public class OldRecipesGenerator
         }
 
         var missingRecipes = 0;
-        var remappedRecipes = 0;
+        var newRemaps = 0;
+        var remappedRecipes = new Dictionary<string, Recipe>();
         foreach (var recipe in allRecipes)
         {
             var id = ReadString(dataBin, intBuffer, recipe + 4);
@@ -113,15 +116,34 @@ public class OldRecipesGenerator
             if (recipesByHash.TryGetValue(Convert.ToBase64String(hash1.GetCurrentHash()), out var existingRecipe) 
                 || recipesByHash.TryGetValue(Convert.ToBase64String(hash2.GetCurrentHash()), out existingRecipe))
             {
-                remappedRecipes++;
+                remappedRecipes[id] = existingRecipe;
                 repository.remaps.Add(new RecipeRemap {from = id, to = existingRecipe});
+                newRemaps++;
             } 
             else
             {
                 missingRecipes++;
             }
         }
+
+        var oldRemaps = 0;
+        if (dataVersion >= 4)
+        {
+            var oldRemap = ReadSlice(intBuffer, 7);
+            foreach (var remap in oldRemap)
+            {
+                var idFrom = ReadString(dataBin, intBuffer, intBuffer[remap]);
+                var idTo = ReadString(dataBin, intBuffer, intBuffer[remap+1] + 4);
+
+                var recipeTo = recipesById.GetValueOrDefault(idTo) ?? remappedRecipes.GetValueOrDefault(idTo);
+                if (recipeTo == null)
+                    continue;
+                remappedRecipes[idFrom] = recipeTo;
+                repository.remaps.Add(new RecipeRemap {from = idFrom, to = recipeTo});
+                oldRemaps++;
+            }
+        }
         
-        Console.WriteLine("Missing recipes: "+missingRecipes+", Remapped recipes: "+remappedRecipes);
+        Console.WriteLine("Missing recipes: "+missingRecipes+", Remapped recipes: "+newRemaps+", Old remaps: "+oldRemaps);
     }
 }

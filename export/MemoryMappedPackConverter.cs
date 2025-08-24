@@ -103,6 +103,7 @@ namespace Source
             WriteInt(recipeType.voltageTier);
             WriteInt((recipeType.cleanRoom ? 1 : 0) + (recipeType.lowGravity ? 2 : 0));
             WriteStringRef(recipeType.additionalInfo);
+            WriteInt(recipeType.circuitConflicts);
         }
 
         private void WriteIndexBits(IndexableObject obj)

@@ -152,6 +152,27 @@ class NeiRecipeTypeInfo extends Array implements NeiRowAllocator<Recipe>
         return index;
     }
 
+    FormatCircuitConflicts(circuitConflicts: number): string {
+        if (circuitConflicts === 0) {
+            return "No recipe conflicts";
+        }
+
+        const conflictingCircuits: number[] = [];
+        let n = circuitConflicts;
+        while (n !== 0) {
+            // Get position of rightmost set bit
+            const pos = Math.log2(n & -n);
+            conflictingCircuits.push(pos);
+            // Remove rightmost set bit
+            n = n & (n - 1);
+        }
+
+        if (conflictingCircuits.length === 1) {
+            return `Recipe conflicts on circuit #${conflictingCircuits[0]}`;
+        }
+        return `Recipe conflicts on circuits #${conflictingCircuits.join(", #")}`;
+    }
+
     BuildRowDom(elements:Recipe[], elementWidth:number, elementHeight:number, rowY:number, overrideIo?:RecipeInOut[]):string
     {
         let dom:string[] = [];
@@ -185,6 +206,7 @@ class NeiRecipeTypeInfo extends Array implements NeiRowAllocator<Recipe>
                     dom.push(recipe.gtRecipe.additionalInfo);
                     dom.push(`</span>`);
                 }
+                dom.push(`<span class="text-small">${this.FormatCircuitConflicts(recipe.gtRecipe.circuitConflicts)}</span>`);
             }
             dom.push(`</div>`);
         }

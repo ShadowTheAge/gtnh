@@ -15,6 +15,8 @@ namespace Source
             
             PackPreProcessor.PreProcessPack(repository);
             HardcodeFixes.Fix(repository);
+            FontCharactersFixer.FixFontCharacters(repository);
+            RecipeConflictsCalculator.CalculateRecipeConflicts(repository);
             
             if (previousDataBin != null)
             {
