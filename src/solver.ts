@@ -98,8 +98,8 @@ function PreProcessRecipe(recipeModel:RecipeModel, model:Model, collection:LinkC
         let overclockTiers = isSingleblock ? tierDifference : Math.min(tierDifference, Math.floor(Math.log2(maxParallels / parallels) / 2));
         let overclockSpeed = 1;
         let overclockPower = gtRecipe.amperage;
-        let perfectOverclocks = Math.min(GetParameter(machineInfo.perfectOverclock, recipeModel), overclockTiers);
-        let normalOverclocks = overclockTiers - perfectOverclocks;
+        let perfectOverclocks = machineInfo.doesNotOverclock ? 0 : Math.min(GetParameter(machineInfo.perfectOverclock, recipeModel), overclockTiers);
+        let normalOverclocks = machineInfo.doesNotOverclock ? 0 : overclockTiers - perfectOverclocks;
         let overclockDoesNotAffectSpeed = machineInfo.overclockDoesNotAffectSpeed;
         if (perfectOverclocks > 0 && !overclockDoesNotAffectSpeed) {
             overclockSpeed = Math.pow(4, perfectOverclocks);

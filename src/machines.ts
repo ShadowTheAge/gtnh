@@ -14,6 +14,7 @@ export type Machine = {
     parallels: MachineCoefficient;
     recipe?: (recipe:RecipeModel, choices:{[key:string]:number}, items:RecipeInOut[]) => RecipeInOut[];
     overclockDoesNotAffectSpeed?: boolean;
+    doesNotOverclock?: boolean;
     info?: string;
 }
 
@@ -728,6 +729,7 @@ machines["Transcendent Plasma Mixer"] = {
     perfectOverclock: 0,
     speed: 1,
     power: 1,
+    doesNotOverclock: true,
     parallels: (recipe, choices) => choices.parallels,
     choices: {parallels: {description: "Parallels", min: 1}}
 };
