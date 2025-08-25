@@ -273,6 +273,12 @@ export class RecipeModel extends RecipeGroupEntry
     }
 }
 
+export type OverclockResult = {
+    overclockSpeed : number;
+    overclockPower : number;
+    perfectOverclocks?: number;
+}
+
 export class ProductModel extends ModelObject
 {
     goodsId: string;
