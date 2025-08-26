@@ -1006,7 +1006,8 @@ machines["Large Sifter Control Block"] = {
 
 function makeFusionOverclockCalculator(fusionTier:number, overclockMultiplier:number):(recipeModel:RecipeModel, overclockTiers:number) => OverclockResult {
     return function (recipeModel:RecipeModel, overclockTiers:number): OverclockResult {
-        const perfectOverclocks = Math.min(overclockTiers, Math.max(0, fusionTier - (recipeModel.recipe?.gtRecipe?.voltageTier || 0)));
+        const recipeTier = Math.max(TIER_LUV, recipeModel.recipe?.gtRecipe?.voltageTier || 0);
+        const perfectOverclocks = Math.min(overclockTiers, Math.max(0, fusionTier - recipeTier));
         return {overclockSpeed:Math.pow(overclockMultiplier, perfectOverclocks), overclockPower:1, perfectOverclocks:perfectOverclocks};
     };
 }
