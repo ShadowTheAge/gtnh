@@ -37,7 +37,11 @@ export var voltageTier:GtVoltageTier[] = [
     {name: "UIV", voltage: 33554432},
     {name: "UMV", voltage: 134217728},
     {name: "UXV", voltage: 536870912},
-    {name: "MAX", voltage: 2147483640}
+    {name: "MAX", voltage: 2147483640},
+    {name: "MAX+1", voltage: 2147483640*4},
+    {name: "MAX+2", voltage: 2147483640*16},
+    {name: "MAX+3", voltage: 2147483640*64},
+    {name: "MAX+4", voltage: 2147483640*256},
   ];
 
 export const TIER_LV = 0;
