@@ -257,6 +257,26 @@ export class RecipeModel extends RecipeGroupEntry
 
         this.choices = validatedChoices;
     }
+
+    public getFusionStartupCost(): number {
+        if (this.recipe?.gtRecipe?.additionalInfo) {
+            const regex = /To start:\s*([\d,]+(?:\.\d+)?)/i;
+            const match = this.recipe.gtRecipe.additionalInfo.match(regex);
+    
+            if (match && match[1]) {
+                const numberString = match[1].replace(/,/g, '');
+                return parseInt(numberString);
+            }
+        }
+
+        return 0;
+    }
+}
+
+export type OverclockResult = {
+    overclockSpeed : number;
+    overclockPower : number;
+    perfectOverclocks?: number;
 }
 
 export class ProductModel extends ModelObject

@@ -1,6 +1,6 @@
-import { RecipeModel } from "./page.js";
+import { RecipeModel, OverclockResult } from "./page.js";
 import { Fluid, Goods, Item, Recipe, RecipeInOut, RecipeIoType, RecipeType, Repository } from "./repository.js";
-import { TIER_LV, TIER_UEV } from "./utils.js";
+import { TIER_LV, TIER_LUV, TIER_ZPM, TIER_UV, TIER_UHV, TIER_UEV } from "./utils.js";
 
 export type MachineCoefficient = number | ((recipe:RecipeModel, choices:{[key:string]:number}) => number);
 
@@ -8,13 +8,17 @@ const MAX_OVERCLOCK = Number.POSITIVE_INFINITY;
 
 export type Machine = {
     choices?: {[key:string]:Choice};
-    perfectOverclock: MachineCoefficient;
+    perfectOverclock?: MachineCoefficient;
     speed: MachineCoefficient;
     power: MachineCoefficient;
     parallels: MachineCoefficient;
+    customOverclock?: (recipeModel:RecipeModel, overclockTiers:number) => OverclockResult;
     recipe?: (recipe:RecipeModel, choices:{[key:string]:number}, items:RecipeInOut[]) => RecipeInOut[];
-    overclockDoesNotAffectSpeed?: boolean;
     info?: string;
+}
+
+function noOverclock(recipeModel:RecipeModel, overclockTiers:number): OverclockResult {
+    return {overclockSpeed:1, overclockPower:1, perfectOverclocks:0};
 }
 
 export type Choice = {
@@ -183,16 +187,15 @@ machines["Naquadah Fuel Refinery"] = {
 };
 
 machines["Neutron Activator"] = {
-    perfectOverclock: 0,
     speed: (recipe, choices) => Math.pow((1/0.9), (choices.speedingPipeCasing - 4)),
     power: 0,
     parallels: 1,
+    customOverclock: noOverclock,
     choices: {speedingPipeCasing: {
         description: "Speeding Pipe Casing",
         min: 4,
     }},
     info: "Power calculation is not implemented.",
-    overclockDoesNotAffectSpeed: true,
 };
 
 machines["Precise Auto-Assembler MT-3662"] = {
@@ -725,9 +728,9 @@ machines["Large Thermal Refinery"] = {
 };
 
 machines["Transcendent Plasma Mixer"] = {
-    perfectOverclock: 0,
     speed: 1,
-    power: 10, // https://github.com/GTNewHorizons/GT5-Unofficial/blob/6f40a0564b57a104f3fd50a11ebd8002d236e4f2/src/main/java/gregtech/common/tileentities/machines/multi/MTETranscendentPlasmaMixer.java#L191
+    customOverclock: noOverclock,
+    power: 10,
     parallels: (recipe, choices) => choices.parallels,
     choices: {parallels: {description: "Parallels", min: 1}}
 };
@@ -955,8 +958,6 @@ let leavesMultipliers = [0, 1, 2, 4];
 let fruitsMultipliers = [0, 1];
 
 machines["Tree Growth Simulator"] = {
-    overclockDoesNotAffectSpeed: true,
-    perfectOverclock: 0,
     speed: 1,
     recipe: (recipe, choices, items) => {
         items = createEditableCopy(items);
@@ -977,6 +978,7 @@ machines["Tree Growth Simulator"] = {
         }
         return items;
     },
+    customOverclock: noOverclock,
     choices: {
         saw: {description: "Saw", choices: ["No saw", "Saw (x1)", "Buzzsaw (x2)", "Chainsaw (x4)"]},
         saplings: {description: "Saplings", choices: ["No grafter", "Branch cutter (x1)", "Grafter (x4)"]},
@@ -1000,4 +1002,91 @@ machines["Large Sifter Control Block"] = {
     speed: 5,
     power: 0.75,
     parallels: (recipe) => (recipe.voltageTier + 1) * 4,
+};
+
+function makeFusionOverclockCalculator(fusionTier:number, overclockMultiplier:number):(recipeModel:RecipeModel, overclockTiers:number) => OverclockResult {
+    return function (recipeModel:RecipeModel, overclockTiers:number): OverclockResult {
+        const perfectOverclocks = Math.min(overclockTiers, Math.max(0, fusionTier - (recipeModel.recipe?.gtRecipe?.voltageTier || 0)));
+        return {overclockSpeed:Math.pow(overclockMultiplier, perfectOverclocks), overclockPower:1, perfectOverclocks:perfectOverclocks};
+    };
+}
+
+machines["Fusion Control Computer Mark I"] = {
+    speed: 1,
+    power: 1,
+    parallels: 1,
+    customOverclock: makeFusionOverclockCalculator(TIER_LUV, 2),
+};
+
+machines["Fusion Control Computer Mark II"] = {
+    speed: 1,
+    power: 1,
+    parallels: 1,
+    customOverclock: makeFusionOverclockCalculator(TIER_ZPM, 2),
+};
+
+machines["Fusion Control Computer Mark III"] = {
+    speed: 1,
+    power: 1,
+    parallels: 1,
+    customOverclock: makeFusionOverclockCalculator(TIER_UV, 2),
+};
+
+machines["FusionTech MK IV"] = {
+    speed: 1,
+    power: 1,
+    parallels: 1,
+    customOverclock: makeFusionOverclockCalculator(TIER_UHV, 4),
+};
+
+machines["FusionTech MK V"] = {
+    speed: 1,
+    power: 1,
+    parallels: 1,
+    customOverclock: makeFusionOverclockCalculator(TIER_UEV, 4),
+};
+
+machines["Compact Fusion Computer MK-I Prototype"] = {
+    speed: 1,
+    power: 1,
+    parallels: 64,
+    customOverclock: makeFusionOverclockCalculator(TIER_LUV, 2),
+};
+
+function getCompactFusionParallel(recipe:RecipeModel, buckets:number[][]) {
+    const startupCost = recipe.getFusionStartupCost();
+    for (const [threshold, parallel] of buckets) {
+        if (startupCost < threshold) {
+            return parallel;
+        }
+    }
+    return 1;
+}
+
+machines["Compact Fusion Computer MK-II"] = {
+    speed: 1,
+    power: 1,
+    parallels: (recipe) => getCompactFusionParallel(recipe, [[160_000_000, 128], [Number.POSITIVE_INFINITY, 64]]),
+    customOverclock: makeFusionOverclockCalculator(TIER_ZPM, 2),
+};
+
+machines["Compact Fusion Computer MK-III"] = {
+    speed: 1,
+    power: 1,
+    parallels: (recipe) => getCompactFusionParallel(recipe, [[160_000_000, 192], [320_000_000, 128], [Number.POSITIVE_INFINITY, 64]]),
+    customOverclock: makeFusionOverclockCalculator(TIER_UV, 2),
+};
+
+machines["Compact Fusion Computer MK-IV Prototype"] = {
+    speed: 1,
+    power: 1,
+    parallels: (recipe) => getCompactFusionParallel(recipe, [[160_000_000, 256], [320_000_000, 192], [640_000_000, 128], [Number.POSITIVE_INFINITY, 64]]),
+    customOverclock: makeFusionOverclockCalculator(TIER_UHV, 4),
+};
+
+machines["Compact Fusion Computer MK-V"] = {
+    speed: 1,
+    power: 1,
+    parallels: (recipe) => getCompactFusionParallel(recipe, [[160_000_000, 320], [320_000_000, 256], [640_000_000, 192], [1_200_000_000, 128], [Number.POSITIVE_INFINITY, 64]]),
+    customOverclock: makeFusionOverclockCalculator(TIER_UEV, 4),
 };
