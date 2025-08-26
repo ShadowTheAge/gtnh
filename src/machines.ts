@@ -729,8 +729,8 @@ machines["Large Thermal Refinery"] = {
 
 machines["Transcendent Plasma Mixer"] = {
     speed: 1,
-    power: 1,
     customOverclock: noOverclock,
+    power: 10,
     parallels: (recipe, choices) => choices.parallels,
     choices: {parallels: {description: "Parallels", min: 1}}
 };
