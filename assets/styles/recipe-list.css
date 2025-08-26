@@ -222,6 +222,10 @@ select:hover {
     color: #ffffff;
 }
 
+.red-text {
+    color: #cc3333;
+}
+
 .io-items {
     display: flex;
     flex-wrap: wrap;

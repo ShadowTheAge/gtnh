@@ -323,8 +323,7 @@ export class RecipeList {
                                 let finalTier = initialTier + obj.overclockTiers;
                                 let initialTierName = voltageTier[initialTier].name;
                                 let finalTierName = voltageTier[finalTier].name;
-                                let overclocksText = obj.perfectOverclocks == 0 ? `${obj.overclockTiers} overclocks` : obj.perfectOverclocks == obj.overclockTiers ? `${obj.overclockTiers} perfect overclocks` : 
-                                    `${obj.overclockTiers} overclocks (${obj.perfectOverclocks} perfect)`;
+                                let overclocksText = obj.getOverclockInfoText();
                                 text = `${obj.parallels} parallels\n` +
                                        `${overclocksText} ${initialTier == finalTier ? `(${initialTierName})` : `(${initialTierName} → ${finalTierName})`}\n` +
                                        text + `\n${formatAmount(obj.overclockFactor)}x machine speed\n` +
@@ -568,7 +567,7 @@ export class RecipeList {
                 if (recipeModel.parallels > 1)
                     info.push(`${recipeModel.parallels} parallels`);
                 if (recipeModel.overclockTiers > 0)
-                    info.push(`${recipeModel.perfectOverclocks == 0 ? "OC" : recipeModel.perfectOverclocks == recipeModel.overclockTiers ? "Perfect OC" : "Mixed OC"} x${recipeModel.overclockTiers}`);
+                    info.push(recipeModel.getOverclockInfoText());
                 shortInfoContent += `<span class="text-small white-text">(${info.join(", ")})</span>`;
             }
 

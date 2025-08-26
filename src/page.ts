@@ -210,6 +210,8 @@ export class RecipeModel extends RecipeGroupEntry
     multiblockCrafter:Item | null = null;
     recipeItems:RecipeInOut[] = [];
 
+    overclock?:OverclockResult;
+
     Visit(visitor: ModelObjectVisitor): void {
         visitor.VisitData(this, "type", this.type);
         visitor.VisitData(this, "recipeId", this.recipeId);
@@ -256,6 +258,18 @@ export class RecipeModel extends RecipeGroupEntry
         }
 
         this.choices = validatedChoices;
+    }
+
+    public getOverclockInfoText(): string {
+        if (!this.overclock || (this.overclock.overclockPower == 1 && this.overclock.overclockSpeed == 1 && this.overclock.perfectOverclocks == 0)) {
+            return 'No overclocks';
+        }
+
+        if (this.overclock.overclockPower == 1) {
+            return `${this.overclock.overclockPower}x power, ${this.overclock.overclockSpeed}x speed`;
+        } else {
+            return `<span class="text-small red-text">${this.overclock.overclockPower}x power</span>, ${this.overclock.overclockSpeed}x speed`;
+        }
     }
 
     public getFusionStartupCost(): number {

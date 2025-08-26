@@ -116,14 +116,15 @@ function PreProcessRecipe(recipeModel:RecipeModel, model:Model, collection:LinkC
         let parallels = Math.min(maxParallels, machineParallels);
         let tierDifference = recipeModel.voltageTier - gtRecipe.voltageTier;
         let overclockTiers = isSingleblock ? tierDifference : Math.min(tierDifference, Math.floor(Math.log2(maxParallels / parallels) / 2));
-        let {overclockSpeed, overclockPower, perfectOverclocks} = (machineInfo.customOverclock || calculateDefaultOverclocks)(recipeModel, overclockTiers);
+        let overclock = (machineInfo.customOverclock || calculateDefaultOverclocks)(recipeModel, overclockTiers);
         let speedModifier = GetParameter(machineInfo.speed, recipeModel);
         //console.log({machineParallels, maxParallels, parallels, overclockTiers, overclockSpeed, overclockPower, energyModifier, speedModifier});
-        recipeModel.overclockFactor = overclockSpeed * speedModifier * parallels;
-        recipeModel.powerFactor = overclockPower * energyModifier / speedModifier;
+        recipeModel.overclockFactor = overclock.overclockSpeed * speedModifier * parallels;
+        recipeModel.powerFactor = overclock.overclockPower * energyModifier / speedModifier;
         recipeModel.overclockTiers = overclockTiers;
-        recipeModel.perfectOverclocks = perfectOverclocks || 0;
+        recipeModel.perfectOverclocks = overclock.perfectOverclocks || 0;
         recipeModel.parallels = parallels;
+        recipeModel.overclock = overclock;
 
         if (recipeModel.fixedCrafterCount) {
             let crafterName = `fixed_${recipeModel.iid}`;
