@@ -502,6 +502,19 @@ exports[`Solver Processing Epoxid.gtnh should process without errors 1`] = `
 ]
 `;
 
+exports[`Solver Processing Fusion test.gtnh should process without errors 1`] = `
+[
+  {
+    "crafterCount": 0.16666666666666669,
+    "id": "r~DP9KmpbrNhK_f7XN8kGPuQ==",
+    "overclockFactor": 64,
+    "overclockName": "4/4 OC x3",
+    "powerFactor": 1,
+    "recipesPerMinute": 800,
+  },
+]
+`;
+
 exports[`Solver Processing HOG 2.gtnh should process without errors 1`] = `
 [
   {
