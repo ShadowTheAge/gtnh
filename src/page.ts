@@ -203,8 +203,8 @@ export class RecipeModel extends RecipeGroupEntry
     overclockFactor:number = 1;
     powerFactor:number = 1;
     parallels:number = 0;
+    overclockName:string | undefined;
     overclockTiers:number = 0;
-    perfectOverclocks:number = 0;
     selectedOreDicts:{[key:string]:Item} = {};
     machineInfo:Machine = singleBlockMachine;
     multiblockCrafter:Item | null = null;
@@ -277,6 +277,7 @@ export type OverclockResult = {
     overclockSpeed : number;
     overclockPower : number;
     perfectOverclocks?: number;
+    overclockName?: string;
 }
 
 export class ProductModel extends ModelObject

@@ -1007,8 +1007,13 @@ machines["Large Sifter Control Block"] = {
 function makeFusionOverclockCalculator(fusionTier:number, overclockMultiplier:number):(recipeModel:RecipeModel, overclockTiers:number) => OverclockResult {
     return function (recipeModel:RecipeModel, overclockTiers:number): OverclockResult {
         const recipeTier = Math.max(TIER_LUV, recipeModel.recipe?.gtRecipe?.voltageTier || 0);
-        const perfectOverclocks = Math.min(overclockTiers, Math.max(0, fusionTier - recipeTier));
-        return {overclockSpeed:Math.pow(overclockMultiplier, perfectOverclocks), overclockPower:1, perfectOverclocks:perfectOverclocks};
+        const perfectOverclocks = Math.max(0, fusionTier - recipeTier);
+        return {
+            overclockSpeed:Math.pow(overclockMultiplier, perfectOverclocks),
+            overclockPower:1,
+            perfectOverclocks:perfectOverclocks,
+            overclockName:overclockMultiplier+"/"+overclockMultiplier+" OC x"+perfectOverclocks
+        };
     };
 }
 
@@ -1017,6 +1022,7 @@ machines["Fusion Control Computer Mark I"] = {
     power: 1,
     parallels: 1,
     customOverclock: makeFusionOverclockCalculator(TIER_LUV, 2),
+    info: "Min. energy hatch tier: LUV",
 };
 
 machines["Fusion Control Computer Mark II"] = {
@@ -1024,6 +1030,7 @@ machines["Fusion Control Computer Mark II"] = {
     power: 1,
     parallels: 1,
     customOverclock: makeFusionOverclockCalculator(TIER_ZPM, 2),
+    info: "Min. energy hatch tier: ZPM",
 };
 
 machines["Fusion Control Computer Mark III"] = {
@@ -1031,6 +1038,7 @@ machines["Fusion Control Computer Mark III"] = {
     power: 1,
     parallels: 1,
     customOverclock: makeFusionOverclockCalculator(TIER_UV, 2),
+    info: "Min. energy hatch tier: UV",
 };
 
 machines["FusionTech MK IV"] = {
@@ -1038,6 +1046,7 @@ machines["FusionTech MK IV"] = {
     power: 1,
     parallels: 1,
     customOverclock: makeFusionOverclockCalculator(TIER_UHV, 4),
+    info: "Min. energy hatch tier: UHV",
 };
 
 machines["FusionTech MK V"] = {
@@ -1045,6 +1054,7 @@ machines["FusionTech MK V"] = {
     power: 1,
     parallels: 1,
     customOverclock: makeFusionOverclockCalculator(TIER_UEV, 4),
+    info: "Min. energy hatch tier: UEV",
 };
 
 machines["Compact Fusion Computer MK-I Prototype"] = {
@@ -1052,6 +1062,7 @@ machines["Compact Fusion Computer MK-I Prototype"] = {
     power: 1,
     parallels: 64,
     customOverclock: makeFusionOverclockCalculator(TIER_LUV, 2),
+    info: "Min. energy hatch tier: LUV",
 };
 
 function getCompactFusionParallel(recipe:RecipeModel, buckets:number[][]) {
@@ -1069,6 +1080,7 @@ machines["Compact Fusion Computer MK-II"] = {
     power: 1,
     parallels: (recipe) => getCompactFusionParallel(recipe, [[160_000_000, 128], [Number.POSITIVE_INFINITY, 64]]),
     customOverclock: makeFusionOverclockCalculator(TIER_ZPM, 2),
+    info: "Min. energy hatch tier: ZPM",
 };
 
 machines["Compact Fusion Computer MK-III"] = {
@@ -1076,6 +1088,7 @@ machines["Compact Fusion Computer MK-III"] = {
     power: 1,
     parallels: (recipe) => getCompactFusionParallel(recipe, [[160_000_000, 192], [320_000_000, 128], [Number.POSITIVE_INFINITY, 64]]),
     customOverclock: makeFusionOverclockCalculator(TIER_UV, 2),
+    info: "Min. energy hatch tier: UV",
 };
 
 machines["Compact Fusion Computer MK-IV Prototype"] = {
@@ -1083,6 +1096,7 @@ machines["Compact Fusion Computer MK-IV Prototype"] = {
     power: 1,
     parallels: (recipe) => getCompactFusionParallel(recipe, [[160_000_000, 256], [320_000_000, 192], [640_000_000, 128], [Number.POSITIVE_INFINITY, 64]]),
     customOverclock: makeFusionOverclockCalculator(TIER_UHV, 4),
+    info: "Min. energy hatch tier: UHV",
 };
 
 machines["Compact Fusion Computer MK-V"] = {
@@ -1090,4 +1104,5 @@ machines["Compact Fusion Computer MK-V"] = {
     power: 1,
     parallels: (recipe) => getCompactFusionParallel(recipe, [[160_000_000, 320], [320_000_000, 256], [640_000_000, 192], [1_200_000_000, 128], [Number.POSITIVE_INFINITY, 64]]),
     customOverclock: makeFusionOverclockCalculator(TIER_UEV, 4),
+    info: "Min. energy hatch tier: UEV",
 };

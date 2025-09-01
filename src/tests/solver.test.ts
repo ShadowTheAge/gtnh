@@ -18,7 +18,7 @@ function getRecipeExpectations(recipe: RecipeModel) {
         crafterCount: recipe.crafterCount,
         powerFactor: recipe.powerFactor,
         overclockFactor: recipe.overclockFactor,
-        perfectOverclocks: recipe.perfectOverclocks,
+        overclockName: recipe.overclockName,
         id: recipe.recipeId
     };
 }
