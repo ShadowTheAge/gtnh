@@ -111,7 +111,7 @@ function PreProcessRecipe(recipeModel:RecipeModel, model:Model, collection:LinkC
         machineInfo = crafter ? (machines[crafter.name] || notImplementedMachine) : GetSingleBlockMachine(recipe.recipeType);
         recipeModel.multiblockCrafter = crafter;
         recipeModel.machineInfo = machineInfo;
-        recipeModel.ValidateChoices(machineInfo);
+        recipeModel.ValidateChoices(machineInfo, recipeModel);
         let actualVoltage = voltageTier[recipeModel.voltageTier].voltage;
         let machineParallels = GetParameter(machineInfo.parallels, recipeModel, 1);
         let energyModifier = GetParameter(machineInfo.power, recipeModel);

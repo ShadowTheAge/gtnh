@@ -236,7 +236,7 @@ export class RecipeModel extends RecipeGroupEntry
         }
     }
 
-    ValidateChoices(machineInfo: Machine): void {
+    ValidateChoices(machineInfo: Machine, recipe: RecipeModel): void {
         if (!machineInfo.choices) {
             this.choices = {};
             return;
@@ -254,6 +254,9 @@ export class RecipeModel extends RecipeGroupEntry
                 max = typedChoice.choices.length - 1;
             validatedChoices[key] = Math.min(Math.max(currentValue ?? min, min), max);
         }
+
+        if (machineInfo.enforceChoiceConstraints)
+            machineInfo.enforceChoiceConstraints(recipe, validatedChoices);
 
         this.choices = validatedChoices;
     }
