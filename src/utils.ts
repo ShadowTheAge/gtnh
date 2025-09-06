@@ -38,10 +38,17 @@ export var voltageTier:GtVoltageTier[] = [
     {name: "UMV", voltage: 134217728},
     {name: "UXV", voltage: 536870912},
     {name: "MAX", voltage: 2147483640},
-    {name: "MAX+1", voltage: 2147483640*4},
-    {name: "MAX+2", voltage: 2147483640*16},
-    {name: "MAX+3", voltage: 2147483640*64},
-    {name: "MAX+4", voltage: 2147483640*256},
+    {name: "MAX+1", voltage: 2147483640*Math.pow(4, 1)},
+    {name: "MAX+2", voltage: 2147483640*Math.pow(4, 2)},
+    {name: "MAX+3", voltage: 2147483640*Math.pow(4, 3)},
+    {name: "MAX+4", voltage: 2147483640*Math.pow(4, 4)},
+    {name: "MAX+5", voltage: 2147483640*Math.pow(4, 5)},
+    {name: "MAX+6", voltage: 2147483640*Math.pow(4, 6)},
+    {name: "MAX+7", voltage: 2147483640*Math.pow(4, 7)},
+    {name: "MAX+8", voltage: 2147483640*Math.pow(4, 8)},
+    {name: "MAX+9", voltage: 2147483640*Math.pow(4, 9)},
+    {name: "MAX+10", voltage: 2147483640*Math.pow(4, 10)},
+    {name: "MAX+11", voltage: 2147483640*Math.pow(4, 11)},
   ];
 
 export const TIER_LV = 0;
@@ -72,7 +79,13 @@ export function formatAmount(amount: number): string {
     let suffix = '';
     let divisor = 1;
     
-    if (amount >= 1e10) {
+    if (amount >= 1e16) {
+        suffix = 'P';
+        divisor = 1e15;
+    } else if (amount >= 1e13) {
+        suffix = 'T';
+        divisor = 1e12;
+    } else if (amount >= 1e10) {
         suffix = 'G';
         divisor = 1e9;
     } else if (amount >= 1e7) {
