@@ -1,6 +1,7 @@
 import { RecipeModel, OverclockResult } from "./page.js";
 import { Fluid, Goods, Item, Recipe, RecipeInOut, RecipeIoType, RecipeType, Repository } from "./repository.js";
 import { TIER_LV, TIER_LUV, TIER_ZPM, TIER_UV, TIER_UHV, TIER_UEV } from "./utils.js";
+import { voltageTier } from "./utils.js";
 
 export type MachineCoefficient = number | ((recipe:RecipeModel, choices:{[key:string]:number}) => number);
 
@@ -15,6 +16,7 @@ export type Machine = {
     customOverclock?: (recipeModel:RecipeModel, overclockTiers:number) => OverclockResult;
     recipe?: (recipe:RecipeModel, choices:{[key:string]:number}, items:RecipeInOut[]) => RecipeInOut[];
     info?: string;
+    ignoreParallelLimit?: boolean;
 }
 
 function noOverclock(recipeModel:RecipeModel, overclockTiers:number): OverclockResult {
@@ -456,12 +458,64 @@ machines["Assembly Line"] = {
     parallels: 1,
 };
 
+function laserOverclockCalculator(recipeModel:RecipeModel, overclockTiers:number): OverclockResult {
+    const amperage = recipeModel.choices.inputAmperage;
+    const availableEut = voltageTier[recipeModel.voltageTier].voltage * amperage;
+    let currentEut = (recipeModel.recipe?.gtRecipe?.voltage || 32) * recipeModel.getItemInputCount();
+    
+    let overclockSpeed = 1;
+    let overclockPower = 1;
+
+    const maxRegularOverclocks = recipeModel.voltageTier - (recipeModel.recipe?.gtRecipe?.voltageTier || TIER_LV);
+    let regularOverclocks = 0;
+    while (currentEut * 4 < availableEut && regularOverclocks < maxRegularOverclocks) {
+        currentEut *= 4;
+        overclockSpeed *= 2;
+        overclockPower *= 2;
+        regularOverclocks += 1;
+    }
+
+    let laserOverclocks = 0;
+    while (true) {
+        const multiplier = 4.0 + 0.3 * (laserOverclocks + 1);
+        const potentialEU = currentEut * multiplier;
+
+        if (potentialEU >= availableEut) break;
+
+        currentEut = potentialEU;
+        overclockSpeed *= 2;
+        overclockPower *= multiplier / 2;
+        laserOverclocks += 1;
+
+        if (laserOverclocks + regularOverclocks > overclockTiers + (Math.log(amperage) / Math.log(4))) break;
+    }
+
+    let overclockNameParts = new Array();
+    if (regularOverclocks > 0) {
+        overclockNameParts.push("OC x" + regularOverclocks);
+    }
+
+    if (laserOverclocks > 0 ) {
+        overclockNameParts.push("Laser OC x" + laserOverclocks);
+    }
+
+    return {
+        overclockSpeed : overclockSpeed, 
+        overclockPower : overclockPower, 
+        perfectOverclocks : 0,
+        overclockName : overclockNameParts.join(", ")
+    };
+};
+
 machines["Advanced Assembly Line"] = {
     perfectOverclock: 0,
-    speed: 1, // TODO
-    power: 1, // TODO
-    parallels: 1,
-    info: "Laser overclocks and slices logic not implemented.",
+    speed: 1,
+    power: 1,
+    customOverclock: laserOverclockCalculator,
+    parallels: (recipe) => recipe.getItemInputCount(),
+    ignoreParallelLimit: true, // prevent parallel limitation as solver does not understand separate ampearage
+    choices: {inputAmperage: {description: "Input Amperage", min: 16}},
+    info: "NOTE: Voltage determines the energy hatch voltage, not maximum voltage. WARNING: Calculates beyond 1 slice per tick.",
 };
 
 machines["Large Fluid Extractor"] = {

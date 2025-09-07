@@ -1,4 +1,4 @@
-import { Goods, Item, Recipe, RecipeInOut, RecipeObject } from "./repository.js";
+import { Goods, Item, Recipe, RecipeInOut, RecipeIoType, RecipeObject } from "./repository.js";
 import { SolvePage } from "./solver.js";
 import { showConfirmDialog } from './dialogues.js';
 import { Machine, singleBlockMachine } from "./machines.js";
@@ -270,6 +270,14 @@ export class RecipeModel extends RecipeGroupEntry
         }
 
         return 0;
+    }
+
+    public getInputCount(): number {
+        return this.recipeItems.filter((entry) => entry.type in [RecipeIoType.FluidInput, RecipeIoType.ItemInput, RecipeIoType.OreDictInput]).length;
+    }
+
+    public getItemInputCount(): number {
+        return this.recipeItems.filter((entry) => entry.type in [RecipeIoType.ItemInput, RecipeIoType.OreDictInput]).length;
     }
 }
 

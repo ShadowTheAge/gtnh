@@ -1,5 +1,42 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
+exports[`Solver Processing AAL Test.gtnh should process without errors 1`] = `
+[
+  {
+    "crafterCount": 1,
+    "id": "r~mjanTBsvMoi-HxLdheY97Q==",
+    "overclockFactor": 8,
+    "overclockName": "Laser OC x3",
+    "powerFactor": 12.11525,
+    "recipesPerMinute": 8,
+  },
+  {
+    "crafterCount": 1,
+    "id": "r~UWfVVJ52Nf6dd16uHjf0qA==",
+    "overclockFactor": 16,
+    "overclockName": "OC x2, Laser OC x2",
+    "powerFactor": 19.779999999999998,
+    "recipesPerMinute": 19.2,
+  },
+  {
+    "crafterCount": 1.0000000004882812,
+    "id": "r~Df5GsNjCMqK_u0z-6q8kOg==",
+    "overclockFactor": 4096,
+    "overclockName": "OC x1, Laser OC x11",
+    "powerFactor": 209856.26988275952,
+    "recipesPerMinute": 6.82666667,
+  },
+  {
+    "crafterCount": 1,
+    "id": "r~yN311ZzWOtGIrnebDveuZA==",
+    "overclockFactor": 128,
+    "overclockName": "Laser OC x7",
+    "powerFactor": 766.1896116875,
+    "recipesPerMinute": 153.6,
+  },
+]
+`;
+
 exports[`Solver Processing Bacterial VAT.gtnh should process without errors 1`] = `
 [
   {
