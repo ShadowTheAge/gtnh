@@ -9,6 +9,7 @@ const MAX_OVERCLOCK = Number.POSITIVE_INFINITY;
 
 export type Machine = {
     choices?: {[key:string]:Choice};
+    enforceChoiceConstraints?: (recipe:RecipeModel, choices:{[key:string]:number}) => void;
     perfectOverclock?: MachineCoefficient;
     speed: MachineCoefficient;
     power: MachineCoefficient;
@@ -671,13 +672,134 @@ machines["PCB Factory"] = {
     info: "Production multiplier based on trace size is not implemented.",
 };
 
+class DtpfCatalyst {
+    tier: number;
+    name: string;
+    id: string;
+    euPerLiter: number;
+    residuePerLiter: number;
+
+    constructor(tier: number, name: string, id: string, euPerLiter: number, residuePerLiter: number) {
+        this.tier = tier;
+        this.name = name;
+        this.id = id;
+        this.euPerLiter = euPerLiter;
+        this.residuePerLiter = residuePerLiter;
+    }
+}
+
+let DtpfCatalysts = [
+    new DtpfCatalyst(0, "Excited Dimensionally Transcendent Crude Catalyst", "f:gregtech:exciteddtcc", 14_514_093, 0.125),
+    new DtpfCatalyst(1, "Excited Dimensionally Transcendent Prosaic Catalyst", "f:gregtech:exciteddtpc", 66_768_460, 0.25),
+    new DtpfCatalyst(2, "Excited Dimensionally Transcendent Resplendent Catalyst", "f:gregtech:exciteddtrc", 269_326_451, 0.5),
+    new DtpfCatalyst(3, "Excited Dimensionally Transcendent Exotic Catalyst", "f:gregtech:exciteddtec", 1_073_007_393, 1.0),
+    new DtpfCatalyst(4, "Excited Dimensionally Transcendent Stellar Catalyst", "f:gregtech:exciteddtsc", 4_276_767_521, 2.0),
+]
+
+let DtpfCatalystByName = Object.fromEntries(DtpfCatalysts.map(cat => [cat.name, cat]));
+
+function findDtpfCatalyst(items:RecipeInOut[]) : DtpfCatalyst | undefined {
+    for (let i=0; i<items.length; i++) {
+        let item = items[i];
+        if (item.type == RecipeIoType.FluidInput) {
+            let name = (item.goods as Fluid).name;
+            if (name in DtpfCatalystByName) {
+                return DtpfCatalystByName[name];
+            }
+        }
+    }
+}
+
 machines["Dimensionally Transcendent Plasma Forge"] = {
     perfectOverclock: (recipe, choices) => choices.convergence > 0 ? MAX_OVERCLOCK : 0,
     speed: 1,
     power: (recipe, choices) => choices.convergence > 0 ? 0.5 : 1,
+    recipe: (recipe, choices, items) => {
+        items = createEditableCopy(items);
+
+        let discount = choices.convergence > 0 ? 0.5 : (choices.discount == 0 ? 0.0 : 0.5);
+
+        if (choices.convergence > 0) {
+            // Logic based on https://github.com/GTNewHorizons/GT5-Unofficial/blob/bdfefcfc4f851a07303cfdde21c26767210ebf57/src/main/java/gregtech/common/tileentities/machines/multi/MTEPlasmaForge.java#L1035-L1041
+            let amperage = recipe.recipe?.gtRecipe.amperage || 1;
+            let voltage = recipe.recipe?.gtRecipe.voltage || TIER_LV;
+            let machineConsumption = amperage * voltage * Math.pow(4, recipe.overclockTiers);
+            let durationTicks = (recipe.recipe?.gtRecipe.durationTicks || 1) / Math.pow(4, recipe.overclockTiers);
+            let requiredCatalystEu = (Math.pow(2, recipe.overclockTiers) - 1) * machineConsumption * durationTicks;
+
+            let catalyst = findDtpfCatalyst(items) || DtpfCatalysts[choices.catalyst];
+
+            let requiredCatalystLiters = requiredCatalystEu / catalyst.euPerLiter;
+            let residueLiters = Math.floor(requiredCatalystLiters * catalyst.residuePerLiter);
+
+            let transdimensionalAlignmentMatrixItem : RecipeInOut = {
+                type : RecipeIoType.ItemInput,
+                goodsPtr : 0,
+                goods : Repository.current.GetById<Item>("i:gregtech:gt.metaitem.03:32758") as Item,
+                slot : 0,
+                amount : 0,
+                probability : 1.0
+            };
+
+            let catalystFluid : RecipeInOut = { 
+                type : RecipeIoType.FluidInput,
+                goodsPtr : 0,
+                goods : Repository.current.GetById<Fluid>(catalyst.id) as Fluid,
+                slot : 0,
+                amount : requiredCatalystLiters,
+                probability : 1.0
+            };
+
+            let residueFluid : RecipeInOut = {
+                type : RecipeIoType.FluidOutput,
+                goodsPtr : 0,
+                goods : Repository.current.GetById<Fluid>("f:gregtech:dimensionallytranscendentresidue") as Fluid,
+                slot : 0,
+                amount : residueLiters,
+                probability : 1.0
+            };
+
+            items.push(transdimensionalAlignmentMatrixItem);
+            items.push(catalystFluid);
+            items.push(residueFluid);
+        }
+        
+        if (discount > 0.0) {
+            for (let i=0; i<items.length; i++) {
+                let item = items[i];
+                if (item.type == RecipeIoType.FluidInput) {
+                    let name = (item.goods as Fluid).name;
+                    if (name in DtpfCatalystByName) {
+                        item.amount *= (1-discount);
+                    }
+                }
+            }
+        }
+
+        return items;
+    },
     parallels: 1,
-    choices: {convergence: {description: "Convergence", choices: ["No Convergence", "Convergence"]}},
-    info: "Extra power cost during Perfect Overclocks is added in form of increased catalyst amounts (Not implemented).",
+    choices: {
+        convergence: {
+            description: "Convergence", choices: ["No Convergence", "Convergence"]
+        },
+        discount: {
+            description: "Discount", choices: ["0%", "50%"]
+        },
+        catalyst: {
+            description: "Catalyst", choices: DtpfCatalysts.map(cat => cat.name)
+        },
+    },
+    enforceChoiceConstraints: (recipe, choices) => {
+        if (choices.convergence > 0) {
+            choices.discount = 1;
+        }
+
+        let catalyst = findDtpfCatalyst(recipe.recipe?.items || []);
+        if (catalyst) {
+            choices.catalyst = catalyst.tier;
+        }
+    }
 };
 
 machines["Bricked Blast Furnace"] = {

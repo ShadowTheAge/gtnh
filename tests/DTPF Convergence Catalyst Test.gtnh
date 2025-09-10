@@ -1,0 +1,70 @@
+{
+  "name": "DTPF Convergence Catalyst Test",
+  "products": [],
+  "rootGroup": {
+    "type": "recipe_group",
+    "links": {},
+    "elements": [
+      {
+        "type": "recipe_group",
+        "links": {},
+        "elements": [
+          {
+            "type": "recipe",
+            "recipeId": "r~PXvO6_fCO7uQE421Cqqr-A==",
+            "voltageTier": 17,
+            "choices": {
+              "convergence": 0,
+              "discount": 1,
+              "catalyst": 2
+            },
+            "fixedCrafterCount": 1
+          },
+          {
+            "type": "recipe",
+            "recipeId": "r~-7U0f46CO-ulE9EVR5E1rA==",
+            "voltageTier": 17,
+            "choices": {
+              "parallels": 1000
+            }
+          }
+        ],
+        "collapsed": false,
+        "name": "Group"
+      },
+      {
+        "type": "recipe_group",
+        "links": {},
+        "elements": [
+          {
+            "type": "recipe",
+            "recipeId": "r~PXvO6_fCO7uQE421Cqqr-A==",
+            "voltageTier": 15,
+            "choices": {
+              "convergence": 1,
+              "discount": 1,
+              "catalyst": 2
+            },
+            "fixedCrafterCount": 1
+          },
+          {
+            "type": "recipe",
+            "recipeId": "r~-7U0f46CO-ulE9EVR5E1rA==",
+            "voltageTier": 17,
+            "choices": {
+              "parallels": 1000
+            }
+          }
+        ],
+        "collapsed": false,
+        "name": "Group"
+      }
+    ],
+    "collapsed": false,
+    "name": "Group"
+  },
+  "settings": {
+    "minVoltage": 0,
+    "timeUnit": "sec"
+  }
+}

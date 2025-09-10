@@ -228,6 +228,104 @@ exports[`Solver Processing Catalyst.gtnh should process without errors 1`] = `
 ]
 `;
 
+exports[`Solver Processing DTPF Convergence Catalyst Test.gtnh should process without errors 1`] = `
+[
+  {
+    "crafterCount": 1,
+    "id": "r~PXvO6_fCO7uQE421Cqqr-A==",
+    "overclockFactor": 16,
+    "overclockName": "OC x4",
+    "powerFactor": 16,
+    "recipesPerMinute": 12.8,
+  },
+  {
+    "crafterCount": 0.00261437908496732,
+    "id": "r~-7U0f46CO-ulE9EVR5E1rA==",
+    "overclockFactor": 204,
+    "overclockName": undefined,
+    "powerFactor": 10,
+    "recipesPerMinute": 6.4,
+  },
+  {
+    "crafterCount": 1,
+    "id": "r~PXvO6_fCO7uQE421Cqqr-A==",
+    "overclockFactor": 16,
+    "overclockName": "Perfect OC x2",
+    "powerFactor": 0.5,
+    "recipesPerMinute": 12.8,
+  },
+  {
+    "crafterCount": 0.05503272494689542,
+    "id": "r~-7U0f46CO-ulE9EVR5E1rA==",
+    "overclockFactor": 204,
+    "overclockName": undefined,
+    "powerFactor": 10,
+    "recipesPerMinute": 134.72011067,
+  },
+]
+`;
+
+exports[`Solver Processing DTPF Convergence Test.gtnh should process without errors 1`] = `
+[
+  {
+    "crafterCount": 0.9999999999902344,
+    "id": "r~RG2BosO7PuSrOWlTPoRkvg==",
+    "overclockFactor": 64,
+    "overclockName": "Perfect OC x3",
+    "powerFactor": 0.5,
+    "recipesPerMinute": 133.56521739,
+  },
+  {
+    "crafterCount": 0.9999999999902344,
+    "id": "r~RG2BosO7PuSrOWlTPoRkvg==",
+    "overclockFactor": 64,
+    "overclockName": "OC x6",
+    "powerFactor": 64,
+    "recipesPerMinute": 133.56521739,
+  },
+  {
+    "crafterCount": 0.9999999999902344,
+    "id": "r~RG2BosO7PuSrOWlTPoRkvg==",
+    "overclockFactor": 64,
+    "overclockName": "OC x6",
+    "powerFactor": 64,
+    "recipesPerMinute": 133.56521739,
+  },
+  {
+    "crafterCount": 1,
+    "id": "r~wNYM12NpOKOirsoiRpH7Qw==",
+    "overclockFactor": 256,
+    "overclockName": "Perfect OC x4",
+    "powerFactor": 0.5,
+    "recipesPerMinute": 204.8,
+  },
+  {
+    "crafterCount": 1,
+    "id": "r~wNYM12NpOKOirsoiRpH7Qw==",
+    "overclockFactor": 16,
+    "overclockName": "OC x4",
+    "powerFactor": 16,
+    "recipesPerMinute": 12.8,
+  },
+  {
+    "crafterCount": 1,
+    "id": "r~2qAAgMvVN1-Z5bTHtUbBWA==",
+    "overclockFactor": 256,
+    "overclockName": "Perfect OC x4",
+    "powerFactor": 0.5,
+    "recipesPerMinute": 768,
+  },
+  {
+    "crafterCount": 1,
+    "id": "r~2qAAgMvVN1-Z5bTHtUbBWA==",
+    "overclockFactor": 256,
+    "overclockName": "Perfect OC x4",
+    "powerFactor": 0.5,
+    "recipesPerMinute": 768,
+  },
+]
+`;
+
 exports[`Solver Processing EG+CBD.gtnh should process without errors 1`] = `
 [
   {
