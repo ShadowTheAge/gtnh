@@ -686,6 +686,15 @@ class DtpfCatalyst {
         this.euPerLiter = euPerLiter;
         this.residuePerLiter = residuePerLiter;
     }
+
+    public getCompactName() {
+        const regex = /^Excited Dimensionally Transcendent (.+?) Catalyst$/;
+        const match = this.name.match(regex);
+        if (!match) {
+            throw new Error(`Cannot compactify non-standard DTPF catalyst name: "${self.name}"`);
+        }
+        return match[1];
+    }
 }
 
 let DtpfCatalysts = [
@@ -787,7 +796,7 @@ machines["Dimensionally Transcendent Plasma Forge"] = {
             description: "Discount", choices: ["0%", "50%"]
         },
         catalyst: {
-            description: "Catalyst", choices: DtpfCatalysts.map(cat => cat.name)
+            description: "Catalyst", choices: DtpfCatalysts.map(cat => cat.getCompactName())
         },
     },
     enforceChoiceConstraints: (recipe, choices) => {
