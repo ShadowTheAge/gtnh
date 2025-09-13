@@ -1,4 +1,4 @@
-import { Goods, Item, Recipe, RecipeInOut, RecipeObject, Repository } from "./repository.js";
+import { Goods, Item, Recipe, RecipeInOut, RecipeIoType, RecipeObject, Repository } from "./repository.js";
 import { SolvePage } from "./solver.js";
 import { showConfirmDialog } from './dialogues.js';
 import { Machine, singleBlockMachine } from "./machines.js";
@@ -235,8 +235,8 @@ export class RecipeModel extends RecipeGroupEntry
     overclockFactor:number = 1;
     powerFactor:number = 1;
     parallels:number = 0;
+    overclockName:string | undefined;
     overclockTiers:number = 0;
-    perfectOverclocks:number = 0;
     selectedOreDicts:{[key:string]:Item} = {};
     machineInfo:Machine = singleBlockMachine;
     multiblockCrafter:Item | null = null;
@@ -268,7 +268,7 @@ export class RecipeModel extends RecipeGroupEntry
         }
     }
 
-    ValidateChoices(machineInfo: Machine): void {
+    ValidateChoices(machineInfo: Machine, recipe: RecipeModel): void {
         if (!machineInfo.choices) {
             this.choices = {};
             return;
@@ -287,6 +287,9 @@ export class RecipeModel extends RecipeGroupEntry
             validatedChoices[key] = Math.min(Math.max(currentValue ?? min, min), max);
         }
 
+        if (machineInfo.enforceChoiceConstraints)
+            machineInfo.enforceChoiceConstraints(recipe, validatedChoices);
+
         this.choices = validatedChoices;
     }
 
@@ -303,12 +306,21 @@ export class RecipeModel extends RecipeGroupEntry
 
         return 0;
     }
+
+    public getInputCount(): number {
+        return this.recipeItems.filter((entry) => entry.type in [RecipeIoType.FluidInput, RecipeIoType.ItemInput, RecipeIoType.OreDictInput]).length;
+    }
+
+    public getItemInputCount(): number {
+        return this.recipeItems.filter((entry) => entry.type in [RecipeIoType.ItemInput, RecipeIoType.OreDictInput]).length;
+    }
 }
 
 export type OverclockResult = {
     overclockSpeed : number;
     overclockPower : number;
     perfectOverclocks?: number;
+    overclockName?: string;
 }
 
 export class ProductModel extends ModelObject

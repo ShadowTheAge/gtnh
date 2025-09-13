@@ -1,0 +1,28 @@
+{
+  "name": "Fusion test",
+  "products": [
+    {
+      "goodsId": "f:gregtech:plasma.helium",
+      "amount": 100000
+    }
+  ],
+  "rootGroup": {
+    "type": "recipe_group",
+    "links": {},
+    "elements": [
+      {
+        "type": "recipe",
+        "recipeId": "r~DP9KmpbrNhK_f7XN8kGPuQ==",
+        "voltageTier": 7,
+        "crafter": "i:gregtech:gt.blockmachines:965",
+        "choices": {}
+      }
+    ],
+    "collapsed": false,
+    "name": "Group"
+  },
+  "settings": {
+    "minVoltage": 0,
+    "timeUnit": "min"
+  }
+}

@@ -1,0 +1,96 @@
+{
+  "name": "DTPF Convergence Test",
+  "products": [],
+  "rootGroup": {
+    "type": "recipe_group",
+    "links": {
+      "f:gregtech:molten.neutronium": 1,
+      "f:gregtech:dimensionallytranscendentresidue": 1
+    },
+    "elements": [
+      {
+        "type": "recipe",
+        "recipeId": "r~RG2BosO7PuSrOWlTPoRkvg==",
+        "voltageTier": 14,
+        "choices": {
+          "convergence": 1,
+          "discount": 1,
+          "catalyst": 1
+        },
+        "fixedCrafterCount": 1
+      },
+      {
+        "type": "recipe",
+        "recipeId": "r~RG2BosO7PuSrOWlTPoRkvg==",
+        "voltageTier": 17,
+        "choices": {
+          "convergence": 0,
+          "discount": 1,
+          "catalyst": 1
+        },
+        "fixedCrafterCount": 1
+      },
+      {
+        "type": "recipe",
+        "recipeId": "r~RG2BosO7PuSrOWlTPoRkvg==",
+        "voltageTier": 17,
+        "choices": {
+          "convergence": 0,
+          "discount": 0,
+          "catalyst": 1
+        },
+        "fixedCrafterCount": 1
+      },
+      {
+        "type": "recipe",
+        "recipeId": "r~wNYM12NpOKOirsoiRpH7Qw==",
+        "voltageTier": 17,
+        "choices": {
+          "convergence": 1,
+          "discount": 1,
+          "catalyst": 4
+        },
+        "fixedCrafterCount": 1
+      },
+      {
+        "type": "recipe",
+        "recipeId": "r~wNYM12NpOKOirsoiRpH7Qw==",
+        "voltageTier": 17,
+        "choices": {
+          "convergence": 0,
+          "discount": 0,
+          "catalyst": 4
+        },
+        "fixedCrafterCount": 1
+      },
+      {
+        "type": "recipe",
+        "recipeId": "r~2qAAgMvVN1-Z5bTHtUbBWA==",
+        "voltageTier": 17,
+        "choices": {
+          "convergence": 1,
+          "discount": 1,
+          "catalyst": 0
+        },
+        "fixedCrafterCount": 1
+      },
+      {
+        "type": "recipe",
+        "recipeId": "r~2qAAgMvVN1-Z5bTHtUbBWA==",
+        "voltageTier": 17,
+        "choices": {
+          "convergence": 1,
+          "discount": 1,
+          "catalyst": 4
+        },
+        "fixedCrafterCount": 1
+      }
+    ],
+    "collapsed": false,
+    "name": "Group"
+  },
+  "settings": {
+    "minVoltage": 0,
+    "timeUnit": "sec"
+  }
+}
