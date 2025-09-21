@@ -351,7 +351,7 @@ export class RecipeList {
                                 let finalTier = initialTier + obj.overclockTiers;
                                 let initialTierName = voltageTier[initialTier].name;
                                 let finalTierName = voltageTier[finalTier].name;
-                                let overclocksText = obj.overclockName;
+                                let overclocksText = obj.overclockName ?? "No overclocks";
                                 text = `${obj.parallels} parallels\n` +
                                        `${overclocksText} ${initialTier == finalTier ? `(${initialTierName})` : `(${initialTierName} → ${finalTierName})`}\n` +
                                        text + `\n${formatAmount(obj.overclockFactor)}x machine speed\n` +
@@ -579,7 +579,7 @@ export class RecipeList {
             return `
                 <td colspan="2">
                     <span style="color: red;">Missing recipe</span>
-                    <div class="text-small">This recipe was deleted or changed. Replace or remove it.</div>
+                    <div class="text-small">This recipe was deleted or changed. Replace or remove it. (Or load a different version of this app)</div>
                 </td>
             `;
         }

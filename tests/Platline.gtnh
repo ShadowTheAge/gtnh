@@ -29,7 +29,7 @@
         "elements": [
           {
             "type": "recipe",
-            "recipeId": "r~wQh6-ivoP-ypqW5-Wg0G4Q==",
+            "recipeId": "r~LynJPjiqMsiUBCSoN2J2GA==",
             "voltageTier": 1,
             "crafter": "i:gregtech:gt.blockmachines:1169",
             "choices": {}
@@ -129,7 +129,7 @@
             "choices": {}
           }
         ],
-        "collapsed": true,
+        "collapsed": false,
         "name": "Palladium"
       },
       {
@@ -178,12 +178,12 @@
           },
           {
             "type": "recipe",
-            "recipeId": "r~epfHDjjYMHiXvL46D-psuQ==",
+            "recipeId": "r~y_1VfXznPde_m6qsPvzi6A==",
             "voltageTier": 0,
             "choices": {}
           }
         ],
-        "collapsed": true,
+        "collapsed": false,
         "name": "Basics"
       },
       {
@@ -314,7 +314,7 @@
             "choices": {}
           }
         ],
-        "collapsed": true,
+        "collapsed": false,
         "name": "Rhodium"
       },
       {
@@ -337,7 +337,7 @@
           },
           {
             "type": "recipe",
-            "recipeId": "r~xDD_lTDhMdaw1icPRS82VQ==",
+            "recipeId": "r~DDnMMSc1MwSd5dWPtL7NnQ==",
             "voltageTier": 0,
             "choices": {}
           },
@@ -375,7 +375,7 @@
             "choices": {}
           }
         ],
-        "collapsed": true,
+        "collapsed": false,
         "name": "Ruthenium"
       },
       {
