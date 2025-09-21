@@ -277,7 +277,7 @@ namespace Source
                 recipes[gt.RecipeId].recipe.gtInfo = new GtRecipeInfo
                 {
                     amperage = gt.Amperage, voltage = gt.Voltage, voltageTier = VoltageTiers.GetVoltageTier(gt.VoltageTier), durationTicks = gt.Duration, cleanRoom = gt.RequiresCleanroom,
-                    lowGravity = gt.RequiresLowGravity, additionalInfo = gt.AdditionalInfo
+                    lowGravity = gt.RequiresLowGravity, additionalInfo = gt.AdditionalInfo, specialValue = gt.RecipeSpecialValue,
                 };
             }
 

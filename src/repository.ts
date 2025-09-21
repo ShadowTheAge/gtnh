@@ -313,6 +313,7 @@ class GtRecipe extends MemMappedObject
     get lowGravity():boolean {return (this.GetInt(4) & 2) === 2;}
     get additionalInfo():string {return this.GetString(5);}
     get circuitConflicts():number {return this.GetInt(6);}
+    get specialValue():number {return this.GetInt(7);}
 }
 
 export enum RecipeIoType

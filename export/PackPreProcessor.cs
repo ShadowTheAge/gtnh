@@ -76,8 +76,10 @@ namespace Source
 
             foreach (var (_, (type, item)) in categoryMachines)
             {
+                Item fallbackCrafter = null;
                 foreach (var crafter in type.crafters)
                 {
+                    fallbackCrafter = crafter;
                     if (!item.Contains(crafter))
                     {
                         if (!crafter.tooltip.Contains("DEPRECATED"))
@@ -100,7 +102,7 @@ namespace Source
                 if (maxTier > -1)
                     type.singleblocks.AddRange(sb.Take(maxTier+1));
                 type.multiblocks.AddRange(mb);
-                type.defaultCrafter = type.singleblocks.Count > 0 ? type.singleblocks.First(x => x != null) : type.multiblocks[0];
+                type.defaultCrafter = type.singleblocks.Count > 0 ? type.singleblocks.First(x => x != null) : type.multiblocks.FirstOrDefault(fallbackCrafter);
             }
         }
 

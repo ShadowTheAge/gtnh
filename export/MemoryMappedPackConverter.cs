@@ -104,6 +104,7 @@ namespace Source
             WriteInt((recipeType.cleanRoom ? 1 : 0) + (recipeType.lowGravity ? 2 : 0));
             WriteStringRef(recipeType.additionalInfo);
             WriteInt(recipeType.circuitConflicts);
+            WriteInt(recipeType.specialValue);
         }
 
         private void WriteIndexBits(IndexableObject obj)

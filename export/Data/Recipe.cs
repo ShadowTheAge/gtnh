@@ -23,6 +23,7 @@ namespace Source.Data
         public bool lowGravity;
         public string additionalInfo;
         public int circuitConflicts;
+        public int specialValue;
     }
     
     [Serializable]

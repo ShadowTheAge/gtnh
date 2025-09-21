@@ -11,6 +11,7 @@
             {("Forestry", "beeQueenGE"), null},
             {("Forestry", "caterpillarGE"), null},
             {("Forestry", "pollenFertile"), null},
+            {("Forestry", "sapling"), null},
             {("ForbiddenMagic", "MobCrystal"), null},
             {("IC2", "itemCropSeed"), null},
             {("TConstruct", "ArrowAmmo"), null},
