@@ -282,6 +282,34 @@ export class RecipeList {
                 UpdateProject();
             }
         });
+
+        this.actionHandlers.set("accept_recipe_change", (obj, event, parent) => {
+            if (obj instanceof RecipeModel && event.type === "click") {
+                const recipe = Repository.current.GetById<Recipe>(obj.recipeId);
+                if (recipe) {
+                    obj.recipeId = recipe.id;
+                    UpdateProject();
+                }
+            }
+        });
+
+        this.actionHandlers.set("change_recipe", (obj, event, parent) => {
+            if (obj instanceof RecipeModel && event.type === "click") {
+                const callback: ShowNeiCallback = {
+                    onSelectRecipe: (recipe: Recipe) => {
+                        let mustResetCrafter = obj.multiblockCrafter && recipe.recipeType.multiblocks.includes(obj.multiblockCrafter);
+                        obj.recipeId = recipe.id;
+                        obj.voltageTier = Math.max(recipe.gtRecipe?.voltageTier ?? 0, obj.voltageTier);
+                        if (mustResetCrafter) {
+                            obj.crafter = undefined;
+                            obj.choices = {};
+                        }
+                        UpdateProject();
+                    }
+                };
+                ShowNei(null, ShowNeiMode.Production, callback);
+            }
+        });
     }
 
     private setupGlobalEventListeners() {
@@ -323,7 +351,7 @@ export class RecipeList {
                                 let finalTier = initialTier + obj.overclockTiers;
                                 let initialTierName = voltageTier[initialTier].name;
                                 let finalTierName = voltageTier[finalTier].name;
-                                let overclocksText = obj.overclockName;
+                                let overclocksText = obj.overclockName ?? "No overclocks";
                                 text = `${obj.parallels} parallels\n` +
                                        `${overclocksText} ${initialTier == finalTier ? `(${initialTierName})` : `(${initialTierName} → ${finalTierName})`}\n` +
                                        text + `\n${formatAmount(obj.overclockFactor)}x machine speed\n` +
@@ -336,6 +364,12 @@ export class RecipeList {
                                 overrideIo: obj.recipeItems
                             });
                         }
+                        break;
+                    case "change_recipe":
+                        ShowTooltip(element as HTMLElement, {
+                            header: "Change Recipe",
+                            text: "Click to select a different recipe"
+                        });
                         break;
                     case "link":
                         ShowTooltip(element as HTMLElement, {
@@ -543,7 +577,10 @@ export class RecipeList {
     private renderRecipeShortInfo(recipe: Recipe | null, recipeModel: RecipeModel, group: RecipeGroupModel): string {
         if (recipe === null) {
             return `
-                <td colspan="2">Unknown recipe</td>
+                <td colspan="2">
+                    <span style="color: red;">Missing recipe</span>
+                    <div class="text-small">This recipe was deleted or changed. Replace or remove it. (Or load a different version of this app)</div>
+                </td>
             `;
         }
         let crafter = recipeModel.multiblockCrafter ?? recipe.recipeType.singleblocks[recipeModel.voltageTier] ?? recipe.recipeType.defaultCrafter;
@@ -577,6 +614,10 @@ export class RecipeList {
                 </select>
                 ${shortInfoContent} 
             `;
+        }
+
+        if (recipe.id !== recipeModel.recipeId) {
+            shortInfoContent = `<div><span style="color: orange;">This recipe was changed!</span> <a href="#" data-iid="${recipeModel.iid}" data-action="accept_recipe_change">Accept</a></div>${shortInfoContent}`;
         }
 
         // Render machine choices if they exist
@@ -647,6 +688,7 @@ export class RecipeList {
                 ${this.renderIoInfo(recipeModel.flow, group)}
                 <td>
                     <div class="icon-container">
+                        <button class="delete-btn" data-iid="${recipeModel.iid}" data-action="change_recipe" data-tooltip="change_recipe">↔</button>
                         <button class="delete-btn" data-iid="${recipeModel.iid}" data-action="delete_recipe">x</button>
                     </div>
                 </td>

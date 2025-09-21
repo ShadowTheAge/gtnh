@@ -76,8 +76,10 @@ namespace Source
 
             foreach (var (_, (type, item)) in categoryMachines)
             {
+                Item fallbackCrafter = null;
                 foreach (var crafter in type.crafters)
                 {
+                    fallbackCrafter = crafter;
                     if (!item.Contains(crafter))
                     {
                         if (!crafter.tooltip.Contains("DEPRECATED"))
@@ -100,7 +102,7 @@ namespace Source
                 if (maxTier > -1)
                     type.singleblocks.AddRange(sb.Take(maxTier+1));
                 type.multiblocks.AddRange(mb);
-                type.defaultCrafter = type.singleblocks.Count > 0 ? type.singleblocks.First(x => x != null) : type.multiblocks[0];
+                type.defaultCrafter = type.singleblocks.Count > 0 ? type.singleblocks.First(x => x != null) : type.multiblocks.FirstOrDefault(fallbackCrafter);
             }
         }
 
@@ -137,13 +139,13 @@ namespace Source
                 item.tooltip ??= "";
                 var parts = item.tooltip.Split('\n');
                 builder.Clear();
-                for (var i = 2; i < parts.Length; i++)
+                for (var i = 1; i < parts.Length-1; i++)
                 {
                     var part = parts[i];
                     if ((part.Contains("press", StringComparison.OrdinalIgnoreCase) || part.Contains("hold", StringComparison.OrdinalIgnoreCase)) &&
                         (part.Contains("ctrl", StringComparison.OrdinalIgnoreCase) || part.Contains("shift", StringComparison.OrdinalIgnoreCase) || part.Contains("control", StringComparison.OrdinalIgnoreCase)))
                         continue;
-                    if (i == 2 && part == "")
+                    if (i == 1 && part == "")
                         continue;
 
                     builder.Append(part).Append('\n');

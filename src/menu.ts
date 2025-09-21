@@ -1,6 +1,34 @@
-import { PageModel, serializer, SetCurrentPage, addProjectChangeListener, page, UpdateProject } from './page.js';
+import { PageModel, serializer, SetCurrentPage, addProjectChangeListener, page, UpdateProject, ModelObjectValidator } from './page.js';
 import { showConfirmDialog } from './dialogues.js';
 import { ShowNei, ShowNeiMode } from "./nei.js";
+
+async function ValidateAndNotify(page: PageModel): Promise<void> {
+    const validator = new ModelObjectValidator();
+    const errors = validator.Validate(page);
+
+    const missing = errors.missingRecipe || 0;
+    const changed = errors.changedRecipe || 0;
+
+    if (missing > 0 || changed > 0) {
+        let message = "The page you are about to load contains:";
+        if (missing > 0) {
+            message += `\n- ${missing} missing recipe(s)`;
+            message += `\nA missing recipe is a recipe that was deleted or substantially changed. These recipes will be displayed as missing and must be deleted or replaced.\n`;
+        }
+        if (changed > 0) {
+            message += `\n- ${changed} changed recipe(s)`;
+            message += `\nA changed recipe is a recipe that was changed a bit and might break, but uses and produces the same items as before. These recipes were replaced with the best matching recipes.\n`;
+        }
+        message += `This is likely caused by the game version change.`;
+
+        await showConfirmDialog(
+            message,
+            "OK",
+            null,
+            null
+        );
+    }
+}
 
 export class PageManager {
     private pages: string[] = [];
@@ -161,6 +189,7 @@ export class PageManager {
             const stored = localStorage.getItem(`p:${pageName}`);
             if (stored) {
                 page = new PageModel(JSON.parse(stored));
+                ValidateAndNotify(page);
                 page.name = pageName;
                 this.pageCache.set(pageName, page);
                 // Initialize history with the loaded state
@@ -238,6 +267,7 @@ export class PageManager {
             const json = new TextDecoder().decode(decompressed);
             console.log("Loaded page", json);
             const importedPage = new PageModel(JSON.parse(json));
+            await ValidateAndNotify(importedPage);
             window.location.hash = "";
             this.importPage(importedPage);
         } catch (e) {
@@ -352,6 +382,7 @@ export class PageManager {
                     const text = await file.text();
                     const json = JSON.parse(text);
                     const pageModel = new PageModel(json);
+                    await ValidateAndNotify(pageModel);
                     this.importPage(pageModel);
                 } catch (error) {
                     console.error('Failed to load file:', error);

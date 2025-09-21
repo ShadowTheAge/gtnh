@@ -23,19 +23,20 @@
         "type": "recipe_group",
         "links": {
           "i:bartworks:gt.bwMetaGenerateddust:47": 1,
-          "f:bartworks:ammonium chloride": 1
+          "f:bartworks:ammonium chloride": 1,
+          "f:gregtech:hydrochloricacid_gt5u": 1
         },
         "elements": [
           {
             "type": "recipe",
-            "recipeId": "r~wQh6-ivoP-ypqW5-Wg0G4Q==",
-            "voltageTier": 2,
+            "recipeId": "r~LynJPjiqMsiUBCSoN2J2GA==",
+            "voltageTier": 1,
             "crafter": "i:gregtech:gt.blockmachines:1169",
             "choices": {}
           },
           {
             "type": "recipe",
-            "recipeId": "r~6e8yNa47PW2X-pZz5BCaBQ==",
+            "recipeId": "r~Nl4XZN9dMfWJG1fm81lzYg==",
             "voltageTier": 2,
             "crafter": "i:gregtech:gt.blockmachines:1169",
             "choices": {}
@@ -43,7 +44,7 @@
           {
             "type": "recipe",
             "recipeId": "r~yNGXyzctMyOA2P1elXuagQ==",
-            "voltageTier": 0,
+            "voltageTier": 1,
             "choices": {}
           },
           {
@@ -52,32 +53,33 @@
             "voltageTier": 1,
             "crafter": "i:gregtech:gt.blockmachines:1000",
             "choices": {
-              "coilTier": 0
+              "coilTier": 0,
+              "muffler": 0
             }
           },
           {
             "type": "recipe",
             "recipeId": "r~tr4LppjYNN2G1Hml9L6aFQ==",
-            "voltageTier": 2,
+            "voltageTier": 1,
             "crafter": "i:gregtech:gt.blockmachines:1169",
             "choices": {}
           },
           {
             "type": "recipe",
             "recipeId": "r~0OGphknuNJOqPi_j63HBvw==",
-            "voltageTier": 2,
-            "choices": {}
-          },
-          {
-            "type": "recipe",
-            "recipeId": "r~m1OX8a5BMQa8OD1tIPT68A==",
             "voltageTier": 1,
             "choices": {}
           },
           {
             "type": "recipe",
+            "recipeId": "r~ONmYeQdgOqy64CAeHS-Adg==",
+            "voltageTier": 0,
+            "choices": {}
+          },
+          {
+            "type": "recipe",
             "recipeId": "r~0LjH8tPBMXy_rPTPxOyRrg==",
-            "voltageTier": 2,
+            "voltageTier": 0,
             "crafter": "i:gregtech:gt.blockmachines:1169",
             "choices": {}
           },
@@ -89,8 +91,46 @@
             "choices": {}
           }
         ],
-        "collapsed": true,
+        "collapsed": false,
         "name": "Basic platinum loop"
+      },
+      {
+        "type": "recipe_group",
+        "links": {
+          "f:bartworks:palladium enriched ammonia": 1,
+          "f:dreamcraft:ammonia": 1
+        },
+        "elements": [
+          {
+            "type": "recipe",
+            "recipeId": "r~pMPqnAZcOvezrSqqqsOA9A==",
+            "voltageTier": 0,
+            "choices": {}
+          },
+          {
+            "type": "recipe",
+            "recipeId": "r~cM4gFPskOIezTTJYHti9cQ==",
+            "voltageTier": 0,
+            "crafter": "i:gregtech:gt.blockmachines:1169",
+            "choices": {}
+          },
+          {
+            "type": "recipe",
+            "recipeId": "r~zGXNxD7bMRiXezvT9TPv2w==",
+            "voltageTier": 0,
+            "crafter": "i:gregtech:gt.blockmachines:1169",
+            "choices": {}
+          },
+          {
+            "type": "recipe",
+            "recipeId": "r~4t1Pi95eM9qhOzz6oYfUeg==",
+            "voltageTier": 0,
+            "crafter": "i:gregtech:gt.blockmachines:1169",
+            "choices": {}
+          }
+        ],
+        "collapsed": false,
+        "name": "Palladium"
       },
       {
         "type": "recipe_group",
@@ -134,56 +174,17 @@
             "type": "recipe",
             "recipeId": "r~Ypoytta6PUeIoQetrBcqEQ==",
             "voltageTier": 0,
-            "crafter": "i:Avaritia:Neutronium_Compressor:0",
             "choices": {}
           },
           {
             "type": "recipe",
-            "recipeId": "r~epfHDjjYMHiXvL46D-psuQ==",
+            "recipeId": "r~y_1VfXznPde_m6qsPvzi6A==",
             "voltageTier": 0,
             "choices": {}
           }
         ],
-        "collapsed": true,
+        "collapsed": false,
         "name": "Basics"
-      },
-      {
-        "type": "recipe_group",
-        "links": {
-          "f:bartworks:palladium enriched ammonia": 1,
-          "f:dreamcraft:ammonia": 1
-        },
-        "elements": [
-          {
-            "type": "recipe",
-            "recipeId": "r~pMPqnAZcOvezrSqqqsOA9A==",
-            "voltageTier": 0,
-            "choices": {}
-          },
-          {
-            "type": "recipe",
-            "recipeId": "r~cM4gFPskOIezTTJYHti9cQ==",
-            "voltageTier": 0,
-            "crafter": "i:gregtech:gt.blockmachines:1169",
-            "choices": {}
-          },
-          {
-            "type": "recipe",
-            "recipeId": "r~zGXNxD7bMRiXezvT9TPv2w==",
-            "voltageTier": 0,
-            "crafter": "i:gregtech:gt.blockmachines:1169",
-            "choices": {}
-          },
-          {
-            "type": "recipe",
-            "recipeId": "r~4t1Pi95eM9qhOzz6oYfUeg==",
-            "voltageTier": 0,
-            "crafter": "i:gregtech:gt.blockmachines:1169",
-            "choices": {}
-          }
-        ],
-        "collapsed": true,
-        "name": "Palladium"
       },
       {
         "type": "recipe_group",
@@ -201,7 +202,8 @@
             "voltageTier": 1,
             "crafter": "i:gregtech:gt.blockmachines:1000",
             "choices": {
-              "coilTier": 0
+              "coilTier": 0,
+              "muffler": 0
             }
           },
           {
@@ -230,7 +232,8 @@
             "voltageTier": 1,
             "crafter": "i:gregtech:gt.blockmachines:1000",
             "choices": {
-              "coilTier": 0
+              "coilTier": 0,
+              "muffler": 0
             }
           },
           {
@@ -311,7 +314,7 @@
             "choices": {}
           }
         ],
-        "collapsed": true,
+        "collapsed": false,
         "name": "Rhodium"
       },
       {
@@ -328,12 +331,13 @@
             "voltageTier": 1,
             "crafter": "i:gregtech:gt.blockmachines:1000",
             "choices": {
-              "coilTier": 0
+              "coilTier": 0,
+              "muffler": 0
             }
           },
           {
             "type": "recipe",
-            "recipeId": "r~xDD_lTDhMdaw1icPRS82VQ==",
+            "recipeId": "r~DDnMMSc1MwSd5dWPtL7NnQ==",
             "voltageTier": 0,
             "choices": {}
           },
@@ -371,7 +375,7 @@
             "choices": {}
           }
         ],
-        "collapsed": true,
+        "collapsed": false,
         "name": "Ruthenium"
       },
       {
@@ -384,7 +388,8 @@
             "voltageTier": 1,
             "crafter": "i:gregtech:gt.blockmachines:1000",
             "choices": {
-              "coilTier": 0
+              "coilTier": 0,
+              "muffler": 0
             }
           },
           {
@@ -407,7 +412,8 @@
             "voltageTier": 1,
             "crafter": "i:gregtech:gt.blockmachines:1000",
             "choices": {
-              "coilTier": 0
+              "coilTier": 0,
+              "muffler": 0
             }
           },
           {

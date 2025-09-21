@@ -22,6 +22,8 @@ namespace Source.Data
         public bool cleanRoom;
         public bool lowGravity;
         public string additionalInfo;
+        public int circuitConflicts;
+        public int specialValue;
     }
     
     [Serializable]

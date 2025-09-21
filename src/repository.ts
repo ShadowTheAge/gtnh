@@ -4,7 +4,7 @@ const charCodeItem = "i".charCodeAt(0);
 const charCodeFluid = "f".charCodeAt(0);
 const charCodeRecipe = "r".charCodeAt(0);
 
-const DATA_VERSION = 3;
+const DATA_VERSION = 4;
 export class Repository
 {
     static current:Repository;
@@ -41,12 +41,23 @@ export class Repository
         this.FillObjectPositionMap(this.fluids);
         this.FillObjectPositionMap(this.oreDicts);
         this.FillObjectPositionMap(this.recipes);
+
+        let remap = this.ReadSlice(this.elements[7]);
+        this.FillRecipesRemap(remap);
     }
 
     static load(data: ArrayBuffer): Repository {
         const repository = new Repository(data);
         Repository.current = repository;
         return repository;
+    }
+
+    private FillRecipesRemap(remap:Int32Array) {
+        for (let i = 0; i < remap.length; i++) {
+            let remapPos = remap[i];
+            let id = this.GetString(this.elements[remapPos]);
+            this.objectPositionMap[id] = this.elements[remapPos+1];
+        }
     }
 
     private FillObjectPositionMap(elements:Int32Array) {
@@ -301,6 +312,8 @@ class GtRecipe extends MemMappedObject
     get cleanRoom():boolean {return (this.GetInt(4) & 1) === 1;}
     get lowGravity():boolean {return (this.GetInt(4) & 2) === 2;}
     get additionalInfo():string {return this.GetString(5);}
+    get circuitConflicts():number {return this.GetInt(6);}
+    get specialValue():number {return this.GetInt(7);}
 }
 
 export enum RecipeIoType

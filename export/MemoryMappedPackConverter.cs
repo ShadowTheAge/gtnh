@@ -19,7 +19,7 @@ namespace Source
         private readonly List<int> rawData = new List<int>();
         private readonly string[] serviceItems = new[] { "Quest Book", "Anvil" };
         
-        private const int DATA_VERSION = 3;
+        private const int DATA_VERSION = 4;
 
         public MemoryMappedPackConverter(Repository repository)
         {
@@ -31,6 +31,7 @@ namespace Source
             WriteObjectRef(repository.recipeTypes);
             WriteObjectRef(repository.recipes);
             WriteObjectRef(Array.ConvertAll(serviceItems, x => this.repository.items.First(y => y.name == x)));
+            WriteObjectRef(repository.remaps);
         }
 
         private void WriteInt(int i)
@@ -71,6 +72,7 @@ namespace Source
                 case FluidContainer container: Write(container); return;
                 case int[] intArr: Write(intArr); return;
                 case IList genericList: Write(genericList); return;
+                case RecipeRemap remap: Write(remap); return;
                 case int i: WriteInt(i); return;
                 case string s: WriteStringRef(s); return;
                 default: throw new InvalidOperationException("Unexpected type: "+o.GetType());
@@ -101,6 +103,8 @@ namespace Source
             WriteInt(recipeType.voltageTier);
             WriteInt((recipeType.cleanRoom ? 1 : 0) + (recipeType.lowGravity ? 2 : 0));
             WriteStringRef(recipeType.additionalInfo);
+            WriteInt(recipeType.circuitConflicts);
+            WriteInt(recipeType.specialValue);
         }
 
         private void WriteIndexBits(IndexableObject obj)
@@ -118,6 +122,12 @@ namespace Source
         {
             WriteIndexBits(dict);
             WriteObjectRef(dict.variants);
+        }
+        
+        private void Write(RecipeRemap remap)
+        {
+            WriteStringRef(remap.from);
+            WriteObjectRef(remap.to);
         }
 
         private object[] PackRecipeInOut(Recipe recipe)

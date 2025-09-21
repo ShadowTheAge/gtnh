@@ -7,6 +7,13 @@
         public List<OreDict> oreDicts = new List<OreDict>();
         public List<RecipeType> recipeTypes = new List<RecipeType>();
         public List<Recipe> recipes = new List<Recipe>();
+        public List<RecipeRemap> remaps = new List<RecipeRemap>();
+    }
+
+    public class RecipeRemap
+    {
+        public string from;
+        public Recipe to;
     }
 
     public abstract class IndexableObject

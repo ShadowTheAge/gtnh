@@ -1,10 +1,11 @@
-﻿using Source.Data;
+﻿using export;
+using Source.Data;
 
 namespace Source
 {
     public static class PackGenerator
     {
-        public static Repository Generate(string sourcePath, string targetPath, bool skipIcons = false)
+        public static Repository Generate(string sourcePath, string targetPath, bool skipIcons = false, string previousDataBin = null)
         {
             var dbParser = new DatabaseParser();
             dbParser.Parse(Path.Combine(sourcePath, "nesql-db.script"));
@@ -14,6 +15,13 @@ namespace Source
             
             PackPreProcessor.PreProcessPack(repository);
             HardcodeFixes.Fix(repository);
+            FontCharactersFixer.FixFontCharacters(repository);
+            RecipeConflictsCalculator.CalculateRecipeConflicts(repository);
+            
+            if (previousDataBin != null)
+            {
+                OldRecipesGenerator.PopulateOldRecipes(repository, previousDataBin);
+            }
             
             Console.WriteLine("Exporting data.bin...");
             var mmap = new MemoryMappedPackConverter(repository);

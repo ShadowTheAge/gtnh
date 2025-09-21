@@ -229,7 +229,7 @@ function ApplySolutionRecipe(recipeModel:RecipeModel, solution:Solution):void
     let flow:FlowInformation = new FlowInformation();
     recipeModel.flow = flow;
     let name = `recipe_${recipeModel.iid}`;
-    let recipe = recipeModel.recipe!;
+    let recipe = recipeModel.recipe;
     let solutionValue = (solution[name] || 0) as number;
     recipeModel.recipesPerMinute = solutionValue;
     recipeModel.crafterCount = 0;
@@ -247,7 +247,7 @@ function ApplySolutionRecipe(recipeModel:RecipeModel, solution:Solution):void
         } else flow.Add(goods, amount, isProduction);
     }
 
-    let gtRecipe = recipe.gtRecipe;
+    let gtRecipe = recipe?.gtRecipe;
     if (gtRecipe && gtRecipe.durationTicks > 0) {
         flow.energy[recipeModel.voltageTier] = gtRecipe.durationMinutes * gtRecipe.voltage * solutionValue * recipeModel.powerFactor;
         recipeModel.crafterCount = solutionValue * gtRecipe.durationMinutes / recipeModel.overclockFactor;

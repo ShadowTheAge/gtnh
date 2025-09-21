@@ -81,6 +81,9 @@ namespace GT_recipe_parser
 
         [SchemaName("RECIPE_ID")]
         public string RecipeId { get; set; }
+        
+        [SchemaName("RECIPE_SPECIAL_VALUE")]
+        public int RecipeSpecialValue { get; set; }
     }
 
     public class GregTechRecipeItemModel
