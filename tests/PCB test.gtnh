@@ -1,0 +1,47 @@
+{
+  "name": "PCB test",
+  "products": [
+    {
+      "goodsId": "i:gregtech:gt.metaitem.03:32102",
+      "amount": 10000
+    },
+    {
+      "goodsId": "i:gregtech:gt.metaitem.03:32105",
+      "amount": 10000
+    }
+  ],
+  "rootGroup": {
+    "type": "recipe_group",
+    "links": {},
+    "elements": [
+      {
+        "type": "recipe",
+        "recipeId": "r~3SKHWZ2eOC25FzCsEvSmUA==",
+        "voltageTier": 13,
+        "choices": {
+          "nanites": 1,
+          "traceSize": 200,
+          "biochamber": 0,
+          "cooling": 0
+        }
+      },
+      {
+        "type": "recipe",
+        "recipeId": "r~oW7Dz6k_MM6mgTRc0NBX8g==",
+        "voltageTier": 13,
+        "choices": {
+          "nanites": 100,
+          "traceSize": 50,
+          "biochamber": 1,
+          "cooling": 2
+        }
+      }
+    ],
+    "collapsed": false,
+    "name": "Group"
+  },
+  "settings": {
+    "minVoltage": 0,
+    "timeUnit": "min"
+  }
+}

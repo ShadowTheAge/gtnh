@@ -1283,6 +1283,27 @@ exports[`Solver Processing Oxygen.gtnh should process without errors 1`] = `
 ]
 `;
 
+exports[`Solver Processing PCB test.gtnh should process without errors 1`] = `
+[
+  {
+    "crafterCount": 94.27083333333334,
+    "id": "r~3SKHWZ2eOC25FzCsEvSmUA==",
+    "overclockFactor": 4,
+    "overclockName": undefined,
+    "powerFactor": 0.25,
+    "recipesPerMinute": 1250,
+  },
+  {
+    "crafterCount": 0.36410108025638016,
+    "id": "r~oW7Dz6k_MM6mgTRc0NBX8g==",
+    "overclockFactor": 128,
+    "overclockName": "Perfect OC x2",
+    "powerFactor": 5.656854249492381,
+    "recipesPerMinute": 185.18518519,
+  },
+]
+`;
+
 exports[`Solver Processing Platline.gtnh should process without errors 1`] = `
 [
   {
@@ -2073,7 +2094,7 @@ exports[`Solver Processing Tungsten.gtnh should process without errors 1`] = `
     "id": "r~rIoTKaPxP6mnlSIf647ZOA==",
     "overclockFactor": 2,
     "overclockName": "OC x1",
-    "powerFactor": 2,
+    "powerFactor": 1.9,
     "recipesPerMinute": 8,
   },
   {
@@ -2222,7 +2243,7 @@ exports[`Solver Processing UHV naqfuel mk3 chromatic glass.gtnh should process w
     "id": "r~KcV7Okx_PX2io84jpBy7Qg==",
     "overclockFactor": 70.4,
     "overclockName": "Perfect OC x1",
-    "powerFactor": 0.3165467471590908,
+    "powerFactor": 0.30071940980113626,
     "recipesPerMinute": 12,
   },
   {
@@ -2230,7 +2251,7 @@ exports[`Solver Processing UHV naqfuel mk3 chromatic glass.gtnh should process w
     "id": "r~cXEm-XdKOxyUAWAJTlI7zA==",
     "overclockFactor": 70.4,
     "overclockName": "Perfect OC x1",
-    "powerFactor": 0.27139926734552544,
+    "powerFactor": 0.25782930397824916,
     "recipesPerMinute": 24,
   },
   {

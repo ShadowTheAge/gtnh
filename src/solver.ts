@@ -65,7 +65,7 @@ function CreateLinkByAlgorithm(model:Model, algorithm:LinkAlgorithm, group:Recip
     model.constraints[linkName] = {equal:amount};
 }
 
-function calculateDefaultOverclocks(recipeModel:RecipeModel, overclockTiers:number): OverclockResult {
+export function calculateDefaultOverclocks(recipeModel:RecipeModel, overclockTiers:number): OverclockResult {
     let machineInfo = recipeModel.machineInfo;
 
     let overclockSpeed = 1;

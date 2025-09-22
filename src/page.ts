@@ -293,20 +293,6 @@ export class RecipeModel extends RecipeGroupEntry
         this.choices = validatedChoices;
     }
 
-    public getFusionStartupCost(): number {
-        if (this.recipe?.gtRecipe?.additionalInfo) {
-            const regex = /To start:\s*([\d,]+(?:\.\d+)?)/i;
-            const match = this.recipe.gtRecipe.additionalInfo.match(regex);
-    
-            if (match && match[1]) {
-                const numberString = match[1].replace(/,/g, '');
-                return parseInt(numberString);
-            }
-        }
-
-        return 0;
-    }
-
     public getInputCount(): number {
         return this.recipeItems.filter((entry) => entry.type in [RecipeIoType.FluidInput, RecipeIoType.ItemInput, RecipeIoType.OreDictInput]).length;
     }

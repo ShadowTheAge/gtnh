@@ -200,7 +200,6 @@ export abstract class Goods extends RecipeObject
     get name(): string {return this.GetString(5);}
     get mod(): string {return this.GetString(6);}
     get internalName(): string {return this.GetString(7);}
-    get numericId(): number {return this.GetInt(8);}
     get iconId(): number {return this.GetInt(9);}
     get tooltip(): string | null {return this.GetString(10);}
     get unlocalizedName(): string {return this.GetString(11);}
@@ -225,7 +224,7 @@ export class Item extends Goods
     get container():FluidContainer | null {return this.GetObject(17, FluidContainer);}
     
     get tooltipDebugInfo(): string {
-        var baseInfo = `${this.mod}:${this.internalName} (${this.numericId}:${this.damage})`;
+        var baseInfo = `${this.mod}:${this.internalName}:${this.damage}`;
         var nbt = this.nbt;
         if (nbt != null)
             baseInfo += "\n" + nbt;
@@ -245,7 +244,7 @@ export class Fluid extends Goods
     get isGas():boolean {return this.GetInt(15) === 1;}
     get containers():Int32Array {return this.GetSlice(16);}
     get tooltipDebugInfo(): string {
-        return `${this.mod}:${this.internalName} (${this.numericId})`;
+        return `${this.mod}:${this.internalName}`;
     }
 }
 

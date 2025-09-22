@@ -1,5 +1,6 @@
 import { RecipeModel, OverclockResult } from "./page.js";
 import { Fluid, Goods, Item, Recipe, RecipeInOut, RecipeIoType, RecipeType, Repository } from "./repository.js";
+import { calculateDefaultOverclocks } from "./solver.js";
 import { TIER_LV, TIER_LUV, TIER_ZPM, TIER_UV, TIER_UHV, TIER_UEV } from "./utils.js";
 import { voltageTier } from "./utils.js";
 
@@ -263,34 +264,9 @@ machines["Industrial Autoclave"] = {
     choices: {coilTier: CoilTierChoice, pipeCasingTier: PipeCasingTierChoice},
 };
 
-const ebfRecipeBaseCoilTierCache: {[key: string]: number} = {};
-
 function GetEbfRecipeBaseCoilTier(recipe?: Recipe): number {
-    if (!recipe) return 0;
-    const recipeId = recipe.id;
-    let cached = ebfRecipeBaseCoilTierCache[recipeId];
-    if (cached !== undefined) return cached;
-
-    let recipeInfo = recipe.gtRecipe.additionalInfo;
-    if (!recipeInfo) return 0;
-
-    let coilTier = 0;
-    if (recipeInfo.endsWith("(Cupronickel)")) coilTier = 0;
-    else if (recipeInfo.endsWith("(Kanthal)")) coilTier = 1;
-    else if (recipeInfo.endsWith("(Nichrome)")) coilTier = 2;
-    else if (recipeInfo.endsWith("(TPV)")) coilTier = 3;
-    else if (recipeInfo.endsWith("(HSS-G)")) coilTier = 4;
-    else if (recipeInfo.endsWith("(HSS-S)")) coilTier = 5;
-    else if (recipeInfo.endsWith("(Naquadah)")) coilTier = 6;
-    else if (recipeInfo.endsWith("(Naquadah Alloy)")) coilTier = 7;
-    else if (recipeInfo.endsWith("(Trinium)")) coilTier = 8;
-    else if (recipeInfo.endsWith("(Electrum Flux)")) coilTier = 9;
-    else if (recipeInfo.endsWith("(Awakened Draconium)")) coilTier = 10;
-    else if (recipeInfo.endsWith("(Infinity)")) coilTier = 11;
-    else if (recipeInfo.endsWith("(Hypogen)")) coilTier = 12;
-    else if (recipeInfo.endsWith("(Eternal)")) coilTier = 13;
-
-    ebfRecipeBaseCoilTierCache[recipeId] = coilTier;
+    let temp = recipe?.gtRecipe.specialValue ?? 0;
+    let coilTier = Math.max(0, Math.min(13, Math.floor((temp - 1801) / 900)));
     return coilTier;
 }
 
@@ -660,60 +636,66 @@ machines["PCB Factory"] = {
     perfectOverclock: (recipe, choices) => choices.cooling >= 2 ? MAX_OVERCLOCK : 0,
     speed: (recipe, choices) => 1/Math.pow(100/choices.traceSize, 2),
     power: (recipe, choices) => choices.cooling > 0 && choices.biochamber > 0 ? Math.sqrt(2) : 1,
+    customOverclock: function(recipe, overclockTiers) {
+        if (recipe.choices.cooling == 0)
+            return noOverclock(recipe, overclockTiers);
+        return calculateDefaultOverclocks(recipe, overclockTiers);
+    },
     parallels: (recipe, choices) => {
         const nanites = choices.nanites;
-        return Math.floor(Math.log2(nanites) + 1);
+        return Math.min(256, Math.ceil(Math.pow(nanites, 0.75)));
     },
     choices: {nanites: {description: "Nanites", min: 1}, 
         traceSize: {description: "Trace Size", min:50, max:200}, 
         biochamber: {description: "Biochamber", choices: ["No Biochamber", "Biochamber"]}, 
         cooling: {description: "Cooling", choices: ["No Cooling", "Liquid Cooling", "Thermosink Radiator"]},
     },
-    info: "Production multiplier based on trace size is not implemented.",
+    recipe: (recipe, choices, items) => {
+        items = createEditableCopy(items);
+        let productionMultiplier = 100 / choices.traceSize;
+        for (let i=0; i<items.length; i++) {
+            let item = items[i];
+            if (item.type == RecipeIoType.ItemOutput && item.goods instanceof Item) {
+                item.amount = Math.floor(item.amount * productionMultiplier);
+            }
+        }
+        return items;
+    },
 };
 
 class DtpfCatalyst {
     tier: number;
-    name: string;
+    displayName: string;
     id: string;
     euPerLiter: number;
     residuePerLiter: number;
 
-    constructor(tier: number, name: string, id: string, euPerLiter: number, residuePerLiter: number) {
+    constructor(tier: number, displayName: string, id: string, euPerLiter: number, residuePerLiter: number) {
         this.tier = tier;
-        this.name = name;
+        this.displayName = displayName;
         this.id = id;
         this.euPerLiter = euPerLiter;
         this.residuePerLiter = residuePerLiter;
     }
-
-    public getCompactName() {
-        const regex = /^Excited Dimensionally Transcendent (.+?) Catalyst$/;
-        const match = this.name.match(regex);
-        if (!match) {
-            throw new Error(`Cannot compactify non-standard DTPF catalyst name: "${self.name}"`);
-        }
-        return match[1];
-    }
 }
 
 let DtpfCatalysts = [
-    new DtpfCatalyst(0, "Excited Dimensionally Transcendent Crude Catalyst", "f:gregtech:exciteddtcc", 14_514_093, 0.125),
-    new DtpfCatalyst(1, "Excited Dimensionally Transcendent Prosaic Catalyst", "f:gregtech:exciteddtpc", 66_768_460, 0.25),
-    new DtpfCatalyst(2, "Excited Dimensionally Transcendent Resplendent Catalyst", "f:gregtech:exciteddtrc", 269_326_451, 0.5),
-    new DtpfCatalyst(3, "Excited Dimensionally Transcendent Exotic Catalyst", "f:gregtech:exciteddtec", 1_073_007_393, 1.0),
-    new DtpfCatalyst(4, "Excited Dimensionally Transcendent Stellar Catalyst", "f:gregtech:exciteddtsc", 4_276_767_521, 2.0),
+    new DtpfCatalyst(0, "Crude", "f:gregtech:exciteddtcc", 14_514_093, 0.125),
+    new DtpfCatalyst(1, "Prosaic", "f:gregtech:exciteddtpc", 66_768_460, 0.25),
+    new DtpfCatalyst(2, "Resplendent", "f:gregtech:exciteddtrc", 269_326_451, 0.5),
+    new DtpfCatalyst(3, "Exotic", "f:gregtech:exciteddtec", 1_073_007_393, 1.0),
+    new DtpfCatalyst(4, "Stellar", "f:gregtech:exciteddtsc", 4_276_767_521, 2.0),
 ]
 
-let DtpfCatalystByName = Object.fromEntries(DtpfCatalysts.map(cat => [cat.name, cat]));
+let DtpfCatalystById = Object.fromEntries(DtpfCatalysts.map(cat => [cat.id, cat]));
 
 function findDtpfCatalyst(items:RecipeInOut[]) : DtpfCatalyst | undefined {
     for (let i=0; i<items.length; i++) {
         let item = items[i];
         if (item.type == RecipeIoType.FluidInput) {
-            let name = (item.goods as Fluid).name;
-            if (name in DtpfCatalystByName) {
-                return DtpfCatalystByName[name];
+            let id = (item.goods as Fluid).id;
+            if (id in DtpfCatalystById) {
+                return DtpfCatalystById[id];
             }
         }
     }
@@ -777,8 +759,8 @@ machines["Dimensionally Transcendent Plasma Forge"] = {
             for (let i=0; i<items.length; i++) {
                 let item = items[i];
                 if (item.type == RecipeIoType.FluidInput) {
-                    let name = (item.goods as Fluid).name;
-                    if (name in DtpfCatalystByName) {
+                    let id = (item.goods as Fluid).id;
+                    if (id in DtpfCatalystById) {
                         item.amount *= (1-discount);
                     }
                 }
@@ -796,7 +778,7 @@ machines["Dimensionally Transcendent Plasma Forge"] = {
             description: "Discount", choices: ["0%", "50%"]
         },
         catalyst: {
-            description: "Catalyst", choices: DtpfCatalysts.map(cat => cat.getCompactName())
+            description: "Catalyst", choices: DtpfCatalysts.map(cat => cat.displayName)
         },
     },
     enforceChoiceConstraints: (recipe, choices) => {
@@ -1251,7 +1233,7 @@ machines["Compact Fusion Computer MK-I Prototype"] = {
 };
 
 function getCompactFusionParallel(recipe:RecipeModel, buckets:number[][]) {
-    const startupCost = recipe.getFusionStartupCost();
+    const startupCost = recipe.recipe?.gtRecipe?.specialValue ?? 0;
     for (const [threshold, parallel] of buckets) {
         if (startupCost < threshold) {
             return parallel;
