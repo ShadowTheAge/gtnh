@@ -1,0 +1,26 @@
+{
+  "name": "mebf",
+  "products": [],
+  "rootGroup": {
+    "type": "recipe_group",
+    "links": {},
+    "elements": [
+      {
+        "type": "recipe",
+        "recipeId": "r~s6XwXJ10Nf6Rm_EayZQMUA==",
+        "voltageTier": 24,
+        "crafter": "i:gregtech:gt.blockmachines:12730",
+        "choices": {
+          "coilTier": 13
+        },
+        "fixedCrafterCount": 1
+      }
+    ],
+    "collapsed": false,
+    "name": "Group"
+  },
+  "settings": {
+    "minVoltage": 0,
+    "timeUnit": "min"
+  }
+}

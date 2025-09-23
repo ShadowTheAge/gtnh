@@ -309,6 +309,7 @@ machines["Volcanus"] = {
     info: "Blazing pyrotheum required (Not calculated)",
 };
 
+// Name before 2.8
 machines["Mega Blast Furnace"] = {
     perfectOverclock: ebfPerfectOverclock,
     speed: 1,
@@ -316,6 +317,9 @@ machines["Mega Blast Furnace"] = {
     parallels: 256,
     choices: {coilTier: CoilTierChoice},
 };
+
+// Renamed since 2.8
+machines["Mega Electric Blast Furnace"] = machines["Mega Blast Furnace"]
 
 machines["Big Barrel Brewery"] = {
     perfectOverclock: 0,

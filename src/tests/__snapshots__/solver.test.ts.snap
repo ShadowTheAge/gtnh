@@ -2354,3 +2354,16 @@ exports[`Solver Processing Vinyl chloride.gtnh should process without errors 1`]
   },
 ]
 `;
+
+exports[`Solver Processing mebf.gtnh should process without errors 1`] = `
+[
+  {
+    "crafterCount": 1,
+    "id": "r~s6XwXJ10Nf6Rm_EayZQMUA==",
+    "overclockFactor": 131072,
+    "overclockName": "OC x9",
+    "powerFactor": 512,
+    "recipesPerMinute": 262144,
+  },
+]
+`;
