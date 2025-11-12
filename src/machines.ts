@@ -1945,12 +1945,21 @@ function getFogVoltageTier(crafter: string, recipeModel: RecipeModel, choices:{[
             return i - 1;
         }
     }
-    return voltageTier.length;
+    return voltageTier.length - 1;
+}
+
+function getFogModulePowerMultiplier(crafter: string, recipeModel: RecipeModel, choices:{[key:string]:number}) {
+    const rawHeat = getFogRawHeat("Helioflare Power Forge", choices);
+    const heatForOC = getFogHeatForOC("Helioflare Power Forge", choices, rawHeat);
+    const recipeHeat = recipeModel.recipe?.gtRecipe.specialValue ?? 0;
+    const discounts = Math.floor((heatForOC - recipeHeat) / 900);
+    const base = (choices.upgrade_IMKG == 1) ? 0.92 : 0.95;
+    return Math.pow(base, discounts);
 }
 
 machines["Helioflare Power Forge"] = {
     speed: (recipeModel, choices) => getFogModuleSpeed("Helioflare Power Forge", recipeModel, choices),
-    power: 1,
+    power: (recipeModel, choices) => getFogModulePowerMultiplier("Helioflare Power Forge", recipeModel, choices),
     parallels: (recipeModel, choices) => getFogModuleParallel("Helioflare Power Forge", recipeModel, choices),
     choices: {
         fuelFactor: {
@@ -2020,9 +2029,14 @@ machines["Helioflare Power Forge"] = {
         upgrade_NGMS: {
             description: "NGMS",
             choices: ["No", "Yes"]
+        },
+        upgrade_IMKG: {
+            description: "IMKG",
+            choices: ["No", "Yes"]
         }
     },
     fixedVoltageTier: (recipeModel, choices) => getFogVoltageTier("Helioflare Power Forge", recipeModel, choices),
+    // TODO: normal overclock factor
     overclocker: (recipeModel, choices) => {
         const rawHeat = getFogRawHeat("Helioflare Power Forge", choices);
         const heatForOC = getFogHeatForOC("Helioflare Power Forge", choices, rawHeat);
