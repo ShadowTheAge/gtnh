@@ -1939,7 +1939,7 @@ function getFogVoltage(crafter: string, recipeModel: RecipeModel, choices:{[key:
 function getFogVoltageTier(crafter: string, recipeModel: RecipeModel, choices:{[key:string]:number}) {
     const voltage = getFogVoltage(crafter, recipeModel, choices);
     const parallels = getFogModuleParallel(crafter, recipeModel, choices);
-    const power = voltage * parallels * 2;
+    const power = voltage * parallels * 4;
     for (let i = 0; i < voltageTier.length; ++i) {
         if (voltageTier[i].voltage > power) {
             return i - 1;
