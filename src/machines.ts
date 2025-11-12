@@ -1822,15 +1822,11 @@ const FOG_MODULE_BASE_PARALLEL : Map<string, number> = new Map([
     ["Helioflare Power Forge", 1024],
 ]);
 
-function getFogHeat() {
-    return 13000;
-}
-
 function getFogRawHeat(crafter:string, choices:{[key:string]:number}) {
     const fuelFactor = choices.fuelFactor;
     let logBase = 1.5;
     let baseHeat = 12601;
-    if (choices.upgrade_SEFCP) {
+    if (choices.upgrade_SEFCP == 1) {
         logBase = (crafter === "Helioflux Power Forge") ? 1.12 : 1.18;
     }
     return baseHeat + Math.floor((Math.log(fuelFactor) / Math.log(logBase) * 1000));
@@ -1839,10 +1835,10 @@ function getFogRawHeat(crafter:string, choices:{[key:string]:number}) {
 function getFogHeatForOC(crafter: string, choices:{[key:string]:number}, rawHeat: number) {
     let actualHeat = 0;
 
-    if (choices.upgrade_NDPE) {
+    if (choices.upgrade_NDPE == 1) {
         const exponent = (crafter === "Helioflux Power Forge") ? 0.85 : 0.8;
         actualHeat = (rawHeat > 30000) ? Math.floor(30000 + Math.pow(rawHeat - 30000, exponent)) : rawHeat;
-    } else if (choices.upgrade_CNTI) {
+    } else if (choices.upgrade_CNTI == 1) {
         actualHeat = Math.min(rawHeat, 30000);
     } else {
         actualHeat = Math.min(rawHeat, 15000);
@@ -1862,7 +1858,7 @@ function getFogEffectiveFuelFactor(fuelFactor: number) {
 function getFogModuleParallel(crafter: string, recipeModel: RecipeModel, choices:{[key:string]:number}) {
     const fuelFactor = choices.fuelFactor;
     const upgradeCount = choices.upgradeCount;
-    const heat = getFogHeat();
+    const heat = getFogRawHeat(crafter, choices);
     const baseParallel = FOG_MODULE_BASE_PARALLEL.get(crafter) || 1;
 
     let fuelFactorMultiplier = 1;
@@ -1901,8 +1897,30 @@ function getFogModuleParallel(crafter: string, recipeModel: RecipeModel, choices
     return maxParallel;
 }
 
+function getFogModuleSpeed(crafter: string, recipeModel: RecipeModel, choices:{[key:string]:number}) {
+    const heat = getFogRawHeat(crafter, choices);
+
+    let durationModifier = 1;
+
+    if (choices.upgrade_IGCC == 1) {
+        durationModifier = Math.pow(heat, -0.01);
+    }
+
+    if (choices.upgrade_DOR == 1) {
+        const parallels = getFogModuleParallel(crafter, recipeModel, choices);
+        const exponent = (crafter === "Heliothermal Plasma Fabricator") ? 0.02 : 0.012;
+        durationModifier /= Math.pow(parallels, exponent);
+    }
+
+    if (crafter === "Heliofusion Exoticizer") {
+        durationModifier = (choices.upgrade_PA == 1) ? Math.sqrt(durationModifier) : 1;
+    }
+
+    return 1 / durationModifier;
+}
+
 machines["Helioflare Power Forge"] = {
-    speed: 1,
+    speed: (recipeModel, choices) => getFogModuleSpeed("Helioflare Power Forge", recipeModel, choices),
     power: 1,
     parallels: (recipeModel, choices) => getFogModuleParallel("Helioflare Power Forge", recipeModel, choices),
     choices: {
@@ -1952,6 +1970,14 @@ machines["Helioflare Power Forge"] = {
         },
         upgrade_SEFCP: {
             description: "SEFCP",
+            choices: ["No", "Yes"]
+        },
+        upgrade_IGCC: {
+            description: "IGCC",
+            choices: ["No", "Yes"]
+        },
+        upgrade_DOR: {
+            description: "DOR",
             choices: ["No", "Yes"]
         }
     },
