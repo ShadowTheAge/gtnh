@@ -1919,6 +1919,35 @@ function getFogModuleSpeed(crafter: string, recipeModel: RecipeModel, choices:{[
     return 1 / durationModifier;
 }
 
+// TODO: use actual voltage instead of voltage tier approximation.
+function getFogVoltage(crafter: string, recipeModel: RecipeModel, choices:{[key:string]:number}) {
+    const fuelFactor = choices.fuelFactor;
+    const ringCount = choices.ringCount;
+    let voltage = 2e9;
+
+    if (choices.upgrade_GISS == 1) {
+        voltage += getFogEffectiveFuelFactor(fuelFactor) * 1e8;
+    }
+
+    if (choices.upgrade_NGMS == 1) {
+        voltage *= Math.pow(4, ringCount);
+    }
+
+    return voltage;
+}
+
+function getFogVoltageTier(crafter: string, recipeModel: RecipeModel, choices:{[key:string]:number}) {
+    const voltage = getFogVoltage(crafter, recipeModel, choices);
+    const parallels = getFogModuleParallel(crafter, recipeModel, choices);
+    const power = voltage * parallels * 2;
+    for (let i = 0; i < voltageTier.length; ++i) {
+        if (voltageTier[i].voltage > power) {
+            return i - 1;
+        }
+    }
+    return voltageTier.length;
+}
+
 machines["Helioflare Power Forge"] = {
     speed: (recipeModel, choices) => getFogModuleSpeed("Helioflare Power Forge", recipeModel, choices),
     power: 1,
@@ -1930,6 +1959,10 @@ machines["Helioflare Power Forge"] = {
         },
         upgradeCount: {
             description: "Upgrade count",
+            min: 1
+        },
+        ringCount: {
+            description: "Ring count",
             min: 1
         },
         upgrade_DOP: {
@@ -1979,8 +2012,17 @@ machines["Helioflare Power Forge"] = {
         upgrade_DOR: {
             description: "DOR",
             choices: ["No", "Yes"]
+        },
+        upgrade_GISS: {
+            description: "GISS",
+            choices: ["No", "Yes"]
+        },
+        upgrade_NGMS: {
+            description: "NGMS",
+            choices: ["No", "Yes"]
         }
     },
+    fixedVoltageTier: (recipeModel, choices) => getFogVoltageTier("Helioflare Power Forge", recipeModel, choices),
     overclocker: (recipeModel, choices) => {
         const rawHeat = getFogRawHeat("Helioflare Power Forge", choices);
         const heatForOC = getFogHeatForOC("Helioflare Power Forge", choices, rawHeat);
