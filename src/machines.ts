@@ -1817,3 +1817,106 @@ machines["Eye of Harmony"] = {
     },
     info: "NOTE: Power input/output not calculated"
 }
+
+const FOG_MODULE_BASE_PARALLEL : Map<string, number> = new Map([
+    ["Helioflare Power Forge", 1024],
+]);
+
+function getFogHeat() {
+    return 13000;
+}
+
+function getFogEffectiveFuelFactor(fuelFactor: number) {
+    if (fuelFactor <= 43) {
+        return fuelFactor;
+    } else {
+        return 43 + Math.floor(Math.pow((fuelFactor - 43), 0.4));
+    }
+}
+
+function getFogModuleParallel(crafter: string, recipeModel: RecipeModel, choices:{[key:string]:number}) {
+    const fuelFactor = choices.fuelFactor;
+    const upgradeCount = choices.upgradeCount;
+    const heat = getFogHeat();
+    const baseParallel = FOG_MODULE_BASE_PARALLEL.get(crafter) || 1;
+
+    let fuelFactorMultiplier = 1;
+    let heatMultiplier = 1;
+    let upgradeAmountMultiplier = 1;
+    let node53 = (choices.upgrade_CTCDD == 1) ? 2 : 1;
+    let isMoltenOrSmeltingWithUpgrade = 
+           (crafter === "Helioflux Melting Core") 
+        || (crafter === "Helioflux Power Forge" && choices.upgrade_DOP == 1);
+    
+    if (choices.upgrade_SA == 1) {
+        fuelFactorMultiplier = 1 + getFogEffectiveFuelFactor(fuelFactor) / 15.0;
+        if (choices.upgrade_TCT == 1) {
+            fuelFactorMultiplier *= isMoltenOrSmeltingWithUpgrade ? 3 : 2;
+        }
+    }
+
+    if (choices.upgrade_EPEC == 1) {
+        const divisor = isMoltenOrSmeltingWithUpgrade ? 15000 : 25000;
+        heatMultiplier = 1 + heat / divisor;
+    }
+
+    if (choices.upgrade_POS == 1) {
+        const divisor = isMoltenOrSmeltingWithUpgrade ? 5 : 8;
+        upgradeAmountMultiplier = 1 + upgradeCount / divisor;
+    }
+
+    let totalBonuses = node53 * fuelFactorMultiplier * heatMultiplier * upgradeAmountMultiplier;
+
+    if (crafter === "Heliofusion Exoticizer") {
+        totalBonuses = (choices.upgrade_PA == 1) ? Math.sqrt(totalBonuses) : 1;
+    }
+
+    const maxParallel = Math.floor(baseParallel * totalBonuses);
+
+    return maxParallel;
+}
+
+machines["Helioflare Power Forge"] = {
+    speed: 1,
+    power: 1,
+    parallels: (recipeModel, choices) => getFogModuleParallel("Helioflare Power Forge", recipeModel, choices),
+    choices: {
+        fuelFactor: {
+            description: "Fuel factor",
+            min: 1
+        },
+        upgradeCount: {
+            description: "Upgrade count",
+            min: 1
+        },
+        upgrade_DOP: {
+            description: "DOP",
+            choices: ["No", "Yes"]
+        },
+        upgrade_CTCDD: {
+            description: "CTCDD",
+            choices: ["No", "Yes"]
+        },
+        upgrade_SA: {
+            description: "SA",
+            choices: ["No", "Yes"]
+        },
+        upgrade_EPEC: {
+            description: "EPEC",
+            choices: ["No", "Yes"]
+        },
+        upgrade_POS: {
+            description: "POS",
+            choices: ["No", "Yes"]
+        },
+        upgrade_PA: {
+            description: "PA",
+            choices: ["No", "Yes"]
+        },
+        upgrade_TCT: {
+            description: "TCT",
+            choices: ["No", "Yes"]
+        }
+    },
+    overclocker: StandardOverclocker.onlyNormal()
+}
