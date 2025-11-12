@@ -1826,6 +1826,31 @@ function getFogHeat() {
     return 13000;
 }
 
+function getFogRawHeat(crafter:string, choices:{[key:string]:number}) {
+    const fuelFactor = choices.fuelFactor;
+    let logBase = 1.5;
+    let baseHeat = 12601;
+    if (choices.upgrade_SEFCP) {
+        logBase = (crafter === "Helioflux Power Forge") ? 1.12 : 1.18;
+    }
+    return baseHeat + Math.floor((Math.log(fuelFactor) / Math.log(logBase) * 1000));
+}
+
+function getFogHeatForOC(crafter: string, choices:{[key:string]:number}, rawHeat: number) {
+    let actualHeat = 0;
+
+    if (choices.upgrade_NDPE) {
+        const exponent = (crafter === "Helioflux Power Forge") ? 0.85 : 0.8;
+        actualHeat = (rawHeat > 30000) ? Math.floor(30000 + Math.pow(rawHeat - 30000, exponent)) : rawHeat;
+    } else if (choices.upgrade_CNTI) {
+        actualHeat = Math.min(rawHeat, 30000);
+    } else {
+        actualHeat = Math.min(rawHeat, 15000);
+    }
+
+    return actualHeat;
+}
+
 function getFogEffectiveFuelFactor(fuelFactor: number) {
     if (fuelFactor <= 43) {
         return fuelFactor;
@@ -1916,7 +1941,25 @@ machines["Helioflare Power Forge"] = {
         upgrade_TCT: {
             description: "TCT",
             choices: ["No", "Yes"]
+        },
+        upgrade_NDPE: {
+            description: "NDPE",
+            choices: ["No", "Yes"]
+        },
+        upgrade_CNTI: {
+            description: "CNTI",
+            choices: ["No", "Yes"]
+        },
+        upgrade_SEFCP: {
+            description: "SEFCP",
+            choices: ["No", "Yes"]
         }
     },
-    overclocker: StandardOverclocker.onlyNormal()
+    overclocker: (recipeModel, choices) => {
+        const rawHeat = getFogRawHeat("Helioflare Power Forge", choices);
+        const heatForOC = getFogHeatForOC("Helioflare Power Forge", choices, rawHeat);
+        const recipeHeat = recipeModel.recipe?.gtRecipe.specialValue ?? 0;
+        const maxPerfectOverclocks = Math.floor((heatForOC - recipeHeat) / 1800);
+        return StandardOverclocker.perfectThenNormal(maxPerfectOverclocks);
+    }
 }
