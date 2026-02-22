@@ -47,6 +47,13 @@ export class PageManager {
         this.setupUndoHandler();
         this.setupUrlHashHandler();
         this.setupFileLoadHandler();
+        this.setupImportPageListener();
+    }
+
+    private setupImportPageListener() {
+        document.addEventListener('import-page', ((e: CustomEvent) => {
+            this.importPage(e.detail as PageModel);
+        }) as EventListener);
     }
 
     private setupUndoHandler() {

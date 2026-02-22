@@ -267,6 +267,13 @@ export class RecipeList {
             }
         });
 
+        this.actionHandlers.set("create_byproducts_page", (obj, event) => {
+            if (event.type === "click") {
+                event.preventDefault();
+                this.createByproductsPage();
+            }
+        });
+
         this.actionHandlers.set("select_crafter", (obj, event, parent) => {
             if (obj instanceof RecipeModel && event.type === "click") {
                 const target = event.target as HTMLElement;
@@ -620,6 +627,35 @@ export class RecipeList {
         UpdateProject();
     }
 
+    private createByproductsPage() {
+        const flow = page.rootGroup.flow;
+        const byproductsPage = new PageModel();
+        byproductsPage.name = page.name + " byproducts";
+        byproductsPage.settings = { ...page.settings };
+
+        // Current outputs become input products (negative amounts)
+        for (const [goodsId, amount] of Object.entries(flow.output)) {
+            if (amount !== 0) {
+                byproductsPage.products.push(new ProductModel({
+                    goodsId: goodsId,
+                    amount: -amount
+                }));
+            }
+        }
+
+        // Current inputs become wanted output products (positive amounts)
+        for (const [goodsId, amount] of Object.entries(flow.input)) {
+            if (amount !== 0) {
+                byproductsPage.products.push(new ProductModel({
+                    goodsId: goodsId,
+                    amount: amount
+                }));
+            }
+        }
+
+        document.dispatchEvent(new CustomEvent('import-page', { detail: byproductsPage }));
+    }
+
     private renderIoInfo(flow: FlowInformation, group: RecipeGroupModel): string {
         const renderFlowItems = (items: {[key:string]:number}, group: RecipeGroupModel) => {
             const sortedFlow = Object.entries(items).sort(([,a], [,b]) => Math.abs(b) - Math.abs(a));
@@ -904,6 +940,13 @@ export class RecipeList {
                         <th class="inputs-cell">INPUTS/${page.settings.timeUnit}</th>
                         <th class="outputs-cell">OUTPUTS/${page.settings.timeUnit}</th>
                         <th class="action-cell"></th>
+                    </tr>
+                    <tr>
+                        <td colspan="3"></td>
+                        <td colspan="2" style="text-align: center;">
+                            <a href="#" class="text-small" data-action="create_byproducts_page">Create byproducts page</a>
+                        </td>
+                        <td></td>
                     </tr>
                     <tr>
                         <td></td>
