@@ -9,25 +9,25 @@ export class LocalePack {
 
 let currentLocale: LocalePack;
 
-export function loadLocale(response: Response): Promise<void> {
+export function LoadLocale(response: Response): Promise<void> {
     return response.json().then((data: LocalePack) => {
         currentLocale = data;
     });
 }
 
-export function getObjectName(id: string): string {
+export function GetObjectName(id: string): string {
     const index = currentLocale.names[id];
     if (index === undefined) return id;
     return currentLocale.lines[index];
 }
 
-export function getObjectTooltip(id: string): string {
+export function GetObjectTooltip(id: string): string {
     const indices = currentLocale.tooltips[id];
     if (indices === undefined) return '';
     return indices.map(i => currentLocale.lines[i]).join('\n');
 }
 
-export function search(query: SearchQuery): Set<string> {
+export function SearchLocale(query: SearchQuery): string[] {
     const matchingLines = new Set<number>();
     for (let i = 0; i < currentLocale.lines.length; i++) {
         if (query.Match(currentLocale.lines[i]))
@@ -46,5 +46,5 @@ export function search(query: SearchQuery): Set<string> {
             result.add(id);
     }
 
-    return result;
+    return [...result];
 }

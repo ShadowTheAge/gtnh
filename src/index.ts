@@ -16,7 +16,7 @@ try {
     repositoryModule.Repository.load(buffer);
     console.log("Repository loaded", repositoryModule.Repository.current);
 
-    await localeModule.loadLocale(localeResponse);
+    await localeModule.LoadLocale(localeResponse);
 
 
     // Then load other modules

@@ -22,6 +22,7 @@ export class Repository
     service:Int32Array;
 
     objectPositionMap: {[id:string]:number} = {};
+    listAllGoods: string[] = [];
 
     constructor(data: ArrayBuffer)
     {
@@ -39,10 +40,10 @@ export class Repository
         this.recipeTypes = this.GetSlice(this.elements[4]);
         this.recipes = this.GetSlice(this.elements[5]);
         this.service = this.GetSlice(this.elements[6]);
-        this.FillObjectPositionMap(this.items);
-        this.FillObjectPositionMap(this.fluids);
-        this.FillObjectPositionMap(this.oreDicts);
-        this.FillObjectPositionMap(this.recipes);
+        this.FillObjectPositionMap(this.items, true);
+        this.FillObjectPositionMap(this.fluids, true);
+        this.FillObjectPositionMap(this.oreDicts, false);
+        this.FillObjectPositionMap(this.recipes, false);
 
         let remap = this.ReadSlice(this.elements[7]);
         this.FillRecipesRemap(remap);
@@ -62,10 +63,12 @@ export class Repository
         }
     }
 
-    private FillObjectPositionMap(elements:Int32Array) {
+    private FillObjectPositionMap(elements:Int32Array, addToList:boolean = false) {
         for (var i=0; i<elements.length; i++) {
             var id = this.GetString(this.elements[elements[i]+4]);
             this.objectPositionMap[id] = elements[i];
+            if (addToList)
+                this.listAllGoods.push(id);
         }
     }
 
@@ -78,16 +81,6 @@ export class Repository
         if (!this.objectPositionMap[id])
             return null;
         return this.GetObject(this.objectPositionMap[id], type) as T;
-    }
-
-    public ObjectMatchQueryBits(query:SearchQuery, pointer:number):boolean
-    {
-        var arr = query.indexBits;
-        for (var i=0; i<4; i++) {
-            if ((this.elements[pointer+i] & arr[i]) !== arr[i])
-                return false;
-        }
-        return true;
     }
 
     GetString(pointer:number):string
@@ -127,24 +120,10 @@ export class Repository
         return new prototype(this, pointer);
     }
 
-    GetObjectIfMatchingSearch<T extends SearchableObject>(query:SearchQuery | null, pointer:number, prototype:IMemMappedObjectPrototype<T>):T | null
-    {
-        if (query === null)
-            return this.GetObject(pointer, prototype);
-        if (!this.ObjectMatchQueryBits(query, pointer))
-            return null;
-        var inst = this.GetObject(pointer, prototype);
-        if (query.original.length === 1)
-            return inst;
-        return inst.MatchSearchText(query) ? inst : null;
-    }
-
     IsObjectMatchingSearch(obj:SearchableObject, query:SearchQuery | null):boolean
     {
         if (query === null)
             return true;
-        if (!this.ObjectMatchQueryBits(query, obj.objectOffset))
-            return false;
         if (query.original.length === 1)
             return true;
         return obj.MatchSearchText(query);
@@ -279,7 +258,7 @@ export class OreDict extends RecipeObject
         var items = this.items;
         for (var i = 0; i < items.length; i++) {
             var item = items[i];
-            if (this.repository.ObjectMatchQueryBits(query, item.objectOffset) && item.MatchSearchText(query))
+            if (item.MatchSearchText(query))
                 return true;
         }
         return false;
@@ -390,8 +369,6 @@ export class Recipe extends SearchableObject
         for (var i=0; i<count; i++) 
         {
             var pointer = slice[i*5+1];
-            if (!this.repository.ObjectMatchQueryBits(query, pointer))
-                continue;
             var objType = RecipeIoTypePrototypes[slice[i*5]];
             var obj = this.repository.GetObject<RecipeObject>(pointer, objType);
             if (obj.MatchSearchText(query))
