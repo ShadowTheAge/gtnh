@@ -3,63 +3,6 @@ import { Fluid, Goods, Item, Recipe, RecipeInOut, RecipeIoType, RecipeType, Repo
 import { TIER_LV, TIER_MV, TIER_LUV, TIER_ZPM, TIER_UV, TIER_UHV, TIER_UEV, TIER_UIV, TIER_UXV, CoilTierNames } from "./utils.js";
 import { voltageTier, getFusionTierByStartupCost, formatTicksAsTime } from "./utils.js";
 
-/**
- * Compare recipe type names after caller resolves locale-specific target names.
- */
-function isRecipeTypeName(name:string, canonical:string): boolean {
-    return name === canonical;
-}
-
-/**
- * EBF muffler reduction must match locale-independent fluid identities.
- */
-function isEbfMufflerReducedFluid(fluidUnlocalizedName:string): boolean {
-    return fluidUnlocalizedName === "fluid.carbondioxide"
-        || fluidUnlocalizedName === "fluid.sulfurdioxide"
-        || fluidUnlocalizedName === "fluid.carbonmonoxide";
-}
-
-let cachedMachineRepository: Repository | undefined;
-const cachedMachineNameByUnlocalizedName = new Map<string, string>();
-
-function rebuildMachineNameCache(repository: Repository): void {
-    cachedMachineNameByUnlocalizedName.clear();
-    for (const pointer of repository.recipeTypes) {
-        const recipeType = repository.GetObject(pointer, RecipeType);
-        const relatedMachines = [
-            ...recipeType.singleblocks,
-            ...recipeType.multiblocks,
-            recipeType.defaultCrafter,
-        ].filter(Boolean);
-        for (const machine of relatedMachines) {
-            cachedMachineNameByUnlocalizedName.set(machine.unlocalizedName, machine.name);
-        }
-    }
-    cachedMachineRepository = repository;
-}
-
-function ensureMachineNameCache(): void {
-    const repository = Repository.current;
-    if (repository && cachedMachineRepository !== repository) {
-        rebuildMachineNameCache(repository);
-    }
-}
-
-/**
- * Resolve current-locale machine display name from stable unlocalizedName.
- */
-export function getMachineName(unlocalizedName:string): string {
-    ensureMachineNameCache();
-    return cachedMachineNameByUnlocalizedName.get(unlocalizedName) ?? unlocalizedName;
-}
-
-/**
- * Recipe type name lookup is machine-name based in current DB locale.
- */
-function getRecipeTypeName(machineUnlocalizedName:string): string {
-    return getMachineName(machineUnlocalizedName);
-}
-
 export type MachineCoefficient<T> = Exclude<T, Function> | ((recipe:RecipeModel, choices:{[key:string]:number}) => T);
 
 export abstract class Overclocker {
@@ -198,15 +141,6 @@ type MachineList = {
 
 export const machines: MachineList = {};
 
-// Machine definitions are keyed by unlocalizedName so matching remains stable across DB locales.
-function resolveMachineByUnlocalizedName(item: Item): Machine | undefined {
-    return machines[item.unlocalizedName];
-}
-
-export function ResolveMachine(item: Item): Machine | undefined {
-    return resolveMachineByUnlocalizedName(item);
-}
-
 export const singleBlockMachine:Machine = {
     overclocker: StandardOverclocker.onlyNormal(),
     speed: 1,
@@ -227,13 +161,13 @@ const singleBlockMachineWith22Overclock:Machine = {
 };
 
 export function GetSingleBlockMachine(recipeType:RecipeType):Machine {
-    if (isRecipeTypeName(recipeType.name, getRecipeTypeName("gt.blockmachines.basicmachine.massfab.tier.01")))
+    if (recipeType.name == "Mass Fabrication")
         return singleBlockMachineWith22Overclock;
     return singleBlockMachine;
 }
 
 function IsRecipeType(recipe:RecipeModel, type:string):boolean {
-    return recipe.recipe ? isRecipeTypeName(recipe.recipe.recipeType.name, type) : false;
+    return recipe.recipe ? recipe.recipe.recipeType.name == type : false;
 }
 
 export const notImplementedMachine:Machine = {
@@ -424,7 +358,7 @@ machines["gt.blockmachines.neutronactivator"] = {
 machines["gt.blockmachines.preciseassembler"] = {
     overclocker: StandardOverclocker.onlyNormal(),
     speed: (recipe, choices) => {
-        return IsRecipeType(recipe, getRecipeTypeName("gt.blockmachines.preciseassembler")) ? 1 : 2;
+        return IsRecipeType(recipe, "Precise Assembler") ? 1 : 2;
     },
     power: 1,
     parallels: (recipe, choices) => {
@@ -461,7 +395,7 @@ machines["gt.blockmachines.industrialarcfurnace.controller.tier.single"] = {
     speed: 3.5,
     power: 1,
     parallels: (recipe, choices) => {
-        return IsRecipeType(recipe, getRecipeTypeName("gt.blockmachines.basicmachine.plasmaarcfurnace.tier.01")) ? (recipe.voltageTier + 1) * 8 * choices.w : (recipe.voltageTier + 1) * choices.w;
+        return IsRecipeType(recipe, "Plasma Arc Furnace") ? (recipe.voltageTier + 1) * 8 * choices.w : (recipe.voltageTier + 1) * choices.w;
     },
     choices: {w: {description: "W", min: 1}},
 };
@@ -546,6 +480,12 @@ function ebfPower(recipe:RecipeModel, choices:{[key:string]:number}) {
     const excessHeat = getEbfExcessHeat(recipe, choices);
     const energyReductions = Math.floor(excessHeat / 900);
     return Math.pow(0.95, energyReductions);
+}
+
+function isEbfMufflerReducedFluid(fluidUnlocalizedName:string): boolean {
+    return fluidUnlocalizedName === "fluid.carbondioxide"
+        || fluidUnlocalizedName === "fluid.sulfurdioxide"
+        || fluidUnlocalizedName === "fluid.carbonmonoxide";
 }
 
 // Electric Blast Furnace
@@ -649,9 +589,9 @@ machines["gt.blockmachines.multimachine.distillationtower"] = {
 // Dangote Distillus
 machines["gt.blockmachines.multimachine.adv.distillationtower"] = {
     overclocker: StandardOverclocker.onlyNormal(),
-    speed: (recipe, choices) => IsRecipeType(recipe, getRecipeTypeName("gt.blockmachines.multimachine.distillationtower")) ? 3.5 : 2,
-    power: (recipe, choices) => IsRecipeType(recipe, getRecipeTypeName("gt.blockmachines.multimachine.distillationtower")) ? 1 : 0.85,
-    parallels: (recipe, choices) => IsRecipeType(recipe, getRecipeTypeName("gt.blockmachines.multimachine.distillationtower")) ? 12 : (recipe.voltageTier + 1) * 8,
+    speed: (recipe, choices) => IsRecipeType(recipe, "Distillation Tower") ? 3.5 : 2,
+    power: (recipe, choices) => IsRecipeType(recipe, "Distillation Tower") ? 1 : 0.85,
+    parallels: (recipe, choices) => IsRecipeType(recipe, "Distillation Tower") ? 12 : (recipe.voltageTier + 1) * 8,
 };
 
 // Mega Distillation Tower
