@@ -1,8 +1,14 @@
+import { applyDatabaseLocaleFont } from "./font.js";
+import type { GameDataLocale } from "./gameDataLocale.js";
+
 const loading = document.getElementById("loading")!;
 try {
     // Load the atlas image
     const atlas = new Image();
     atlas.src = "./data/atlas.webp";
+    
+    const gameDataLocale: GameDataLocale = "zh-CN";
+    applyDatabaseLocaleFont(gameDataLocale);
 
     // Load repository and data in parallel
     const [repositoryModule, response] = await Promise.all([
