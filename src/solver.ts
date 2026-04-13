@@ -93,7 +93,7 @@ function PreProcessRecipe(recipeModel:RecipeModel, model:Model, collection:LinkC
         if (crafter === null && !canBeSingleblock) {
             for(let i = 0; i < recipe.recipeType.multiblocks.length; ++i) {
                 const item = recipe.recipeType.multiblocks[i];
-                const machine = machines[item.name];
+                const machine = machines[item.unlocalizedName];
                 const excluded = machine?.excludesRecipe ? machine.excludesRecipe(recipe) : false;
                 if (!excluded) {
                     crafter = item;
@@ -104,7 +104,8 @@ function PreProcessRecipe(recipeModel:RecipeModel, model:Model, collection:LinkC
                 crafter = recipe.recipeType.defaultCrafter;
         }
         let isSingleblock = !crafter;
-        machineInfo = crafter ? (machines[crafter.name] || notImplementedMachine) : GetSingleBlockMachine(recipe.recipeType);
+        // Machine map keys use unlocalizedName to stay stable across DB locales.
+        machineInfo = crafter ? (machines[crafter.unlocalizedName] || notImplementedMachine) : GetSingleBlockMachine(recipe.recipeType);
         recipeModel.multiblockCrafter = crafter;
         recipeModel.machineInfo = machineInfo;
         if (machineInfo.fixedVoltageTier) {

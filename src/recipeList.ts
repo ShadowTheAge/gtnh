@@ -97,7 +97,8 @@ export class RecipeList {
                 let recipeType = recipe.recipeType;
 
                 let tryAddCrafter = (item:Item) => {
-                    const crafter = machines[item.name];
+                    // Machine map keys are unlocalized names, not localized display names.
+                    const crafter = machines[item.unlocalizedName];
                     const excluded = (crafter && crafter.excludesRecipe) ? crafter.excludesRecipe(recipe) : false;
                     if (!excluded) {
                         options.push(item);

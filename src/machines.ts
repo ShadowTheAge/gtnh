@@ -1,8 +1,64 @@
-import { maxHeaderSize } from "http";
 import { RecipeModel, OverclockResult } from "./page.js";
 import { Fluid, Goods, Item, Recipe, RecipeInOut, RecipeIoType, RecipeType, Repository } from "./repository.js";
 import { TIER_LV, TIER_MV, TIER_LUV, TIER_ZPM, TIER_UV, TIER_UHV, TIER_UEV, TIER_UIV, TIER_UXV, CoilTierNames } from "./utils.js";
 import { voltageTier, getFusionTierByStartupCost, formatTicksAsTime } from "./utils.js";
+
+/**
+ * Compare recipe type names after caller resolves locale-specific target names.
+ */
+function isRecipeTypeName(name:string, canonical:string): boolean {
+    return name === canonical;
+}
+
+/**
+ * EBF muffler reduction must match locale-independent fluid identities.
+ */
+function isEbfMufflerReducedFluid(fluidUnlocalizedName:string): boolean {
+    return fluidUnlocalizedName === "fluid.carbondioxide"
+        || fluidUnlocalizedName === "fluid.sulfurdioxide"
+        || fluidUnlocalizedName === "fluid.carbonmonoxide";
+}
+
+let cachedMachineRepository: Repository | undefined;
+const cachedMachineNameByUnlocalizedName = new Map<string, string>();
+
+function rebuildMachineNameCache(repository: Repository): void {
+    cachedMachineNameByUnlocalizedName.clear();
+    for (const pointer of repository.recipeTypes) {
+        const recipeType = repository.GetObject(pointer, RecipeType);
+        const relatedMachines = [
+            ...recipeType.singleblocks,
+            ...recipeType.multiblocks,
+            recipeType.defaultCrafter,
+        ].filter(Boolean);
+        for (const machine of relatedMachines) {
+            cachedMachineNameByUnlocalizedName.set(machine.unlocalizedName, machine.name);
+        }
+    }
+    cachedMachineRepository = repository;
+}
+
+function ensureMachineNameCache(): void {
+    const repository = Repository.current;
+    if (repository && cachedMachineRepository !== repository) {
+        rebuildMachineNameCache(repository);
+    }
+}
+
+/**
+ * Resolve current-locale machine display name from stable unlocalizedName.
+ */
+export function getMachineName(unlocalizedName:string): string {
+    ensureMachineNameCache();
+    return cachedMachineNameByUnlocalizedName.get(unlocalizedName) ?? unlocalizedName;
+}
+
+/**
+ * Recipe type name lookup is machine-name based in current DB locale.
+ */
+function getRecipeTypeName(machineUnlocalizedName:string): string {
+    return getMachineName(machineUnlocalizedName);
+}
 
 export type MachineCoefficient<T> = Exclude<T, Function> | ((recipe:RecipeModel, choices:{[key:string]:number}) => T);
 
@@ -142,6 +198,15 @@ type MachineList = {
 
 export const machines: MachineList = {};
 
+// Machine definitions are keyed by unlocalizedName so matching remains stable across DB locales.
+function resolveMachineByUnlocalizedName(item: Item): Machine | undefined {
+    return machines[item.unlocalizedName];
+}
+
+export function ResolveMachine(item: Item): Machine | undefined {
+    return resolveMachineByUnlocalizedName(item);
+}
+
 export const singleBlockMachine:Machine = {
     overclocker: StandardOverclocker.onlyNormal(),
     speed: 1,
@@ -162,13 +227,13 @@ const singleBlockMachineWith22Overclock:Machine = {
 };
 
 export function GetSingleBlockMachine(recipeType:RecipeType):Machine {
-    if (recipeType.name == "Mass Fabrication")
+    if (isRecipeTypeName(recipeType.name, getRecipeTypeName("gt.blockmachines.basicmachine.massfab.tier.01")))
         return singleBlockMachineWith22Overclock;
     return singleBlockMachine;
 }
 
 function IsRecipeType(recipe:RecipeModel, type:string):boolean {
-    return recipe.recipe ? recipe.recipe.recipeType.name == type : false;
+    return recipe.recipe ? isRecipeTypeName(recipe.recipe.recipeType.name, type) : false;
 }
 
 export const notImplementedMachine:Machine = {
@@ -179,7 +244,8 @@ export const notImplementedMachine:Machine = {
     info: "Machine not implemented (Calculated as a singleblock)",
 }
 
-machines["Steam Compressor"] = machines["Steam Alloy Smelter"] = machines["Steam Extractor"] = machines["Steam Furnace"] = machines["Steam Forge Hammer"] = machines["Steam Macerator"] = {
+// Steam Compressor / Steam Alloy Smelter / Steam Extractor / Steam Furnace / Steam Forge Hammer / Steam Macerator
+machines["gt.blockmachines.bronzemachine.compressor"] = machines["gt.blockmachines.bronzemachine.alloysmelter"] = machines["gt.blockmachines.bronzemachine.extractor"] = machines["gt.blockmachines.bronzemachine.furnace"] = machines["gt.blockmachines.bronzemachine.hammer"] = machines["gt.blockmachines.bronzemachine.macerator"] = {
     overclocker: NullOverclocker.instance,
     speed: 0.5,
     power: 0,
@@ -188,7 +254,8 @@ machines["Steam Compressor"] = machines["Steam Alloy Smelter"] = machines["Steam
     info: "Steam machine: Steam consumption not calculated",
 }
 
-machines["High Pressure Steam Compressor"] = machines["High Pressure Alloy Smelter"] = machines["High Pressure Steam Extractor"] = machines["High Pressure Steam Furnace"] = machines["High Pressure Steam Forge Hammer"] = machines["High Pressure Steam Macerator"] = {
+// High Pressure Steam Compressor / High Pressure Alloy Smelter / High Pressure Steam Extractor / High Pressure Steam Furnace / High Pressure Steam Forge Hammer / High Pressure Steam Macerator
+machines["gt.blockmachines.hpmachine.compressor"] = machines["gt.blockmachines.hpmachine.alloysmelter"] = machines["gt.blockmachines.hpmachine.extractor"] = machines["gt.blockmachines.hpmachine.furnace"] = machines["gt.blockmachines.hpmachine.hammer"] = machines["gt.blockmachines.hpmachine.macerator"] = {
     overclocker: NullOverclocker.instance,
     speed: 1,
     power: 0,
@@ -197,7 +264,8 @@ machines["High Pressure Steam Compressor"] = machines["High Pressure Alloy Smelt
     info: "High pressure steam machine: Steam consumption not calculated",
 }
 
-machines["Steam Squasher"] = machines["Steam Separator"] = machines["Steam Presser"] = machines["Steam Grinder"] = machines["Steam Purifier"] = machines["Steam Blender"] = {
+// Steam Squasher / Steam Separator / Steam Presser / Steam Grinder / Steam Purifier / Steam Blender
+machines["gt.blockmachines.gtpp.multimachine.steam.compressor"] = machines["gt.blockmachines.gtpp.multimachine.steam.centrifuge"] = machines["gt.blockmachines.gtpp.multimachine.steam.forge.hammer"] = machines["gt.blockmachines.gtpp.multimachine.steam.macerator"] = machines["gt.blockmachines.gtpp.multimachine.steam.washer"] = machines["gt.blockmachines.gtpp.multimachine.steam.mixer"] = {
     overclocker: NullOverclocker.instance,
     speed: (recipe, choices) => choices.pressure == 1 ? 1.25 : 0.625,
     power: 0,
@@ -212,7 +280,8 @@ machines["Steam Squasher"] = machines["Steam Separator"] = machines["Steam Press
     },
 }
 
-machines["Large Electric Compressor"] = {
+// Large Electric Compressor
+machines["gt.blockmachines.multimachine.basiccompressor"] = {
     overclocker: StandardOverclocker.onlyNormal(),
     speed: 2,
     power: 0.9,
@@ -220,7 +289,8 @@ machines["Large Electric Compressor"] = {
     parallels: (recipe) => (recipe.voltageTier + 1) * 2,
 };
 
-machines["Hot Isostatic Pressurization Unit"] = {
+// Hot Isostatic Pressurization Unit
+machines["gt.blockmachines.multimachine.hipcompressor"] = {
     overclocker: StandardOverclocker.onlyNormal(),
     // TODO: 250% faster/slower than singleblock machines of the same voltage
     speed: 2.5,
@@ -232,7 +302,8 @@ machines["Hot Isostatic Pressurization Unit"] = {
     info: "Assumes it is not overheated"
 };
 
-machines["Pseudostable Black Hole Containment Field"] = {
+// Pseudostable Black Hole Containment Field
+machines["gt.blockmachines.multimachine.blackholecompressor"] = {
     overclocker: StandardOverclocker.onlyNormal(),
     speed: 5,
     power: 0.7,
@@ -244,7 +315,8 @@ machines["Pseudostable Black Hole Containment Field"] = {
     info: "Parallels depend on stability, which is not represented.",
 };
 
-machines["Bacterial Vat"] = {
+// Bacterial Vat
+machines["gt.blockmachines.bw.biovat"] = {
     overclocker: StandardOverclocker.onlyNormal(),
     speed: 1,
     power: 1,
@@ -262,14 +334,16 @@ machines["Bacterial Vat"] = {
     },
 };
 
-machines["Circuit Assembly Line"] = {
+// Circuit Assembly Line
+machines["gt.blockmachines.circuitassemblyline"] = {
     overclocker: StandardOverclocker.onlyPerfect(),
     speed: 1,
     power: 1,
     parallels: 1,
 };
 
-machines["Component Assembly Line"] = {
+// Component Assembly Line
+machines["gt.blockmachines.componentassemblyline"] = {
     overclocker: StandardOverclocker.onlyNormal(),
     speed: (recipeModel, choices) => {
         const recipeCoalTier = recipeModel.recipe?.gtRecipe.MetadataByKey("coal_casing_tier") ?? 1;
@@ -290,14 +364,16 @@ machines["Component Assembly Line"] = {
     }
 };
 
-machines["Extreme Heat Exchanger"] = {
+// Extreme Heat Exchanger
+machines["gt.blockmachines.extremeheatexchanger"] = {
     overclocker: StandardOverclocker.onlyNormal(),
     speed: 1,
     power: 1,
     parallels: 1,
 };
 
-machines["Naquadah Fuel Refinery"] = {
+// Naquadah Fuel Refinery
+machines["gt.blockmachines.frf"] = {
     speed: 1,
     power: 1,
     parallels: 1,
@@ -317,7 +393,8 @@ machines["Naquadah Fuel Refinery"] = {
     }
 };
 
-machines["Neutron Activator"] = {
+// Neutron Activator
+machines["gt.blockmachines.neutronactivator"] = {
     speed: (recipe, choices) => Math.pow((1/0.9), (choices.speedingPipeCasing - 4)),
     power: 0,
     parallels: 1,
@@ -343,10 +420,11 @@ machines["Neutron Activator"] = {
     },
 };
 
-machines["Precise Auto-Assembler MT-3662"] = {
+// Precise Auto-Assembler MT-3662
+machines["gt.blockmachines.preciseassembler"] = {
     overclocker: StandardOverclocker.onlyNormal(),
     speed: (recipe, choices) => {
-        return IsRecipeType(recipe, "Precise Assembler") ? 1 : 2;
+        return IsRecipeType(recipe, getRecipeTypeName("gt.blockmachines.preciseassembler")) ? 1 : 2;
     },
     power: 1,
     parallels: (recipe, choices) => {
@@ -358,7 +436,8 @@ machines["Precise Auto-Assembler MT-3662"] = {
     }},
 };
 
-machines["Fluid Shaper"] = {
+// Fluid Shaper
+machines["gt.blockmachines.multimachine.solidifier"] = {
     overclocker: StandardOverclocker.onlyNormal(),
     speed: 3,
     power: 0.8,
@@ -367,7 +446,8 @@ machines["Fluid Shaper"] = {
     info: "Assuming running at max speed.",
 };
 
-machines["Zyngen"] = {
+// Zyngen
+machines["gt.blockmachines.industrialalloysmelter.controller.tier.single"] = {
     overclocker: StandardOverclocker.onlyNormal(),
     speed: (recipe, choices) => 1 + choices.coilTier * 0.05,
     power: 1,
@@ -375,17 +455,19 @@ machines["Zyngen"] = {
     choices: {coilTier: CoilTierChoice},
 };
 
-machines["High Current Industrial Arc Furnace"] = {
+// High Current Industrial Arc Furnace
+machines["gt.blockmachines.industrialarcfurnace.controller.tier.single"] = {
     overclocker: StandardOverclocker.onlyNormal(),
     speed: 3.5,
     power: 1,
     parallels: (recipe, choices) => {
-        return IsRecipeType(recipe, "Plasma Arc Furnace") ? (recipe.voltageTier + 1) * 8 * choices.w : (recipe.voltageTier + 1) * choices.w;
+        return IsRecipeType(recipe, getRecipeTypeName("gt.blockmachines.basicmachine.plasmaarcfurnace.tier.01")) ? (recipe.voltageTier + 1) * 8 * choices.w : (recipe.voltageTier + 1) * choices.w;
     },
     choices: {w: {description: "W", min: 1}},
 };
 
-machines["Large Scale Auto-Assembler v1.01"] = {
+// Large Scale Auto-Assembler v1.01
+machines["gt.blockmachines.gtplusplus.autocrafter.multi"] = {
     overclocker: StandardOverclocker.onlyNormal(),
     speed: 3,
     power: 1,
@@ -396,7 +478,8 @@ function makeSpaceAssemblerRecipeExcluder(tier:number) {
     return (recipe:Recipe) => recipe.gtRecipe.MetadataByKey("space_elevator_module_tier") > tier;
 }
 
-machines["Space Assembler Module MK-I"] = {
+// Space Assembler Module MK-I
+machines["gt.blockmachines.projectmoduleassemblert1"] = {
     overclocker: StandardOverclocker.onlyNormal(),
     speed: 1,
     power: 1,
@@ -406,7 +489,8 @@ machines["Space Assembler Module MK-I"] = {
     info: "NOTE: overrides voltage tier"
 };
 
-machines["Space Assembler Module MK-II"] = {
+// Space Assembler Module MK-II
+machines["gt.blockmachines.projectmoduleassemblert2"] = {
     overclocker: StandardOverclocker.onlyNormal(),
     speed: 1,
     power: 1,
@@ -416,7 +500,8 @@ machines["Space Assembler Module MK-II"] = {
     info: "NOTE: overrides voltage tier"
 };
 
-machines["Space Assembler Module MK-III"] = {
+// Space Assembler Module MK-III
+machines["gt.blockmachines.projectmoduleassemblert3"] = {
     overclocker: StandardOverclocker.onlyNormal(),
     speed: 1,
     power: 1,
@@ -434,7 +519,8 @@ let PipeFluidCasingTierChoice: Choice = {
     description: "Fluid Pipe Casing Tier",
     choices: ["T1: Bronze", "T2: Steel", "T3: Titanium", "T4: Tungstensteel"],
 }
-machines["Industrial Autoclave"] = {
+// Industrial Autoclave
+machines["gt.blockmachines.multimachine.autoclave"] = {
     overclocker: StandardOverclocker.onlyNormal(),
     speed: (recipe, choices) => 1.25 + choices.coilTier * 0.25,
     power: (recipe, choices) => (11 - choices.pipeFluidCasingTier) / 12,
@@ -462,7 +548,8 @@ function ebfPower(recipe:RecipeModel, choices:{[key:string]:number}) {
     return Math.pow(0.95, energyReductions);
 }
 
-machines["Electric Blast Furnace"] = {
+// Electric Blast Furnace
+machines["gt.blockmachines.multimachine.blastfurnace"] = {
     overclocker: makeEbfOverclocker,
     speed: 1,
     power: ebfPower,
@@ -471,7 +558,7 @@ machines["Electric Blast Furnace"] = {
         for (let i=0; i<items.length; i++) {
             let item = items[i];
             if (item.type == RecipeIoType.FluidOutput && item.goods instanceof Fluid && 
-                (item.goods.name == "CO2 Gas" || item.goods.name == "Sulfur Dioxide" || item.goods.name == "Carbon Monoxide")) {
+                isEbfMufflerReducedFluid(item.goods.unlocalizedName)) {
                 items = createEditableCopy(items);
                 items[i].amount = choices.muffler * item.amount * 0.125;
                 break;
@@ -482,7 +569,8 @@ machines["Electric Blast Furnace"] = {
     choices: {coilTier: CoilTierChoice, muffler: {description: "Muffler hatch", choices: ["LV (0%)", "MV (12.5%)", "HV (25%)", "EV (37.5%)", "IV (50%)", "LuV (62.5%)", "ZPM (75%)", "UV (87.5%)", "UHV (100%)"]}},
 };
 
-machines["Volcanus"] = {
+// Volcanus
+machines["gt.blockmachines.multimachine.adv.blastfurnace"] = {
     overclocker: makeEbfOverclocker,
     speed: 2.2,
     power: (recipe, choices) => ebfPower(recipe, choices) * 0.9,
@@ -492,7 +580,7 @@ machines["Volcanus"] = {
 };
 
 // Name before 2.8
-machines["Mega Blast Furnace"] = {
+machines["gt.blockmachines.megablastfurnace"] = {
     overclocker: makeEbfOverclocker,
     speed: 1,
     power: ebfPower,
@@ -500,31 +588,32 @@ machines["Mega Blast Furnace"] = {
     choices: {coilTier: CoilTierChoice},
 };
 
-// Renamed since 2.8
-machines["Mega Electric Blast Furnace"] = machines["Mega Blast Furnace"]
-
-machines["Big Barrel Brewery"] = {
+// Big Barrel Brewery
+machines["gt.blockmachines.multimachine.brewery"] = {
     overclocker: StandardOverclocker.onlyNormal(),
     speed: 1.5,
     power: 1,
     parallels: (recipe) => (recipe.voltageTier + 1) * 4,
 };
 
-machines["TurboCan Pro"] = {
+// TurboCan Pro
+machines["gt.blockmachines.multimachine.canner"] = {
     overclocker: StandardOverclocker.onlyNormal(),
     speed: 2,
     power: 1,
     parallels: (recipe) => (recipe.voltageTier + 1) * 8,
 };
 
-machines["Ore Washing Plant"] = {
+// Ore Washing Plant
+machines["gt.blockmachines.industrialwashplant.controller.tier.single"] = {
     overclocker: StandardOverclocker.onlyNormal(),
     speed: 5,
     power: 1,
     parallels: (recipe) => (recipe.voltageTier + 1) * 4,
 };
 
-machines["Oil Cracking Unit"] = {
+// Oil Cracking Unit
+machines["gt.blockmachines.multimachine.cracker"] = {
     overclocker: StandardOverclocker.onlyNormal(),
     speed: 1,
     power: (recipe, choices) => 1 - Math.min(0.5, (choices.coilTier + 1) * 0.1),
@@ -532,7 +621,8 @@ machines["Oil Cracking Unit"] = {
     choices: {coilTier: CoilTierChoice},
 };
 
-machines["Mega Oil Cracker"] = {
+// Mega Oil Cracker
+machines["gt.blockmachines.megaoilcracker"] = {
     overclocker: StandardOverclocker.onlyNormal(),
     speed: 1,
     power: (recipe, choices) => 1 - Math.min(0.5, (choices.coilTier + 1) * 0.1),
@@ -540,35 +630,40 @@ machines["Mega Oil Cracker"] = {
     choices: {coilTier: CoilTierChoice},
 };
 
-machines["Industrial Cutting Factory"] = {
+// Industrial Cutting Factory
+machines["gt.blockmachines.industrialcuttingmachine.controller.tier.01"] = {
     overclocker: StandardOverclocker.onlyNormal(),
     speed: 3,
     power: 0.75,
     parallels: (recipe) => (recipe.voltageTier + 1) * 4,
 };
 
-machines["Distillation Tower"] = {
+// Distillation Tower
+machines["gt.blockmachines.multimachine.distillationtower"] = {
     overclocker: StandardOverclocker.onlyNormal(),
     speed: 1,
     power: 1,
     parallels: 1,
 };
 
-machines["Dangote Distillus"] = {
+// Dangote Distillus
+machines["gt.blockmachines.multimachine.adv.distillationtower"] = {
     overclocker: StandardOverclocker.onlyNormal(),
-    speed: (recipe, choices) => IsRecipeType(recipe, "Distillation Tower") ? 3.5 : 2,
-    power: (recipe, choices) => IsRecipeType(recipe, "Distillation Tower") ? 1 : 0.85,
-    parallels: (recipe, choices) => IsRecipeType(recipe, "Distillation Tower") ? 12 : (recipe.voltageTier + 1) * 8,
+    speed: (recipe, choices) => IsRecipeType(recipe, getRecipeTypeName("gt.blockmachines.multimachine.distillationtower")) ? 3.5 : 2,
+    power: (recipe, choices) => IsRecipeType(recipe, getRecipeTypeName("gt.blockmachines.multimachine.distillationtower")) ? 1 : 0.85,
+    parallels: (recipe, choices) => IsRecipeType(recipe, getRecipeTypeName("gt.blockmachines.multimachine.distillationtower")) ? 12 : (recipe.voltageTier + 1) * 8,
 };
 
-machines["Mega Distillation Tower"] = {
+// Mega Distillation Tower
+machines["gt.blockmachines.megadistillationtower"] = {
     overclocker: StandardOverclocker.onlyNormal(),
     speed: 1,
     power: 1,
     parallels: 256,
 };
 
-machines["Electric Implosion Compressor"] = {
+// Electric Implosion Compressor
+machines["gt.blockmachines.electricimplosioncompressor"] = {
     overclocker: StandardOverclocker.onlyNormal(),
     speed: 1,
     power: 1,
@@ -584,7 +679,8 @@ let electroMagnets:{name:string, speed:number, power:number, parallels:number}[]
     {name: "Tengam Electromagnet", speed: 2.5, power: 0.5, parallels: 256},
 ]
 
-machines["Magnetic Flux Exhibitor"] = {
+// Magnetic Flux Exhibitor
+machines["gt.blockmachines.multimachine.electromagneticseparator"] = {
     overclocker: StandardOverclocker.onlyNormal(),
     speed: (recipe, choices) => electroMagnets[choices.electromagnet].speed,
     power: (recipe, choices) => electroMagnets[choices.electromagnet].power,
@@ -592,7 +688,8 @@ machines["Magnetic Flux Exhibitor"] = {
     choices: {electromagnet: {description: "Electromagnet", choices: electroMagnets.map(m => m.name)}},
 };
 
-machines["Dissection Apparatus"] = {
+// Dissection Apparatus
+machines["gt.blockmachines.multimachine.extractor"] = {
     overclocker: StandardOverclocker.onlyNormal(),
     speed: 3,
     power: 0.85,
@@ -600,14 +697,16 @@ machines["Dissection Apparatus"] = {
     choices: {pipeCasingTier: PipeItemCasingTierChoice},
 };
 
-machines["Industrial Extrusion Machine"] = {
+// Industrial Extrusion Machine
+machines["gt.blockmachines.industrialextruder.controller.tier.single"] = {
     overclocker: StandardOverclocker.onlyNormal(),
     speed: 3.5,
     power: 1,
     parallels: (recipe) => (recipe.voltageTier + 1) * 4,
 };
 
-machines["Assembly Line"] = {
+// Assembly Line
+machines["gt.blockmachines.multimachine.assemblyline"] = {
     overclocker: StandardOverclocker.onlyNormal(),
     speed: 1,
     power: 1,
@@ -674,7 +773,8 @@ function laserOverclockCalculator(recipeModel:RecipeModel, overclockTiers:number
     };
 };
 
-machines["Advanced Assembly Line"] = {
+// Advanced Assembly Line
+machines["gt.blockmachines.ggfab.machine.adv_assline"] = {
     speed: 1,
     power: 1,
     overclocker: new OverclockerFromClosure(laserOverclockCalculator),
@@ -685,7 +785,8 @@ machines["Advanced Assembly Line"] = {
     info: "NOTE: Voltage determines the energy hatch voltage, not maximum voltage.",
 };
 
-machines["Large Fluid Extractor"] = {
+// Large Fluid Extractor
+machines["gt.blockmachines.multimachine.fluidextractor"] = {
     overclocker: StandardOverclocker.onlyNormal(),
     speed: (recipe, choices) => 1.5 + choices.coilTier * 0.1,
     power: (recipe, choices) => 0.80 * Math.pow(0.90, choices.coilTier),
@@ -693,21 +794,24 @@ machines["Large Fluid Extractor"] = {
     choices: {coilTier: CoilTierChoice, solenoidTier: {description: "Solenoid Tier", choices: ["MV", "HV", "EV", "IV", "LuV", "ZPM", "UV", "UHV", "UEV", "UIV", "UMV"]}},
 };
 
-machines["Thermic Heating Device"] = {
+// Thermic Heating Device
+machines["gt.blockmachines.industrialfluidheater.controller.tier.single"] = {
     overclocker: StandardOverclocker.onlyNormal(),
     speed: 2.2,
     power: 0.9,
     parallels: (recipe) => (recipe.voltageTier + 1) * 8,
 };
 
-machines["Furnace"] = {
+// Furnace
+machines["tile.furnace"] = {
     overclocker: StandardOverclocker.onlyNormal(),
     speed: 1,
     power: 1,
     parallels: 1,
 };
 
-machines["Multi Smelter"] = {
+// Multi Smelter
+machines["gt.blockmachines.multimachine.multifurnace"] = {
     overclocker: StandardOverclocker.onlyNormal(),
     speed: 1,
     power: 1,
@@ -718,7 +822,8 @@ machines["Multi Smelter"] = {
     info: "Parallel amount needs testing!",
 };
 
-machines["Industrial Sledgehammer"] = {
+// Industrial Sledgehammer
+machines["gt.blockmachines.industrialhammer.controller.tier.single"] = {
     overclocker: StandardOverclocker.onlyNormal(),
     speed: 2,
     power: 1,
@@ -726,42 +831,48 @@ machines["Industrial Sledgehammer"] = {
     choices: {anvilTier: {description: "Anvil Tier", choices: ["T1 - Vanilla", "T2 - Steel", "T3 - Dark Steel / Thaumium", "T4 - Void Metal"]}},
 };
 
-machines["Nuclear Reactor"] = {
+// Nuclear Reactor
+machines["ic2.blockNuclearReactor"] = {
     overclocker: StandardOverclocker.onlyNormal(),
     speed: 1,
     power: 1,
     parallels: 1,
 };
 
-machines["Implosion Compressor"] = {
+// Implosion Compressor
+machines["gt.blockmachines.multimachine.implosioncompressor"] = {
     overclocker: StandardOverclocker.onlyNormal(),
     speed: 1,
     power: 1,
     parallels: 1,
 };
 
-machines["Density^2"] = {
+// Density^2
+machines["gt.blockmachines.multimachine.adv.implosioncompressor"] = {
     overclocker: StandardOverclocker.onlyNormal(),
     speed: 2,
     power: 1,
     parallels: (recipe) => Math.floor((recipe.voltageTier + 1) / 2) + 1,
 };
 
-machines["Large Chemical Reactor"] = {
+// Large Chemical Reactor
+machines["gt.blockmachines.multimachine.chemicalreactor"] = {
     overclocker: StandardOverclocker.onlyPerfect(),
     speed: 1,
     power: 1,
     parallels: 1,
 };
 
-machines["Mega Chemical Reactor"] = {
+// Mega Chemical Reactor
+machines["gt.blockmachines.megachemicalreactor"] = {
     overclocker: StandardOverclocker.onlyPerfect(),
     speed: 1,
     power: 1,
     parallels: 256,
 };
 
-machines["Hyper-Intensity Laser Engraver"] = {
+// Hyper-Intensity Laser Engraver
+machines["gt.blockmachines.multimachine.engraver"] = {
     overclocker: StandardOverclocker.onlyNormal(),
     speed: 3.5,
     power: 0.8,
@@ -772,7 +883,8 @@ machines["Hyper-Intensity Laser Engraver"] = {
 let precisionLatheParallels:number[] = [1, 1, 2, 4, 8, 12, 16, 32];
 let precisionLatheSpeed:number[] = [0.75, 0.8, 0.9, 1, 1.5, 2, 3, 4];
 
-machines["Industrial Precision Lathe"] = {
+// Industrial Precision Lathe
+machines["gt.blockmachines.multimachine.lathe"] = {
     overclocker: StandardOverclocker.onlyNormal(),
     speed: (recipe, choices) => ((precisionLatheSpeed[choices.itemPipeCasings] + recipe.voltageTier + 1) / 4),
     power: 0.8,
@@ -780,7 +892,8 @@ machines["Industrial Precision Lathe"] = {
     choices: {itemPipeCasings:PipeItemCasingTierChoice}
 };
 
-machines["Industrial Maceration Stack"] = {
+// Industrial Maceration Stack
+machines["gt.blockmachines.industrialmacerator.controller.tier.single"] = {
     overclocker: StandardOverclocker.onlyNormal(),
     speed: 1.6,
     power: 1,
@@ -792,14 +905,16 @@ machines["Industrial Maceration Stack"] = {
     choices: {upgradeChip: {description: "Upgrade Chip", choices: ["No Upgrade", "Maceration Upgrade Chip"]}},
 };
 
-machines["Industrial Material Press"] = {
+// Industrial Material Press
+machines["gt.blockmachines.industrialbender.controller.tier.single"] = {
     overclocker: StandardOverclocker.onlyNormal(),
     speed: 6,
     power: 1,
     parallels: (recipe) => (recipe.voltageTier + 1) * 4,
 };
 
-machines["Nano Forge"] = {
+// Nano Forge
+machines["gt.blockmachines.multimachine.nanoforge"] = {
     overclocker: (recipeModel, choices) => {
         // if ((mSpecialTier < 4 || recipe.mSpecialValue < 3) && mSpecialTier > recipe.mSpecialValue) {
         //     OCFactor = 4.0;
@@ -873,7 +988,8 @@ function makeCompressorRecipeExcluder(tier:number) {
     return (recipe:Recipe) => tier < (recipe.gtRecipe.MetadataByKey("compression_tier") ?? 0);
 }
 
-machines["Neutronium Compressor"] = {
+// Neutronium Compressor
+machines["gt.blockmachines.multimachine.neutroniumcompressor"] = {
     overclocker: StandardOverclocker.onlyNormal(),
     speed: 1,
     power: 1,
@@ -881,14 +997,16 @@ machines["Neutronium Compressor"] = {
     excludesRecipe: makeCompressorRecipeExcluder(0),
 };
 
-machines["Amazon Warehousing Depot"] = {
+// Amazon Warehousing Depot
+machines["gt.blockmachines.amazonprime.controller.tier.single"] = {
     overclocker: StandardOverclocker.onlyNormal(),
     speed: 6,
     power: 0.75,
     parallels: (recipe) => (recipe.voltageTier + 1) * 16,
 };
 
-machines["PCB Factory"] = {
+// PCB Factory
+machines["gt.blockmachines.multimachine.pcbfactory"] = {
     overclocker: (recipe, choices) => {
         if (choices.cooling == 0)
             return NullOverclocker.instance;
@@ -959,7 +1077,8 @@ function findDtpfCatalyst(items:RecipeInOut[]) : DtpfCatalyst | undefined {
     }
 }
 
-machines["Dimensionally Transcendent Plasma Forge"] = {
+// Dimensionally Transcendent Plasma Forge
+machines["gt.blockmachines.multimachine.plasmaforge"] = {
     overclocker: (recipe, choices) => {
         if (choices.convergence > 0)
             return StandardOverclocker.onlyPerfect();
@@ -1056,56 +1175,64 @@ machines["Dimensionally Transcendent Plasma Forge"] = {
     }
 };
 
-machines["Bricked Blast Furnace"] = {
+// Bricked Blast Furnace
+machines["gt.blockmachines.multimachine.brickedblastfurnace"] = {
     overclocker: StandardOverclocker.onlyNormal(),
     speed: 1,
     power: 1,
     parallels: 1,
 };
 
-machines["Clarifier Purification Unit"] = {
+// Clarifier Purification Unit
+machines["gt.blockmachines.multimachine.purificationunitclarifier"] = {
     overclocker: StandardOverclocker.onlyNormal(),
     speed: 1,
     power: 1,
     parallels: 1,
 };
 
-machines["Residual Decontaminant Degasser Purification Unit"] = {
+// Residual Decontaminant Degasser Purification Unit
+machines["gt.blockmachines.multimachine.purificationunitdegasifier"] = {
     overclocker: StandardOverclocker.onlyNormal(),
     speed: 1,
     power: 1,
     parallels: 1,
 };
 
-machines["Flocculation Purification Unit"] = {
+// Flocculation Purification Unit
+machines["gt.blockmachines.multimachine.purificationunitflocculator"] = {
     overclocker: StandardOverclocker.onlyNormal(),
     speed: 1,
     power: 1,
     parallels: 1,
 };
 
-machines["Ozonation Purification Unit"] = {
+// Ozonation Purification Unit
+machines["gt.blockmachines.multimachine.purificationunitozonation"] = {
     overclocker: StandardOverclocker.onlyNormal(),
     speed: 1,
     power: 1,
     parallels: 1,
 };
 
-machines["pH Neutralization Purification Unit"] = {
+// pH Neutralization Purification Unit
+machines["gt.blockmachines.multimachine.purificationunitphadjustment"] = {
     overclocker: StandardOverclocker.onlyNormal(),
     speed: 1,
     power: 1,
     parallels: 1,
 };
 
-machines["Extreme Temperature Fluctuation Purification Unit"] = {
+// Extreme Temperature Fluctuation Purification Unit
+machines["gt.blockmachines.multimachine.purificationunitplasmaheater"] = {
     overclocker: StandardOverclocker.onlyNormal(),
     speed: 1,
     power: 1,
     parallels: 1,
 };
 
-machines["Absolute Baryonic Perfection Purification Unit"] = {
+// Absolute Baryonic Perfection Purification Unit
+machines["gt.blockmachines.multimachine.purificationunitextractor"] = {
     overclocker: StandardOverclocker.onlyNormal(),
     speed: 1,
     power: 1,
@@ -1113,7 +1240,8 @@ machines["Absolute Baryonic Perfection Purification Unit"] = {
     info: "Machine not implemented",
 };
 
-machines["High Energy Laser Purification Unit"] = {
+// High Energy Laser Purification Unit
+machines["gt.blockmachines.multimachine.purificationunituvtreatment"] = {
     overclocker: StandardOverclocker.onlyNormal(),
     speed: 1,
     power: 1,
@@ -1121,7 +1249,8 @@ machines["High Energy Laser Purification Unit"] = {
     info: "Machine not implemented",
 };
 
-machines["Pyrolyse Oven"] = {
+// Pyrolyse Oven
+machines["gt.blockmachines.multimachine.pyro"] = {
     overclocker: StandardOverclocker.onlyNormal(),
     speed: (recipe, choices) => (choices.coils + 1) * 0.5,
     power: 1,
@@ -1129,35 +1258,40 @@ machines["Pyrolyse Oven"] = {
     choices: {coils: CoilTierChoice},
 };
 
-machines["Elemental Duplicator"] = {
+// Elemental Duplicator
+machines["gt.blockmachines.gtpp.multimachine.replicator"] = {
     overclocker: StandardOverclocker.onlyPerfect(),
     speed: 2,
     power: 1,
     parallels: (recipe) => 8 * (recipe.voltageTier + 1),
 };
 
-machines["Research station"] = {
+// Research station
+machines["gt.blockmachines.multimachine.em.research"] = {
     overclocker: StandardOverclocker.onlyNormal(),
     speed: 1,
     power: 1,
     parallels: 1,
 };
 
-machines["Boldarnator"] = {
+// Boldarnator
+machines["gt.blockmachines.industrialrockcrusher.controller.tier.single"] = {
     overclocker: StandardOverclocker.onlyNormal(),
     speed: 3,
     power: 0.75,
     parallels: (recipe) => (recipe.voltageTier + 1) * 8,
 };
 
-machines["Large Thermal Refinery"] = {
+// Large Thermal Refinery
+machines["gt.blockmachines.industrialthermalcentrifuge.controller.tier.single"] = {
     overclocker: StandardOverclocker.onlyNormal(),
     speed: 2.5,
     power: 0.8,
     parallels: (recipe) => (recipe.voltageTier + 1) * 8,
 };
 
-machines["Transcendent Plasma Mixer"] = {
+// Transcendent Plasma Mixer
+machines["gt.blockmachines.multimachine.transcendentplasmamixer"] = {
     overclocker: NullOverclocker.instance,
     speed: 1,
     power: 10,
@@ -1165,16 +1299,19 @@ machines["Transcendent Plasma Mixer"] = {
     choices: {parallels: {description: "Parallels", min: 1}}
 };
 
-machines["Forge of the Gods"] = notImplementedMachine;
+// Forge of the Gods
+machines["gt.blockmachines.multimachine.em.forge_of_gods"] = notImplementedMachine;
 
-machines["Vacuum Freezer"] = {
+// Vacuum Freezer
+machines["gt.blockmachines.multimachine.vacuumfreezer"] = {
     overclocker: StandardOverclocker.onlyNormal(),
     speed: 1,
     power: 1,
     parallels: 1,
 };
 
-machines["Mega Vacuum Freezer"] = {
+// Mega Vacuum Freezer
+machines["gt.blockmachines.megavacuumfreezer"] = {
     overclocker: (recipe, choices) => StandardOverclocker.perfectThenNormal(choices.coolant),
     speed: 1,
     power: 1,
@@ -1183,28 +1320,32 @@ machines["Mega Vacuum Freezer"] = {
     info: "Coolant calculation not implemented.",
 };
 
-machines["Industrial Wire Factory"] = {
+// Industrial Wire Factory
+machines["gt.blockmachines.industrialwiremill.controller.tier.single"] = {
     overclocker: StandardOverclocker.onlyNormal(),
     speed: 3,
     power: 0.75,
     parallels: (recipe) => (recipe.voltageTier + 1) * 4,
 };
 
-machines["Digester"] = {
+// Digester
+machines["gt.blockmachines.digester"] = {
     overclocker: StandardOverclocker.onlyNormal(),
     speed: 1,
     power: 1,
     parallels: 1,
 };
 
-machines["Dissolution Tank"] = {
+// Dissolution Tank
+machines["gt.blockmachines.dissolution_tank"] = {
     overclocker: StandardOverclocker.onlyNormal(),
     speed: 1,
     power: 1,
     parallels: 1,
 };
 
-machines["Source Chamber"] = {
+// Source Chamber
+machines["gt.blockmachines.source_chamber"] = {
     overclocker: StandardOverclocker.onlyNormal(),
     speed: 1,
     power: 1,
@@ -1212,21 +1353,24 @@ machines["Source Chamber"] = {
     info: "Output energy scales with EU/t up to the point shown in the recipe.",
 };
 
-machines["Target Chamber"] = {
+// Target Chamber
+machines["gt.blockmachines.target_chamber"] = {
     overclocker: StandardOverclocker.onlyNormal(),
     speed: 1,
     power: 1,
     parallels: 1,
 };
 
-machines["Alloy Blast Smelter"] = {
+// Alloy Blast Smelter
+machines["gt.blockmachines.industrialsalloyamelter.controller.tier.single"] = {
     overclocker: StandardOverclocker.onlyNormal(),
     speed: 1,
     power: 1,
     parallels: 1,
 };
 
-machines["Mega Alloy Blast Smelter"] = {
+// Mega Alloy Blast Smelter
+machines["gt.blockmachines.industrialsalloyamelter.controller.tier.mega"] = {
     overclocker: StandardOverclocker.onlyNormal(),
     speed: (recipe, choices) => Math.max(1, 1 - 0.05 * (choices.coilTier - 3)),
     power: (recipe, choices) => Math.pow(0.95, choices.coilTier - recipe.voltageTier),
@@ -1235,7 +1379,8 @@ machines["Mega Alloy Blast Smelter"] = {
     info: "Assumes matching glass tier.",
 };
 
-machines["Industrial Coke Oven"] = {
+// Industrial Coke Oven
+machines["gt.blockmachines.industrialcokeoven.controller.tier.single"] = {
     overclocker: StandardOverclocker.onlyNormal(),
     speed: 1,
     power: (recipe, choices) => 1 - (recipe.voltageTier + 1) * 0.04,
@@ -1243,42 +1388,48 @@ machines["Industrial Coke Oven"] = {
     choices: {casingType: {description: "Casing Type", choices: ["Heat Resistant Casings", "Heat Proof Casings"]}},
 };
 
-machines["Cryogenic Freezer"] = {
+// Cryogenic Freezer
+machines["gt.blockmachines.multimachine.adv.industrialfreezer"] = {
     overclocker: StandardOverclocker.onlyNormal(),
     speed: 2.2,
     power: 0.9,
     parallels: 8,
 };
 
-machines["COMET - Compact Cyclotron"] = {
+// COMET - Compact Cyclotron
+machines["gt.blockmachines.cyclotron.tier.single"] = {
     overclocker: StandardOverclocker.onlyNormal(),
     speed: 1,
     power: 1,
     parallels: 1,
 };
 
-machines["Zhuhai - Fishing Port"] = {
+// Zhuhai - Fishing Port
+machines["gt.blockmachines.industrial.fishpond.controller.tier.single"] = {
     overclocker: StandardOverclocker.onlyNormal(),
     speed: 1,
     power: 1,
     parallels: (recipe) => ((recipe.voltageTier + 1) + 1) * 2,
 };
 
-machines["Reactor Fuel Processing Plant"] = {
+// Reactor Fuel Processing Plant
+machines["gt.blockmachines.industrialrefinery.controller.tier.single"] = {
     overclocker: StandardOverclocker.onlyNormal(),
     speed: 1,
     power: 1,
     parallels: 1,
 };
 
-machines["Flotation Cell Regulator"] = {
+// Flotation Cell Regulator
+machines["gt.blockmachines.gtpp.multimachine.flotationcell"] = {
     overclocker: StandardOverclocker.onlyPerfect(),
     speed: 1,
     power: 1,
     parallels: 1,
 };
 
-machines["ExxonMobil Chemical Plant"] = {
+// ExxonMobil Chemical Plant
+machines["gt.blockmachines.chemicalplant.controller.tier.single"] = {
     overclocker: StandardOverclocker.onlyNormal(),
     speed: (recipe, choices) => {
         return choices.coilTier * 0.5 + 0.5;
@@ -1301,14 +1452,16 @@ machines["ExxonMobil Chemical Plant"] = {
     }
 };
 
-machines["Thorium Reactor [LFTR]"] = {
+// Thorium Reactor [LFTR]
+machines["gt.blockmachines.lftr.controller.single"] = {
     overclocker: StandardOverclocker.onlyNormal(),
     speed: 1,
     power: 1,
     parallels: 1,
 };
 
-machines["Matter Fabrication CPU"] = {
+// Matter Fabrication CPU
+machines["gt.blockmachines.industrialmassfab.controller.tier.single"] = {
     overclocker: StandardOverclocker.onlyPerfect(),
     speed: 1,
     power: 0.8,
@@ -1318,21 +1471,24 @@ machines["Matter Fabrication CPU"] = {
     },
 };
 
-machines["Molecular Transformer"] = {
+// Molecular Transformer
+machines["gt.blockmachines.moleculartransformer.controller.tier.single"] = {
     overclocker: StandardOverclocker.onlyNormal(),
     speed: 1,
     power: 1,
     parallels: 1,
 };
 
-machines["Industrial Centrifuge"] = {
+// Industrial Centrifuge
+machines["gt.blockmachines.industrialcentrifuge.controller.tier.single"] = {
     overclocker: StandardOverclocker.onlyNormal(),
     speed: 2.25,
     power: 0.9,
     parallels: (recipe) => (recipe.voltageTier + 1) * 6,
 };
 
-machines["Utupu-Tanuri"] = {
+// Utupu-Tanuri
+machines["gt.blockmachines.multimachine.adv.vacuumfurnace"] = {
     overclocker: (recipe, choices) => StandardOverclocker.perfectThenNormal(Math.floor(choices.heatIncrements / 2)),
     speed: (recipe, choices) => 2.2 * Math.pow(1.05, choices.heatIncrements),
     power: 0.5,
@@ -1341,35 +1497,40 @@ machines["Utupu-Tanuri"] = {
     info: "Extracting heat difference from the recipe is not implemented.",
 };
 
-machines["Industrial Electrolyzer"] = {
+// Industrial Electrolyzer
+machines["gt.blockmachines.industrialelectrolyzer.controller.tier.single"] = {
     overclocker: StandardOverclocker.onlyNormal(),
     speed: 2.8,
     power: 0.9,
     parallels: (recipe) => (recipe.voltageTier + 1) * 2,
 };
 
-machines["Industrial Mixing Machine"] = {
+// Industrial Mixing Machine
+machines["gt.blockmachines.industrialmixer.controller.tier.single"] = {
     overclocker: StandardOverclocker.onlyNormal(),
     speed: 3.5,
     power: 1,
     parallels: (recipe) => (recipe.voltageTier + 1) * 8,
 };
 
-machines["Nuclear Salt Processing Plant"] = {
+// Nuclear Salt Processing Plant
+machines["gt.blockmachines.nuclearsaltprocessingplant.controller.tier.single"] = {
     overclocker: StandardOverclocker.onlyNormal(),
     speed: 2.5,
     power: 1,
     parallels: (recipe) => (recipe.voltageTier + 1) * 2,
 };
 
-machines["IsaMill Grinding Machine"] = {
+// IsaMill Grinding Machine
+machines["gt.blockmachines.gtpp.multimachine.isamill"] = {
     overclocker: StandardOverclocker.onlyPerfect(),
     speed: 1,
     power: 1,
     parallels: 1,
 };
 
-machines["Quantum Force Transformer"] = {
+// Quantum Force Transformer
+machines["gt.blockmachines.quantumforcetransformer.controller.tier.single"] = {
     overclocker: StandardOverclocker.onlyNormal(),
     speed: 1,
     power: 1,
@@ -1478,7 +1639,8 @@ machines["Quantum Force Transformer"] = {
     }
 };
 
-machines["Sparge Tower Controller"] = {
+// Sparge Tower Controller
+machines["gt.blockmachines.sparge.controller.single"] = {
     overclocker: StandardOverclocker.onlyNormal(),
     speed: 1,
     power: 1,
@@ -1490,7 +1652,8 @@ let saplingsMultipliers = [0, 1, 4];
 let leavesMultipliers = [0, 1, 2, 4];
 let fruitsMultipliers = [0, 1];
 
-machines["Tree Growth Simulator"] = {
+// Tree Growth Simulator
+machines["gt.blockmachines.treefarm.controller.tier.single"] = {
     overclocker: NullOverclocker.instance,
     speed: 1,
     recipe: (recipe, choices, items) => {
@@ -1522,7 +1685,8 @@ machines["Tree Growth Simulator"] = {
     parallels: 1,
 };
 
-machines["Draconic Evolution Fusion Crafter"] = {
+// Draconic Evolution Fusion Crafter
+machines["gt.blockmachines.multimachine.defusioncrafter"] = {
     overclocker: (recipe, choices) => {
         const buildingTierCoil = choices.casings + 1;
         const recipeTierCoil = recipe.recipe?.gtRecipe.MetadataByKey("defc_casing_tier") ?? 1;
@@ -1539,7 +1703,8 @@ machines["Draconic Evolution Fusion Crafter"] = {
     }
 };
 
-machines["Large Sifter Control Block"] = {
+// Large Sifter Control Block
+machines["gt.blockmachines.industrialsifter.controller.tier.single"] = {
     overclocker: StandardOverclocker.onlyNormal(),
     speed: 5,
     power: 0.75,
@@ -1568,7 +1733,8 @@ function makeFusionRecipeExcluder(tier:number) {
     };
 }
 
-machines["Fusion Control Computer Mark I"] = {
+// Fusion Control Computer Mark I
+machines["gt.blockmachines.fusioncomputer.tier.06"] = {
     speed: 1,
     power: 1,
     parallels: 1,
@@ -1578,7 +1744,8 @@ machines["Fusion Control Computer Mark I"] = {
     info: "NOTE: overrides voltage tier"
 };
 
-machines["Fusion Control Computer Mark II"] = {
+// Fusion Control Computer Mark II
+machines["gt.blockmachines.fusioncomputer.tier.07"] = {
     speed: 1,
     power: 1,
     parallels: 1,
@@ -1588,7 +1755,8 @@ machines["Fusion Control Computer Mark II"] = {
     info: "NOTE: overrides voltage tier"
 };
 
-machines["Fusion Control Computer Mark III"] = {
+// Fusion Control Computer Mark III
+machines["gt.blockmachines.fusioncomputer.tier.08"] = {
     speed: 1,
     power: 1,
     parallels: 1,
@@ -1598,7 +1766,8 @@ machines["Fusion Control Computer Mark III"] = {
     info: "NOTE: overrides voltage tier"
 };
 
-machines["FusionTech MK IV"] = {
+// FusionTech MK IV
+machines["gt.blockmachines.fusioncomputer.tier.09"] = {
     speed: 1,
     power: 1,
     parallels: 1,
@@ -1608,7 +1777,8 @@ machines["FusionTech MK IV"] = {
     info: "NOTE: overrides voltage tier"
 };
 
-machines["FusionTech MK V"] = {
+// FusionTech MK V
+machines["gt.blockmachines.fusioncomputer.tier.10"] = {
     speed: 1,
     power: 1,
     parallels: 1,
@@ -1618,7 +1788,8 @@ machines["FusionTech MK V"] = {
     info: "NOTE: overrides voltage tier"
 };
 
-machines["Compact Fusion Computer MK-I Prototype"] = {
+// Compact Fusion Computer MK-I Prototype
+machines["gt.blockmachines.largefusioncomputer1"] = {
     speed: 1,
     power: 1,
     parallels: 64,
@@ -1633,7 +1804,8 @@ function getCompactFusionParallel(recipe:RecipeModel, tier:number) {
     return (1 + tier - fusionTier) * 64;
 }
 
-machines["Compact Fusion Computer MK-II"] = {
+// Compact Fusion Computer MK-II
+machines["gt.blockmachines.largefusioncomputer2"] = {
     speed: 1,
     power: 1,
     parallels: (recipe) => getCompactFusionParallel(recipe, 2),
@@ -1643,7 +1815,8 @@ machines["Compact Fusion Computer MK-II"] = {
     info: "NOTE: overrides voltage tier"
 };
 
-machines["Compact Fusion Computer MK-III"] = {
+// Compact Fusion Computer MK-III
+machines["gt.blockmachines.largefusioncomputer3"] = {
     speed: 1,
     power: 1,
     parallels: (recipe) => getCompactFusionParallel(recipe, 3),
@@ -1653,7 +1826,8 @@ machines["Compact Fusion Computer MK-III"] = {
     info: "NOTE: overrides voltage tier"
 };
 
-machines["Compact Fusion Computer MK-IV Prototype"] = {
+// Compact Fusion Computer MK-IV Prototype
+machines["gt.blockmachines.largefusioncomputer4"] = {
     speed: 1,
     power: 1,
     parallels: (recipe) => getCompactFusionParallel(recipe, 4),
@@ -1663,7 +1837,8 @@ machines["Compact Fusion Computer MK-IV Prototype"] = {
     info: "NOTE: overrides voltage tier"
 };
 
-machines["Compact Fusion Computer MK-V"] = {
+// Compact Fusion Computer MK-V
+machines["gt.blockmachines.largefusioncomputer5"] = {
     speed: 1,
     power: 1,
     parallels: (recipe) => getCompactFusionParallel(recipe, 5),
@@ -1754,7 +1929,8 @@ function getEyeOfHarmonyParallel(astralArrays: number) : number {
     return Math.pow(2, parallelExponent);
 }
 
-machines["Eye of Harmony"] = {
+// Eye of Harmony
+machines["gt.blockmachines.multimachine.em.eye_of_harmony"] = {
     speed: getEyeOfHarmonySpeed,
     power: 1,
     parallels: (recipeModel, choices) => {
@@ -1852,3 +2028,4 @@ machines["Eye of Harmony"] = {
     },
     info: "NOTE: Power input/output not calculated"
 }
+
