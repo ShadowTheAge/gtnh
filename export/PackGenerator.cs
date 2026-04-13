@@ -1,4 +1,6 @@
-﻿using export;
+﻿using System.Text.Json;
+using System.Text.Json.Serialization;
+using export;
 using Source.Data;
 
 namespace Source
@@ -24,6 +26,23 @@ namespace Source
             if (previousDataBin != null)
             {
                 OldRecipesGenerator.PopulateOldRecipes(repository, previousDataBin);
+            }
+
+            Console.WriteLine("Exporting locales...");
+            var localeBuilder = new LocalePackBuilder();
+            var english = localeBuilder.BuildDefault(repository, locale.english.code);
+            var locales = new List<LocalePack> { english };
+
+            foreach (var language in locale.languages)
+            {
+                var lang = locale.TranslateLocale(english, language);
+                locales.Add(lang);
+            }
+
+            foreach (var pack in locales)
+            {
+                using var target = File.Create(Path.Combine(targetPath, pack.code + ".json"));
+                JsonSerializer.Serialize(target, pack);
             }
             
             Console.WriteLine("Exporting data.bin...");
