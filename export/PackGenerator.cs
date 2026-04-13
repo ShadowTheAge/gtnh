@@ -5,10 +5,13 @@ namespace Source
 {
     public static class PackGenerator
     {
-        public static Repository Generate(string sourcePath, string targetPath, bool skipIcons = false, string previousDataBin = null)
+        public static Repository Generate(string sourcePath, string targetPath, string minecraftPath, bool skipIcons = false, string previousDataBin = null)
         {
             var dbParser = new DatabaseParser();
             dbParser.Parse(Path.Combine(sourcePath, "nesql-db.script"));
+            var locale = new Locale();
+            if (minecraftPath != null)
+                locale.LoadFromFolder(minecraftPath);
 
             var iconList = new List<string>();
             var repository = PackConverter.Convert(dbParser, iconList);
