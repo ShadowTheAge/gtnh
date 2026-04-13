@@ -39,21 +39,25 @@ public static class FontCharactersFixer
         {'\ue01d', '♜'},
         {'\ue01f', '⨂'},
     };
+
+    private static void FixFontCharacters(Goods goods)
+    {
+        FixString(ref goods.name, goods);
+        for (var i = 0; i < goods.tooltipParts.Count; i++)
+        {
+            var tt = goods.tooltipParts[i];
+            if (FixString(ref tt, goods))
+                goods.tooltipParts[i] = tt;
+        }
+    }
     
     public static void FixFontCharacters(Repository repository)
     {
         Console.WriteLine("Fixing missing font characters...");
         foreach (var item in repository.items)
-        {
-            FixString(ref item.name, item);
-            FixString(ref item.tooltip, item);
-        }
-        
+            FixFontCharacters(item);
         foreach (var item in repository.fluids)
-        {
-            FixString(ref item.name, item);
-            FixString(ref item.tooltip, item);
-        }
+            FixFontCharacters(item);
     }
 
     private static bool HasInvalidCharacters(string s)
@@ -67,10 +71,10 @@ public static class FontCharactersFixer
         return false;
     }
 
-    private static void FixString(ref string s, Goods item)
+    private static bool FixString(ref string s, Goods item)
     {
         if (!HasInvalidCharacters(s))
-            return;
+            return false;
         Span<char> newChars = stackalloc char[s.Length];
         s.CopyTo(newChars);
 
@@ -85,5 +89,6 @@ public static class FontCharactersFixer
         }
 
         s = new string(newChars);
+        return true;
     }
 }

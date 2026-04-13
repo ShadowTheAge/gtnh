@@ -28,6 +28,14 @@
     {
         private const int CharCount = 26 + 10;
         private const int CharOffset = 128 - CharCount;
+
+        public static IndexBits GetIndexBits(List<string> list)
+        {
+            var bits = new IndexBits();
+            foreach (var s in list)
+                bits |= GetIndexBits(s);
+            return bits;
+        }
         public static IndexBits GetIndexBits(ReadOnlySpan<char> chars)
         {
             var bits = new IndexBits();

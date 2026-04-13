@@ -1,4 +1,6 @@
-﻿namespace Source.Data
+﻿using export;
+
+namespace Source.Data
 {
     public class Repository
     {
@@ -8,6 +10,7 @@
         public List<RecipeType> recipeTypes = new List<RecipeType>();
         public List<Recipe> recipes = new List<Recipe>();
         public List<RecipeRemap> remaps = new List<RecipeRemap>();
+        public Locale locale;
     }
 
     public class RecipeMetadata : IEquatable<RecipeMetadata>

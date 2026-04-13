@@ -34,11 +34,20 @@ namespace GT_recipe_parser
         [SchemaName("NBT")]
         public string Nbt { get; set; }
 
-        [SchemaName("TOOLTIP")]
-        public string Tooltip { get; set; }
-
         [SchemaName("UNLOCALIZED_NAME")]
         public string UnlocalizedName { get; set; }
+    }
+
+    public class ItemTooltipModel
+    {
+        [SchemaName("ITEM_ID")]
+        public string ItemId { get; set; }
+
+        [SchemaName("TOOLTIP")]
+        public string Tooltip { get; set; }
+        
+        [SchemaName("TOOLTIP_ORDER")]
+        public string TooltipOrder { get; set; }
     }
 
     public class ItemGroupModel

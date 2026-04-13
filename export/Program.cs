@@ -12,12 +12,14 @@ class Program
             Console.WriteLine("  --output <path>    Specify the output path for the generated files (default: current directory)");
             Console.WriteLine("  --skipIcons        Skip the icon generation step (you can't change item ban list or similar, or the icon index will be wrong)");
             Console.WriteLine("  --previous <path>  Path to previous data.bin to get old/obsolete recipes from");
+            Console.WriteLine("  --minecraft <path> Path to .minecraft folder (that contains locale files)");
             return;
         }
 
         var path = args[0];
         var outputPath = ".";
         string previous = null;
+        string minecraftPath = null;
         var skipIcons = false;
 
         for (var i = 1; i < args.Length; i++)
@@ -33,11 +35,14 @@ class Program
                 case "--previous":
                     previous = args[++i];
                     break;
+                case "--minecraft":
+                    minecraftPath = args[++i];
+                    break;
                 default:
                     throw new InvalidOperationException("Unknown command line arg "+args[i]);
             }
         }
 
-        PackGenerator.Generate(path, outputPath, skipIcons, previous);
+        PackGenerator.Generate(path, outputPath, minecraftPath, skipIcons, previous);
     }
 }
