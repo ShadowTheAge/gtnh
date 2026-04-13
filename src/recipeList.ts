@@ -6,6 +6,7 @@ import { ShowTooltip } from "./tooltip.js";
 import { IconBox } from "./itemIcon.js";
 import { ShowDropdown, HideDropdown } from "./dropdown.js";
 import { machines, notImplementedMachine, singleBlockMachine, GetSingleBlockMachine, GetParameter } from "./machines.js";
+import { GetObjectName } from "./locale.js";
 
 const linkAlgorithmNames: { [key in LinkAlgorithm]: string } = {
     [LinkAlgorithm.Match]: "",
@@ -127,7 +128,7 @@ export class RecipeList {
                             Select crafter:
                             ${options.map(goods => {
                                 const isSingleblock = recipeType.singleblocks.includes(goods as Item);
-                                const displayName = isSingleblock ? "Singleblock "+recipe.recipeType.name : goods.name;
+                                const displayName = isSingleblock ? "Singleblock "+recipe.recipeType.name : GetObjectName(goods.id);
                                 return `
                                     <div class="dropdown-item" 
                                         data-iid="${obj.iid}"
@@ -609,7 +610,7 @@ export class RecipeList {
         let machineInfo = recipeModel.machineInfo;
         
         let gtRecipe = recipe.gtRecipe;
-        let shortInfoContent = `<span data-tooltip="recipe" data-iid="${recipeModel.iid}">${crafter?.name ?? recipe.recipeType.name}</span>`;
+        let shortInfoContent = `<span data-tooltip="recipe" data-iid="${recipeModel.iid}">${crafter ? GetObjectName(crafter.id) : recipe.recipeType.name}</span>`;
         let machineCountsText = "";
         if (gtRecipe && gtRecipe.durationTicks > 0) {
             let machineCounts = recipeModel.crafterCount;
@@ -936,7 +937,7 @@ export class RecipeList {
                         <item-icon data-id="${goods?.id}" data-action="item_icon_click" data-iid="${page.rootGroup.iid}"></item-icon>
                         <input type="number" class="amount" value="${product.amount/page.timeScale}" step="0" data-iid="${product.iid}" data-action="update_amount">
                         <span class="amount-unit">/${page.settings.timeUnit}</span>
-                        ${goods?.name ?? "Unknown product: " + product.goodsId}
+                        ${goods ? GetObjectName(goods.id) : "Unknown product: " + product.goodsId}
                         <button class="delete-btn" data-iid="${product.iid}" data-action="delete_product">x</button>
                     </div>
                 `;

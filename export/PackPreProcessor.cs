@@ -16,8 +16,6 @@ namespace Source
             Console.WriteLine("Processing tooltips...");
             ProcessToolTips(repository.items);
             ProcessToolTips(repository.fluids);
-            Console.WriteLine("Calculating index bits");
-            CalculateIndexBits(repository);
             Console.WriteLine("Calculating production/consumption");
             CalculateProductionConsumption(repository);
             Console.WriteLine("Calculating containers");
@@ -207,35 +205,6 @@ namespace Source
                 TruncateArray(ref fluid.production);
                 TruncateArray(ref fluid.consumption);
                 TruncateArray(ref fluid.containers);
-            }
-        }
-        
-        private static void CalculateIndexBits(Repository repository)
-        {
-            foreach (var oreDict in repository.oreDicts)
-            {
-                foreach (var variant in oreDict.variants)
-                    oreDict.indexBits |= SearchIndex.GetIndexBits(variant.name);
-            }
-
-            foreach (var item in repository.items)
-                item.indexBits = SearchIndex.GetIndexBits(item.name) | SearchIndex.GetIndexBits(item.tooltipParts);
-            
-            foreach (var fluid in repository.fluids)
-                fluid.indexBits = SearchIndex.GetIndexBits(fluid.name) | SearchIndex.GetIndexBits(fluid.tooltipParts);
-
-            foreach (var recipe in repository.recipes)
-            {
-                foreach (var input in recipe.fluidInputs)
-                    recipe.indexBits |= SearchIndex.GetIndexBits(input.goods.name);
-                foreach (var input in recipe.itemInputs)
-                    recipe.indexBits |= SearchIndex.GetIndexBits(input.goods.name);
-                foreach (var input in recipe.oreDictInputs)
-                    recipe.indexBits |= input.goods.indexBits;
-                foreach (var output in recipe.fluidOutputs)
-                    recipe.indexBits |= SearchIndex.GetIndexBits(output.goods.name);
-                foreach (var output in recipe.itemOutputs)
-                    recipe.indexBits |= SearchIndex.GetIndexBits(output.goods.name);
             }
         }
     }

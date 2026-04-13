@@ -1,3 +1,4 @@
+import { GetObjectName } from "./locale.js";
 import { RecipeModel, OverclockResult } from "./page.js";
 import { Fluid, Goods, Item, Recipe, RecipeInOut, RecipeIoType, RecipeType, Repository } from "./repository.js";
 import { TIER_LV, TIER_MV, TIER_LUV, TIER_ZPM, TIER_UV, TIER_UHV, TIER_UEV, TIER_UIV, TIER_UXV, CoilTierNames } from "./utils.js";
@@ -1382,7 +1383,7 @@ machines["gt.blockmachines.chemicalplant.controller.tier.single"] = {
     recipe: (recipe, choices, items) => {
         if (choices.coilTier >= 10 && choices.pipeFluidCasingTier >= 3)
             return items;
-        let catalystNumber = items.findIndex(item => item.type == RecipeIoType.ItemInput && item.goods instanceof Item && item.goods.name.endsWith("Catalyst"));
+        let catalystNumber = items.findIndex(item => item.type == RecipeIoType.ItemInput && item.goods instanceof Item && GetObjectName(item.goods.id).endsWith("Catalyst"));
         if (catalystNumber == -1)
             return items;
         let catalystUsage = (1 - 0.2 * choices.pipeFluidCasingTier) / 50;
@@ -1818,7 +1819,7 @@ function getEyeOfHarmonyRecipeTier(recipeModel : RecipeModel) : number {
         return 0;
 
     // "Overworld", "T4: Venus", "T10: Deep Dark"
-    const parts = (planetItem.goods as Item).name.split(":");
+    const parts = GetObjectName(planetItem.goods.id).split(":");
     if (parts.length == 2) {
         // Remove leading "T".
         return parseInt(parts[0].substring(1)) || 0;

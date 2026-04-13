@@ -57,7 +57,6 @@ namespace Source.Data
 
     public abstract class IndexableObject
     {
-        public IndexBits indexBits;
         public string id;
     }
 

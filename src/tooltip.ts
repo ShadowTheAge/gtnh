@@ -1,3 +1,4 @@
+import { GetObjectName, GetObjectTooltip } from "./locale.js";
 import { GetSingleRecipeDom } from "./nei.js";
 import { Goods, Recipe, RecipeInOut } from "./repository.js";
 
@@ -37,9 +38,9 @@ export function ShowTooltip(target: HTMLElement, data: TooltipData): void {
     if (data == null)
         return;
 
-    const header = data.goods?.name ?? data.header ?? '';
+    const header = data.goods ? GetObjectName(data.goods.id) : data.header ?? '';
     const debug = data.goods?.tooltipDebugInfo ?? null;
-    const text = data.goods?.tooltip ?? data.text ?? null;
+    const text = data.goods ? GetObjectTooltip(data.goods.id) : data.text ?? null;
     const mod = data.goods?.mod ?? null;
     const action = data.action ?? null;
     const recipe = data.recipe ?? null;

@@ -19,7 +19,7 @@ namespace Source
         private readonly List<int> rawData = new List<int>();
         private readonly string[] serviceItems = new[] { "Quest Book", "Anvil" };
         
-        private const int DATA_VERSION = 5;
+        private const int DATA_VERSION = 6;
 
         public MemoryMappedPackConverter(Repository repository)
         {
@@ -126,12 +126,6 @@ namespace Source
 
         private void WriteIndexBits(IndexableObject obj)
         {
-            Span<byte> buf = stackalloc byte[16];
-            Unsafe.WriteUnaligned(ref buf[0], obj.indexBits);
-            WriteInt(Unsafe.ReadUnaligned<int>(ref buf[0]));
-            WriteInt(Unsafe.ReadUnaligned<int>(ref buf[4]));
-            WriteInt(Unsafe.ReadUnaligned<int>(ref buf[8]));
-            WriteInt(Unsafe.ReadUnaligned<int>(ref buf[12]));
             WriteStringRef(obj.id);
         }
 
@@ -211,12 +205,9 @@ namespace Source
         private void WriteGoods(Goods goods)
         {
             WriteIndexBits(goods);
-            WriteStringRef(MinecraftTextConverter.ToHtml(goods.name));
             WriteStringRef(goods.mod);
             WriteStringRef(goods.internalName);
-            WriteInt(goods.numericId);
             WriteInt(goods.iconId);
-            WriteStringRef(MinecraftTextConverter.ToHtml(goods.tooltip));
             WriteStringRef(goods.unlocalizedName);
             WriteStringRef(goods.nbt);
             WriteObjectRef(Array.ConvertAll(goods.production, x => repository.recipes[x]).ToArray());
