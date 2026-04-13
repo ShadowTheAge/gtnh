@@ -1,18 +1,60 @@
 @font-face {
     font-family:'Minecraftia';
     src: url('./../fonts/F77MinecraftRegular-0VYv.ttf');
+    /* Keep pixel-style font for Latin UI only; CJK should always fall back to secondary fonts. */
+    unicode-range:
+        U+0000-00FF,
+        U+0100-024F,
+        U+1E00-1EFF,
+        U+2000-206F,
+        U+20A0-20CF;
+}
+
+@font-face {
+    font-family:'ProjectUI';
+    src:
+        local('Noto Sans CJK SC'),
+        local('Noto Sans SC'),
+        local('Microsoft YaHei UI'),
+        local('Microsoft YaHei'),
+        local('PingFang SC'),
+        local('Hiragino Sans GB'),
+        local('Source Han Sans SC'),
+        local('SimSun'),
+        local('NSimSun'),
+        local('Arial Unicode MS'),
+        local('Segoe UI Symbol'),
+        url('./../fonts/ui-font.woff2') format('woff2'),
+        url('./../fonts/ui-font.ttf') format('truetype');
+    font-display: swap;
+}
+
+:root {
+    --font-ui-primary: "Minecraftia";
+    --font-ui-secondary-zh: "MiSans", "ProjectUI", "Noto Sans CJK SC", "Noto Sans SC", "Microsoft YaHei UI", "Microsoft YaHei", "PingFang SC", "Hiragino Sans GB", "Source Han Sans SC", "SimSun", "NSimSun", "Arial Unicode MS", "Segoe UI Symbol", sans-serif;
+    --font-ui-secondary-latin: "Segoe UI", "Helvetica Neue", "Arial", "Noto Sans", "Liberation Sans", sans-serif;
+    --font-ui-secondary: var(--font-ui-secondary-latin);
+    --font-ui: var(--font-ui-primary), var(--font-ui-secondary);
+    --font-ui-size: 16px;
+    --font-ui-line-height: 22px;
+    --font-ui-control-size: 16px;
+    --font-ui-control-line-height: 22px;
+    --font-ui-input-line-height: 16px;
+    --font-ui-small-size: 8px;
+    --font-ui-small-line-height: 8px;
+    --font-ui-small-word-spacing: 1px;
 }
 
 body {
-    font-family:'Minecraftia', sans-serif;
-    -webkit-font-smoothing: never;
-    font-smooth: never;
-    font-kerning: none;
-    image-rendering: pixelated;
-    text-rendering: geometricPrecision;
-    font-size: 16px;
+    font-family: var(--font-ui);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    font-kerning: normal;
+    image-rendering: auto;
+    text-rendering: optimizeLegibility;
+    font-size: var(--font-ui-size);
     margin: 0px;
-    line-height: 22px;
+    line-height: var(--font-ui-line-height);
     color: white;
     background-color: #212121;
     word-break: break-word;
@@ -24,15 +66,15 @@ body {
 
 .text-small
 {
-    font-size: 8px;
-    line-height: 8px;
-    word-spacing: 1px;
+    font-size: var(--font-ui-small-size);
+    line-height: var(--font-ui-small-line-height);
+    word-spacing: var(--font-ui-small-word-spacing);
 }
 
 button {
-    font-family: 'Minecraftia', sans-serif;
-    font-size: 16px;
-    line-height: 22px;
+    font-family: var(--font-ui);
+    font-size: var(--font-ui-control-size);
+    line-height: var(--font-ui-control-line-height);
     border: 2px solid;
     border-bottom-width: 4px;
     border-color: #A8A8A8 #565656 #565656 #A8A8A8;
@@ -63,10 +105,10 @@ button:hover {
 }
 
 input {
-    font-family:'Minecraftia', sans-serif;
+    font-family: var(--font-ui);
     background-color: #8B8B8B;
-    font-size: 16px;
-    line-height: 16px;
+    font-size: var(--font-ui-control-size);
+    line-height: var(--font-ui-input-line-height);
     color: white;
     text-shadow: 2px 2px #342C34;
     pointer-events: all;
@@ -74,7 +116,7 @@ input {
     border-width: 2px;
     border-color: #373737 #ffffff #ffffff #373737;
     margin: 2px;
-    height: 16;
+    height: var(--font-ui-input-line-height);
 }
 
 input:focus {
