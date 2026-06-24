@@ -1191,7 +1191,7 @@ machines["Industrial Wire Factory"] = {
 };
 
 machines["Digester"] = {
-    overclocker: StandardOverclocker.onlyNormal(),
+    overclocker: StandardOverclocker.onlyPerfect(),
     speed: 1,
     power: 1,
     parallels: 1,
