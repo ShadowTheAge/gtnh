@@ -120,6 +120,10 @@ export class RecipeList {
                     tryAddCrafter(multiblock);
                 });
 
+                if (options.length === 0) {
+                    tryAddCrafter(recipeType.defaultCrafter);
+                }
+
                 const populateDropdown = (container: HTMLElement) => {
                     container.innerHTML = `
                         <div class="dropdown-list">
@@ -358,7 +362,9 @@ export class RecipeList {
 
         // Tooltip handling
         document.addEventListener("mouseenter", (e) => {
-            const element = (e.target as HTMLElement).closest("[data-tooltip]");
+            if (!(e.target instanceof Element))
+                return;
+            const element = e.target.closest("[data-tooltip]");
             if (element) {
                 const tooltip = element.getAttribute("data-tooltip");
                 switch (tooltip) {
