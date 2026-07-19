@@ -82,7 +82,7 @@ namespace Source
                     fallbackCrafter = crafter;
                     if (!item.Contains(crafter))
                     {
-                        if (!crafter.tooltipParts.Contains("DEPRECATED"))
+                        if (!crafter.tooltipParts.Any(x => x.Contains("DEPRECATED")))
                             item.Add(crafter);
                     }
                 }
@@ -108,7 +108,7 @@ namespace Source
 
         private static void ProcessAspects(Repository repository)
         {
-            var aspects = repository.items.Where(x => x.mod == "thaumcraftneiplugin" && x.name.StartsWith("Aspect: ")).ToDictionary(x => x.name.Substring("Aspect: ".Length));
+            var aspects = repository.items.Where(x => x.damage == 0 && x.unlocalizedName == "item.aspect").ToDictionary(x => x.name);
             var crafter = repository.items.First(x => x.name == "Alchemical Furnace");
             var recipeType = new RecipeType
             {

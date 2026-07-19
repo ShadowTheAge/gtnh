@@ -515,17 +515,13 @@ machines["Volcanus"] = {
     info: "Blazing pyrotheum required (Not calculated)",
 };
 
-// Name before 2.8
-machines["Mega Blast Furnace"] = {
+machines["Exothermic Hearth"] = {
     overclocker: makeEbfOverclocker,
     speed: 1,
     power: ebfPower,
     parallels: 256,
     choices: {coilTier: CoilTierChoice},
 };
-
-// Renamed since 2.8
-machines["Mega Electric Blast Furnace"] = machines["Mega Blast Furnace"]
 
 machines["Big Barrel Brewery"] = {
     overclocker: StandardOverclocker.onlyNormal(),
@@ -1210,7 +1206,7 @@ machines["Vacuum Freezer"] = {
     parallels: 1,
 };
 
-machines["Mega Vacuum Freezer"] = {
+machines["Endothermic Fridge"] = {
     overclocker: (recipe, choices) => StandardOverclocker.perfectThenNormal(choices.coolant),
     speed: 1,
     power: 1,
@@ -1364,9 +1360,22 @@ machines["Molecular Transformer"] = {
 
 machines["Industrial Centrifuge"] = {
     overclocker: StandardOverclocker.onlyNormal(),
-    speed: 2.25,
+    speed: 3,
     power: 0.9,
-    parallels: (recipe) => (recipe.voltageTier + 1) * 6,
+    parallels: (recipe) => (recipe.voltageTier + 1) * 8,
+    info: "Assumes max speed"
+};
+
+machines["Spinmatron-2737"] = {
+    overclocker: StandardOverclocker.onlyNormal(),
+    speed: (recipe, choices) => 3 * (choices.mode == 1 ? 2 : 1),
+    power: (recipe, choices) => 0.7 * (choices.mode == 2 ? 16 : 1),
+    parallels: (recipe, choices) => Math.ceil(choices.sumTurbineTier * 4 * (choices.fuel == 1 ? 1.25 : 1) / (choices.mode == 2 ? 32 : 1)),
+    choices: {
+        mode: {description: "Mode", choices: ["Standard", "Light", "Heavy"]},
+        sumTurbineTier: {description: "Sum Turbine Tier", min:1},
+        fuel: {description: "Fuel", choices: ["Kerosene", "Biocatalysed Propulsion Fluid"]},
+    }
 };
 
 machines["Utupu-Tanuri"] = {

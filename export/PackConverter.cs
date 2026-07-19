@@ -223,7 +223,7 @@ namespace Source
 
             foreach (var tooltip in generator.GetTableContents(itemTooltip))
             {
-                if (items.TryGetValue(tooltip.ItemId, out var item) && item != null)
+                if (items.TryGetValue(tooltip.ItemId, out var item) && item != null && tooltip.Tooltip != "§!shift")
                     item.tooltipParts.Add(tooltip.Tooltip);
             }
 
@@ -349,7 +349,7 @@ namespace Source
 
             foreach (var (_, v) in items)
             {
-                if (v != null && v.container != null)
+                if (v != null && !v.touched && (v.container != null || v.internalName == "aspect"))
                     v.touched = true;
             }
 
