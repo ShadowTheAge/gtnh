@@ -32,9 +32,7 @@
         "recipeId": "r~zkQq1R-lP2GrcbCcrJ7hWQ==",
         "voltageTier": 3,
         "crafter": "i:gregtech:gt.blockmachines:797",
-        "choices": {
-          "upgradeChip": 1
-        }
+        "choices": {}
       },
       {
         "type": "recipe",
@@ -134,46 +132,6 @@
         "crafter": "i:gregtech:gt.blockmachines:963",
         "choices": {
           "coilTier": 9
-        }
-      },
-      {
-        "type": "recipe",
-        "recipeId": "r~ARBcMgYAP6eAIwsaG47tRQ==",
-        "voltageTier": 2,
-        "choices": {}
-      },
-      {
-        "type": "recipe",
-        "recipeId": "r~QAUR6L3pP7OpA6j1OJ_PbA==",
-        "voltageTier": 4,
-        "choices": {}
-      },
-      {
-        "type": "recipe",
-        "recipeId": "r~PaCYd97tMYK4Cex_ZxNF7w==",
-        "voltageTier": 3,
-        "choices": {}
-      },
-      {
-        "type": "recipe",
-        "recipeId": "r~E_dNd2-ZOTOZQAWeP13Fbg==",
-        "voltageTier": 3,
-        "choices": {}
-      },
-      {
-        "type": "recipe",
-        "recipeId": "r~PAzUxVKGPJGf7DmSbhrnEA==",
-        "voltageTier": 0,
-        "choices": {}
-      },
-      {
-        "type": "recipe",
-        "recipeId": "r~rcPNnvRDNmyj6qmxnD66iQ==",
-        "voltageTier": 4,
-        "crafter": "i:gregtech:gt.blockmachines:1000",
-        "choices": {
-          "coilTier": 9,
-          "muffler": 0
         }
       }
     ],

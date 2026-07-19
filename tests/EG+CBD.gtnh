@@ -17,7 +17,8 @@
       "f:gregtech:sulfuricacid": 1,
       "f:GalacticraftMars:oxygen": 1,
       "f:GalacticraftMars:hydrogen": 1,
-      "i:gregtech:gt.metaitem.01:2010": 1
+      "i:gregtech:gt.metaitem.01:2010": 1,
+      "f:gregtech:hydrogen": 1
     },
     "elements": [
       {
@@ -173,13 +174,6 @@
           {
             "type": "recipe",
             "recipeId": "r~_S_QGJNlMVuNJgE-nZGArg==",
-            "voltageTier": 2,
-            "crafter": "i:gregtech:gt.blockmachines:1169",
-            "choices": {}
-          },
-          {
-            "type": "recipe",
-            "recipeId": "r~i4DREKRWNaa-qPungrRcww==",
             "voltageTier": 2,
             "crafter": "i:gregtech:gt.blockmachines:1169",
             "choices": {}

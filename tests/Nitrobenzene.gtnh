@@ -10,7 +10,8 @@
     "type": "recipe_group",
     "links": {
       "f:minecraft:water": 1,
-      "f:GalacticraftMars:hydrogen": 1
+      "f:GalacticraftMars:hydrogen": 1,
+      "f:gregtech:hydrogen": 1
     },
     "elements": [
       {
@@ -20,7 +21,7 @@
         "crafter": "i:gregtech:gt.blockmachines:998",
         "choices": {
           "coilTier": 0,
-          "pipeCasingTier": 0
+          "pipeFluidCasingTier": 0
         }
       },
       {
@@ -28,15 +29,6 @@
         "recipeId": "r~DaiSHwngPtunSBzqDQfuvA==",
         "voltageTier": 2,
         "choices": {}
-      },
-      {
-        "type": "recipe",
-        "recipeId": "r~opmw47SMP7C7XoK5etPV0g==",
-        "voltageTier": 2,
-        "crafter": "i:gregtech:gt.blockmachines:1159",
-        "choices": {
-          "coils": 1
-        }
       },
       {
         "type": "recipe",
@@ -72,18 +64,6 @@
         "voltageTier": 1,
         "crafter": "i:gregtech:gt.blockmachines:796",
         "choices": {}
-      },
-      {
-        "type": "recipe",
-        "recipeId": "r~Hp4YkdOsNOCRXPcRpH4YRA==",
-        "voltageTier": 0,
-        "crafter": "i:gregtech:gt.blockmachines:836",
-        "choices": {
-          "saw": 3,
-          "saplings": 0,
-          "leaves": 0,
-          "fruits": 0
-        }
       }
     ],
     "collapsed": false,

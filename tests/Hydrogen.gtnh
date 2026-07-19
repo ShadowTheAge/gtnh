@@ -9,7 +9,8 @@
   "rootGroup": {
     "type": "recipe_group",
     "links": {
-      "f:GalacticraftMars:oxygen": 1
+      "f:GalacticraftMars:oxygen": 1,
+      "f:gregtech:oxygen": 1
     },
     "elements": [
       {

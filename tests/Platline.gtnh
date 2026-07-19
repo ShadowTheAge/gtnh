@@ -16,7 +16,8 @@
       "f:gregtech:sulfuricacid": 1,
       "i:bartworks:gt.bwMetaGenerateddust:57": 1,
       "i:gregtech:gt.metaitem.01:2017": 1,
-      "i:IC2:itemCellEmpty:0": 1
+      "i:IC2:itemCellEmpty:0": 1,
+      "f:gregtech:oxygen": 1
     },
     "elements": [
       {
@@ -91,14 +92,15 @@
             "choices": {}
           }
         ],
-        "collapsed": false,
+        "collapsed": true,
         "name": "Basic platinum loop"
       },
       {
         "type": "recipe_group",
         "links": {
           "f:bartworks:palladium enriched ammonia": 1,
-          "f:dreamcraft:ammonia": 1
+          "f:dreamcraft:ammonia": 1,
+          "f:gregtech:ammonia": 1
         },
         "elements": [
           {
@@ -129,7 +131,7 @@
             "choices": {}
           }
         ],
-        "collapsed": false,
+        "collapsed": true,
         "name": "Palladium"
       },
       {
@@ -140,7 +142,10 @@
           "f:GalacticraftMars:oxygen": 1,
           "i:IC2:itemCellEmpty:0": 1,
           "f:minecraft:water": 1,
-          "f:GalacticraftMars:hydrogen": 1
+          "f:GalacticraftMars:hydrogen": 1,
+          "f:gregtech:hydrogen": 1,
+          "f:gregtech:oxygen": 1,
+          "f:gregtech:ammonia": 1
         },
         "elements": [
           {
@@ -183,7 +188,7 @@
             "choices": {}
           }
         ],
-        "collapsed": false,
+        "collapsed": true,
         "name": "Basics"
       },
       {
@@ -193,7 +198,8 @@
           "i:gregtech:gt.metaitem.01:2817": 1,
           "i:gregtech:gt.metaitem.01:2022": 1,
           "f:GalacticraftMars:oxygen": 1,
-          "i:gregtech:gt.metaitem.01:2017": 1
+          "i:gregtech:gt.metaitem.01:2017": 1,
+          "f:gregtech:oxygen": 1
         },
         "elements": [
           {
@@ -314,7 +320,7 @@
             "choices": {}
           }
         ],
-        "collapsed": false,
+        "collapsed": true,
         "name": "Rhodium"
       },
       {
@@ -375,7 +381,7 @@
             "choices": {}
           }
         ],
-        "collapsed": false,
+        "collapsed": true,
         "name": "Ruthenium"
       },
       {
@@ -468,7 +474,8 @@
       {
         "type": "recipe_group",
         "links": {
-          "f:gregtech:sulfuricacid": 1
+          "f:gregtech:sulfuricacid": 1,
+          "f:gregtech:hydrogen": 1
         },
         "elements": [
           {

@@ -2,7 +2,7 @@
   "name": "Oxygen",
   "products": [
     {
-      "goodsId": "f:GalacticraftMars:oxygen",
+      "goodsId": "f:gregtech:oxygen",
       "amount": 9600
     }
   ],
@@ -36,12 +36,6 @@
       },
       {
         "type": "recipe",
-        "recipeId": "r~2xThPnRqPJmesxIQ6rorFA==",
-        "voltageTier": 1,
-        "choices": {}
-      },
-      {
-        "type": "recipe",
         "recipeId": "r~vCIgnPLvPtaAXOM9ybTb2Q==",
         "voltageTier": 0,
         "choices": {}
@@ -50,6 +44,12 @@
         "type": "recipe",
         "recipeId": "r~nhMX_iitMiiwky68o_o5Ag==",
         "voltageTier": 0,
+        "choices": {}
+      },
+      {
+        "type": "recipe",
+        "recipeId": "r~6eEcuvgcMBKLvjzLUWv6dQ==",
+        "voltageTier": 1,
         "choices": {}
       }
     ],

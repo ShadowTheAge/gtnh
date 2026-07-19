@@ -32,9 +32,8 @@
       },
       {
         "type": "recipe",
-        "recipeId": "r~Y4EOqPKYOpKmp0js-F02Hw==",
+        "recipeId": "r~cWHUEfLTN2imO-TlDDgr2A==",
         "voltageTier": 0,
-        "crafter": "i:gregtech:gt.blockmachines:1169",
         "choices": {}
       }
     ],

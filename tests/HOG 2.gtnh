@@ -19,7 +19,8 @@
       "f:gregtech:ethylene": 1,
       "f:gregtech:lightlysteamcracked.gas": 1,
       "i:gregtech:gt.metaitem.01:2010": 1,
-      "f:gregtech:gas_gas": 1
+      "f:gregtech:gas_gas": 1,
+      "f:gregtech:hydrogen": 1
     },
     "elements": [
       {

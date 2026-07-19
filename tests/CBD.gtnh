@@ -26,7 +26,8 @@
       "i:IC2:itemCellEmpty:0": 1,
       "f:GalacticraftMars:oxygen": 1,
       "i:gregtech:gt.metaitem.01:2010": 1,
-      "i:gregtech:gt.metaitem.01:2022": 1
+      "i:gregtech:gt.metaitem.01:2022": 1,
+      "f:gregtech:oxygen": 1
     },
     "elements": [
       {

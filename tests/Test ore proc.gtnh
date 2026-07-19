@@ -26,7 +26,8 @@
     "type": "recipe_group",
     "links": {
       "i:gregtech:gt.metaitem.01:2826": 1,
-      "f:GalacticraftMars:oxygen": 1
+      "f:GalacticraftMars:oxygen": 1,
+      "f:gregtech:oxygen": 1
     },
     "elements": [
       {
@@ -38,9 +39,7 @@
             "recipeId": "r~LthoxI6UPgCI9auvW06xrg==",
             "voltageTier": 2,
             "crafter": "i:gregtech:gt.blockmachines:797",
-            "choices": {
-              "upgradeChip": 0
-            }
+            "choices": {}
           },
           {
             "type": "recipe",
@@ -54,15 +53,17 @@
             "recipeId": "r~ZAR3A8_cNweQ9WCobx2q4w==",
             "voltageTier": 2,
             "crafter": "i:gregtech:gt.blockmachines:797",
-            "choices": {
-              "upgradeChip": 0
-            }
+            "choices": {}
           },
           {
             "type": "recipe",
             "recipeId": "r~cFUBZ7exNA6KcgC6Au2bDg==",
             "voltageTier": 2,
-            "choices": {}
+            "choices": {
+              "mode": 0,
+              "sumTurbineTier": 1,
+              "fuel": 0
+            }
           }
         ],
         "collapsed": true,
@@ -77,9 +78,7 @@
             "recipeId": "r~vKYuIkbWNSK0Am1OcMaJQg==",
             "voltageTier": 2,
             "crafter": "i:gregtech:gt.blockmachines:797",
-            "choices": {
-              "upgradeChip": 0
-            }
+            "choices": {}
           },
           {
             "type": "recipe",
@@ -93,15 +92,17 @@
             "recipeId": "r~eQD5ayWzPU-Wp3zHW7hxRQ==",
             "voltageTier": 2,
             "crafter": "i:gregtech:gt.blockmachines:797",
-            "choices": {
-              "upgradeChip": 0
-            }
+            "choices": {}
           },
           {
             "type": "recipe",
             "recipeId": "r~GX27UMD2MTeUfu56vLZeWg==",
             "voltageTier": 2,
-            "choices": {}
+            "choices": {
+              "mode": 0,
+              "sumTurbineTier": 1,
+              "fuel": 0
+            }
           }
         ],
         "collapsed": true,
@@ -116,9 +117,7 @@
             "recipeId": "r~sKTuaIxWNuSk_ZdwwDnMhQ==",
             "voltageTier": 2,
             "crafter": "i:gregtech:gt.blockmachines:797",
-            "choices": {
-              "upgradeChip": 0
-            }
+            "choices": {}
           },
           {
             "type": "recipe",
@@ -132,16 +131,15 @@
             "recipeId": "r~qzk6uMquP2WhAQsZPG7R2Q==",
             "voltageTier": 2,
             "crafter": "i:gregtech:gt.blockmachines:797",
-            "choices": {
-              "upgradeChip": 0
-            }
+            "choices": {}
           },
           {
             "type": "recipe",
             "recipeId": "r~r4dlDN1zNl6sVqaJV4Z6CQ==",
             "voltageTier": 2,
             "choices": {
-              "coilTier": 2
+              "coilTier": 2,
+              "muffler": 0
             }
           },
           {
@@ -149,7 +147,8 @@
             "recipeId": "r~cfghbafANtC1ekHjRzMLxA==",
             "voltageTier": 2,
             "choices": {
-              "coilTier": 2
+              "coilTier": 2,
+              "muffler": 0
             }
           }
         ],
@@ -165,9 +164,7 @@
             "recipeId": "r~8VXs_8X7OOuho_C5et4XBg==",
             "voltageTier": 2,
             "crafter": "i:gregtech:gt.blockmachines:797",
-            "choices": {
-              "upgradeChip": 0
-            }
+            "choices": {}
           },
           {
             "type": "recipe",
@@ -196,9 +193,7 @@
             "recipeId": "r~zxH4ywdANBKqVK5l8rM1bw==",
             "voltageTier": 2,
             "crafter": "i:gregtech:gt.blockmachines:797",
-            "choices": {
-              "upgradeChip": 0
-            }
+            "choices": {}
           },
           {
             "type": "recipe",
@@ -212,15 +207,17 @@
             "recipeId": "r~aMhsOzEhMnK-Em3HqQCr5g==",
             "voltageTier": 2,
             "crafter": "i:gregtech:gt.blockmachines:797",
-            "choices": {
-              "upgradeChip": 0
-            }
+            "choices": {}
           },
           {
             "type": "recipe",
             "recipeId": "r~jZLm8pQMOxK7yMuqoIkHtg==",
             "voltageTier": 2,
-            "choices": {}
+            "choices": {
+              "mode": 0,
+              "sumTurbineTier": 1,
+              "fuel": 0
+            }
           },
           {
             "type": "recipe",
@@ -253,7 +250,11 @@
             "type": "recipe",
             "recipeId": "r~wjHhkfjTN5uBB-OT8VxWJw==",
             "voltageTier": 2,
-            "choices": {}
+            "choices": {
+              "mode": 0,
+              "sumTurbineTier": 1,
+              "fuel": 0
+            }
           },
           {
             "type": "recipe",
@@ -271,7 +272,11 @@
             "type": "recipe",
             "recipeId": "r~nCsplWJTPt-NsgTngfkNfQ==",
             "voltageTier": 3,
-            "choices": {}
+            "choices": {
+              "mode": 0,
+              "sumTurbineTier": 1,
+              "fuel": 0
+            }
           },
           {
             "type": "recipe",
