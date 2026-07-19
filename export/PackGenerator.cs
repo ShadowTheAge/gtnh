@@ -1,4 +1,5 @@
-﻿using System.Text.Json;
+﻿using System.Text.Encodings.Web;
+using System.Text.Json;
 using System.Text.Json.Serialization;
 using export;
 using Source.Data;
@@ -35,14 +36,16 @@ namespace Source
 
             foreach (var language in locale.languages)
             {
+                if (language == locale.english) continue;
                 var lang = locale.TranslateLocale(english, language);
                 locales.Add(lang);
             }
 
+            var options = new JsonSerializerOptions { WriteIndented = true, Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping};
             foreach (var pack in locales)
             {
                 using var target = File.Create(Path.Combine(targetPath, pack.code + ".json"));
-                JsonSerializer.Serialize(target, pack);
+                JsonSerializer.Serialize(target, pack, options);
             }
             
             Console.WriteLine("Exporting data.bin...");

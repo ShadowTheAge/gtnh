@@ -9,7 +9,7 @@ try {
         import("./repository.js"),
         import("./locale.js"),
         fetch(import.meta.resolve("./data/data.bin")),
-        fetch(import.meta.resolve("./data/en_US.json"))
+        fetch(import.meta.resolve("./data/ru_RU.json"))
     ]);
     const stream = response.body!.pipeThrough(new DecompressionStream("gzip"));
     const buffer = await new Response(stream).arrayBuffer();

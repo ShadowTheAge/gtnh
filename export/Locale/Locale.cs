@@ -11,19 +11,38 @@ public class Locale
 
     private static readonly string[] Languages = new[] { "de_DE", "es_ES", "fr_FR", "ja_JP", "ko_KR", "pl_PL", "pt_BR", "ru_RU", "tr_TR", "zh_CN" };
 
+    private LocaleLanguage GetLanguageByFileName(string name)
+    {
+        foreach (var language in languages)
+        {
+            if (name.Contains(language.code, StringComparison.Ordinal))
+                return language;
+        }
+
+        return null;
+    }
+
     public void LoadFromFolder(string path)
     {
+        var config = Path.Combine(path, "config");
         english = new LocaleLanguage("en_US");
-        english.ReadFromFile(Path.Combine(path, "GregTech.lang"));
-
         languages.Clear();
+        languages.Add(english);
         foreach (var s in Languages)
         {
             var locale = new LocaleLanguage(s);
-            locale.ReadFromFile(Path.Combine(path, $"GregTech_{s}.lang"));
             languages.Add(locale);
         }
 
+        foreach (var langFile in Directory.EnumerateFiles(config, "*.lang", SearchOption.AllDirectories))
+        {
+            var language = GetLanguageByFileName(langFile);
+            if (language != null)
+                language.ReadFromFile(langFile);
+        }
+
+        foreach (var language in languages)
+            language.ReadFromFile(Path.Combine(path, language == english ? "GregTech.lang" : $"GregTech_{language.code}.lang"));
         foreach (var (k, v) in english.map)
             revEnglishMap[v] = k;
     }
@@ -70,7 +89,7 @@ public class LocalePackBuilder
     private void BuildGoods(Goods goods)
     {
         var id = goods.id;
-        current.names[id] = AddLine(goods.name, goods.unlocalizedName);
+        current.names[id] = AddLine(goods.name, goods.unlocalizedName + ".name");
         var tooltipIds = new int[goods.tooltipParts.Count];
         for (var i = 0; i < goods.tooltipParts.Count; i++)
             tooltipIds[i] = AddLine(goods.tooltipParts[i], null);

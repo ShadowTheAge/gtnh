@@ -16,9 +16,10 @@ public class LocaleLanguage
         {
             var span = line.AsSpan();
             var trimmed = span.Trim();
-            if (!trimmed.StartsWith("S:"))
+            if (trimmed.StartsWith("#") || !trimmed.Contains('='))
                 continue;
-            trimmed = trimmed[2..];
+            if (trimmed.StartsWith("S:"))
+                trimmed = trimmed[2..];
 
             string key, value;
             if (trimmed[0] == '"')
