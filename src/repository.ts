@@ -4,7 +4,7 @@ const charCodeItem = "i".charCodeAt(0);
 const charCodeFluid = "f".charCodeAt(0);
 const charCodeRecipe = "r".charCodeAt(0);
 
-const DATA_VERSION = 5;
+const DATA_VERSION = 7;
 export class Repository
 {
     static current:Repository;
@@ -197,6 +197,16 @@ class MemMappedObject
         return result;
     }
 
+    protected GetStringArray(offset:number)
+    {
+        let slice = this.GetSlice(offset);
+        let result:string[] = new Array(slice.length);
+        for (var i = 0; i < slice.length; i++) {
+            result[i] = this.repository.GetString(slice[i]);
+        }
+        return result;
+    }
+
     protected GetObject<T extends MemMappedObject>(offset:number, prototype:IMemMappedObjectPrototype<T>)
     {
         return this.repository.GetObject<T>(this.repository.elements[offset + this.objectOffset], prototype);
@@ -214,11 +224,19 @@ export abstract class RecipeObject extends SearchableObject{}
 
 export abstract class Goods extends RecipeObject
 {
+    private _tooltip: string | null | undefined;
+
     get name(): string {return this.GetString(5);}
     get mod(): string {return this.GetString(6);}
     get internalName(): string {return this.GetString(7);}
     get iconId(): number {return this.GetInt(9);}
-    get tooltip(): string | null {return this.GetString(10);}
+    get tooltip(): string | null {
+        if (this._tooltip === undefined) {
+            let parts = this.GetStringArray(10);
+            this._tooltip = parts.length > 0 ? parts.join("\n") : null;
+        }
+        return this._tooltip;
+    }
     get unlocalizedName(): string {return this.GetString(11);}
     get nbt(): string | null {return this.GetString(12);}
     get production(): Int32Array {return this.GetSlice(13);}

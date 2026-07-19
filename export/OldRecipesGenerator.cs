@@ -8,6 +8,22 @@ namespace export;
 
 public class OldRecipesGenerator
 {
+    private static readonly HashSet<string> ExistingItems = new HashSet<string>();
+
+    private static string RemapId(string id)
+    {
+        if (!ExistingItems.Contains(id))
+        {
+            
+            var parts = id.Split(':');
+            parts[1] = "gregtech";
+            var combined = string.Join(':', parts);
+            if (ExistingItems.Contains(combined))
+                return combined;
+        }
+        return id;
+    }
+    
     private static Span<int> ReadSlice(Span<int> data, int pointer)
     {
         var target = data[pointer];
@@ -59,6 +75,13 @@ public class OldRecipesGenerator
         var intBuffer = MemoryMarshal.Cast<byte, int>(dataBin);
         var allRecipes = ReadSlice(intBuffer, 5);
         var dataVersion = intBuffer[0];
+        var recipeIdOffset = dataVersion == 6 ? 0 : 4;
+        
+        ExistingItems.Clear();
+        foreach (var item in repository.items)
+            ExistingItems.Add(item.id);
+        foreach (var fluid in repository.fluids)
+            ExistingItems.Add(fluid.id);
 
         var recipesById = new Dictionary<string, Recipe>();
         var recipesByHash = new Dictionary<string, Recipe>();
@@ -86,12 +109,12 @@ public class OldRecipesGenerator
         var remappedRecipes = new Dictionary<string, Recipe>();
         foreach (var recipe in allRecipes)
         {
-            var id = ReadString(dataBin, intBuffer, recipe + 4);
+            var id = ReadString(dataBin, intBuffer, recipe + recipeIdOffset);
             if (recipesById.ContainsKey(id))
                 continue;
 
-            var recipeTypePtr = intBuffer[recipe + 6];
-            var recipeIoList = ReadSlice(intBuffer, recipe + 5);
+            var recipeTypePtr = intBuffer[recipe + recipeIdOffset + 2];
+            var recipeIoList = ReadSlice(intBuffer, recipe + recipeIdOffset + 1);
 
             using var hash1 = IncrementalHash.CreateHash(HashAlgorithmName.MD5);
             using var hash2 = IncrementalHash.CreateHash(HashAlgorithmName.MD5);
@@ -104,7 +127,7 @@ public class OldRecipesGenerator
                 var goods = recipeIoList[i + 1];
                 var amount = recipeIoList[i + 3];
 
-                var goodsId = Encoding.UTF8.GetBytes(ReadString(dataBin, intBuffer, goods + 4));
+                var goodsId = Encoding.UTF8.GetBytes(RemapId(ReadString(dataBin, intBuffer, goods + 4)));
                 if (amount > 0 || type >= 3)
                 {
                     hash1.AppendData(goodsId);
@@ -132,8 +155,8 @@ public class OldRecipesGenerator
             var oldRemap = ReadSlice(intBuffer, 7);
             foreach (var remap in oldRemap)
             {
-                var idFrom = ReadString(dataBin, intBuffer, intBuffer[remap]);
-                var idTo = ReadString(dataBin, intBuffer, intBuffer[remap+1] + 4);
+                var idFrom = ReadString(dataBin, intBuffer, remap);
+                var idTo = ReadString(dataBin, intBuffer, intBuffer[remap+1] + recipeIdOffset);
 
                 var recipeTo = recipesById.GetValueOrDefault(idTo) ?? remappedRecipes.GetValueOrDefault(idTo);
                 if (recipeTo == null)

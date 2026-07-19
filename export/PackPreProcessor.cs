@@ -11,8 +11,8 @@ namespace Source
         {
             Console.WriteLine("Adding fluid tooltips...");
             ProcessFluidTooltips(repository);
-            //Console.WriteLine("Processing aspects...");
-            //ProcessAspects(repository);
+            Console.WriteLine("Processing aspects...");
+            ProcessAspects(repository);
             Console.WriteLine("Processing tooltips...");
             ProcessToolTips(repository.items);
             ProcessToolTips(repository.fluids);
