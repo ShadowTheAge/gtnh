@@ -19,7 +19,7 @@ namespace Source
         private readonly List<int> rawData = new List<int>();
         private readonly string[] serviceItems = new[] { "Quest Book", "Anvil" };
         
-        private const int DATA_VERSION = 5;
+        private const int DATA_VERSION = 7;
 
         public MemoryMappedPackConverter(Repository repository)
         {
@@ -105,6 +105,11 @@ namespace Source
             WriteInt(elements.Length);
             foreach (var elem in elements)
                 WriteInt(elem);
+        }
+
+        private void Write(string[] elements)
+        {
+            WriteObjectRef(elements);
         }
 
         private void Write(GtRecipeInfo gtRecipe)
@@ -216,7 +221,7 @@ namespace Source
             WriteStringRef(goods.internalName);
             WriteInt(goods.numericId);
             WriteInt(goods.iconId);
-            WriteStringRef(MinecraftTextConverter.ToHtml(goods.tooltip));
+            Write(goods.tooltipParts.Select(MinecraftTextConverter.ToHtml).ToArray());
             WriteStringRef(goods.unlocalizedName);
             WriteStringRef(goods.nbt);
             WriteObjectRef(Array.ConvertAll(goods.production, x => repository.recipes[x]).ToArray());

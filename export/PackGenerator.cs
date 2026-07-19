@@ -9,9 +9,6 @@ namespace Source
         {
             var dbParser = new DatabaseParser();
             dbParser.Parse(Path.Combine(sourcePath, "nesql-db.script"));
-            var locale = new Locale();
-            if (minecraftPath != null)
-                locale.LoadFromFolder(minecraftPath);
 
             var iconList = new List<string>();
             var repository = PackConverter.Convert(dbParser, iconList);
