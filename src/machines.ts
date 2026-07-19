@@ -300,7 +300,7 @@ machines["Extreme Heat Exchanger"] = {
 machines["Naquadah Fuel Refinery"] = {
     speed: 1,
     power: 1,
-    parallels: 1,
+    parallels: (recipe, choices) => (choices.coils + 1) * 4,
     overclocker: (recipeModel, choices) => {
         const buildingTierCoil = choices.coils + 1;
         const recipeTierCoil = recipeModel.recipe?.gtRecipe.MetadataByKey("nfr_coil_tier") ?? 1;
@@ -375,14 +375,38 @@ machines["Zyngen"] = {
     choices: {coilTier: CoilTierChoice},
 };
 
-machines["High Current Industrial Arc Furnace"] = {
-    overclocker: StandardOverclocker.onlyNormal(),
-    speed: 3.5,
-    power: 1,
-    parallels: (recipe, choices) => {
-        return IsRecipeType(recipe, "Plasma Arc Furnace") ? (recipe.voltageTier + 1) * 8 * choices.w : (recipe.voltageTier + 1) * choices.w;
-    },
-    choices: {w: {description: "W", min: 1}},
+type Electrode = {
+    name: string,
+    speed: number,
+    parallels: number,
+    oc: number,
+    power: number,
+};
+
+let Electrodes: Electrode[] = [
+    { name: "Graphite",             speed: 2.0, parallels: 4,     oc: 2,    power: 1.0 },
+    { name: "Tantalum",             speed: 4.0, parallels: 2,     oc: 4,    power: 1.2 },
+    { name: "Molybdenum",           speed: 3.0, parallels: 16,    oc: 3,    power: 0.8 },
+    { name: "Tungsten",             speed: 1.0, parallels: 128,   oc: 1,    power: 1.1 },
+    { name: "Tungstensteel",        speed: 1.0, parallels: 256,   oc: 1,    power: 1.2 },
+    { name: "Graphene",             speed: 2.0, parallels: 16,    oc: 2,    power: 1.0 },
+    { name: "YBCO",                 speed: 6.0, parallels: 8,     oc: 6,    power: 0.8 },
+    { name: "Netherite",            speed: 1.5, parallels: 64,    oc: 1.5,  power: 1.3 },
+    { name: "Tritanium",            speed: 2.0, parallels: 48,    oc: 2,    power: 1.7 },
+    { name: "Infinity",             speed: 1.0, parallels: 1,     oc: 1,    power: 1.0 },
+    { name: "Hypogen",              speed: 1.0, parallels: 256,   oc: 1,    power: 1.5 },
+    { name: "Neutronium Nanite",    speed: 2.0, parallels: 64,    oc: 2,    power: 2.0 },
+    { name: "Transcendent Nanite",  speed: 4.0, parallels: 512,   oc: 4,    power: 2.0 },
+    { name: "Universium Nanite",    speed: 8.0, parallels: 1024,  oc: 8,    power: 2.0 },
+];
+
+machines["Industrial Arc Furnace"] = {
+    overclocker: (recipe, choices) => StandardOverclocker.onlyPerfect(MAX_OVERCLOCK, Electrodes[choices.electrode].oc),
+    speed: (recipe, choices) => Electrodes[choices.electrode].speed,
+    power: (recipe, choices) => Electrodes[choices.electrode].power,
+    parallels: (recipe, choices) => Electrodes[choices.electrode].parallels,
+    choices: {electrode: {description: "Electrode", choices: Electrodes.map(e => e.name)}},
+    info: "Electrode special properties not implemented. Startup not implemented.",
 };
 
 machines["Large Scale Auto-Assembler v1.01"] = {
@@ -540,11 +564,19 @@ machines["Mega Oil Cracker"] = {
     choices: {coilTier: CoilTierChoice},
 };
 
+let ICFSawblades: {name:string, speed:number, power:number, parallels:number}[] = [
+    {name: "Tungsten Titanium Carbide", speed: 2.5, power: 0.9, parallels: 2},
+    {name: "Mysterious Crystal", speed: 3, power: 0.8, parallels: 3},
+    {name: "Neutronium ", speed: 3.5, power: 0.7, parallels: 4},
+    {name: "Transcendent Metal ", speed: 4.5, power: 0.6, parallels: 6},
+]
+
 machines["Industrial Cutting Factory"] = {
     overclocker: StandardOverclocker.onlyNormal(),
-    speed: 3,
-    power: 0.75,
-    parallels: (recipe) => (recipe.voltageTier + 1) * 4,
+    speed: (recipe, choices) => ICFSawblades[choices.sawblade].speed,
+    power: (recipe, choices) => ICFSawblades[choices.sawblade].power,
+    parallels: (recipe, choices) => ICFSawblades[choices.sawblade].parallels * (recipe.voltageTier + 1),
+    choices: {sawblade: {description: "Sawblade", choices: ICFSawblades.map(s => s.name)}},
 };
 
 machines["Distillation Tower"] = {
@@ -604,7 +636,7 @@ machines["Industrial Extrusion Machine"] = {
     overclocker: StandardOverclocker.onlyNormal(),
     speed: 3.5,
     power: 1,
-    parallels: (recipe) => (recipe.voltageTier + 1) * 4,
+    parallels: (recipe) => (recipe.voltageTier + 1) * 6,
 };
 
 machines["Assembly Line"] = {
@@ -685,12 +717,14 @@ machines["Advanced Assembly Line"] = {
     info: "NOTE: Voltage determines the energy hatch voltage, not maximum voltage.",
 };
 
+let SolenoidTierChoice = {description: "Solenoid Tier", choices: ["MV", "HV", "EV", "IV", "LuV", "ZPM", "UV", "UHV", "UEV", "UIV", "UMV"]};
+
 machines["Large Fluid Extractor"] = {
     overclocker: StandardOverclocker.onlyNormal(),
     speed: (recipe, choices) => 1.5 + choices.coilTier * 0.1,
     power: (recipe, choices) => 0.80 * Math.pow(0.90, choices.coilTier),
     parallels: (recipe, choices) => (choices.solenoidTier + 2) * 8,
-    choices: {coilTier: CoilTierChoice, solenoidTier: {description: "Solenoid Tier", choices: ["MV", "HV", "EV", "IV", "LuV", "ZPM", "UV", "UHV", "UEV", "UIV", "UMV"]}},
+    choices: {coilTier: CoilTierChoice, solenoidTier: SolenoidTierChoice},
 };
 
 machines["Thermic Heating Device"] = {
@@ -782,7 +816,7 @@ machines["Industrial Precision Lathe"] = {
 
 machines["Industrial Maceration Stack"] = {
     overclocker: StandardOverclocker.onlyNormal(),
-    speed: 1.6,
+    speed: (recipe, choices) => choices.upgradeChip == 1 ? 6.4 : 1.6,
     power: 1,
     parallels: (recipe, choices) => {
         const hasUpgrade = choices.upgradeChip == 1;
@@ -883,9 +917,10 @@ machines["Neutronium Compressor"] = {
 
 machines["Amazon Warehousing Depot"] = {
     overclocker: StandardOverclocker.onlyNormal(),
-    speed: 6,
+    speed: (recipe, choices) => choices.tier + 1,
     power: 0.75,
     parallels: (recipe) => (recipe.voltageTier + 1) * 16,
+    choices: {tier: PipeItemCasingTierChoice},
 };
 
 machines["PCB Factory"] = {
@@ -1152,9 +1187,10 @@ machines["Boldarnator"] = {
 
 machines["Large Thermal Refinery"] = {
     overclocker: StandardOverclocker.onlyNormal(),
-    speed: 2.5,
-    power: 0.8,
-    parallels: (recipe) => (recipe.voltageTier + 1) * 8,
+    speed: (recipe, choices) => 2.5 * (1 + (choices.coilTier + 1) * 0.05),
+    power: (recipe, choices) => 0.8 * Math.pow(0.95, choices.coilTier + 1),
+    parallels: (recipe, choices) => (recipe.voltageTier + 1) * 8 + (choices.solenoidTier + 1) * 2,
+    choices: {solenoidTier: SolenoidTierChoice, coilTier: CoilTierChoice},
 };
 
 machines["Transcendent Plasma Mixer"] = {
@@ -1185,9 +1221,10 @@ machines["Mega Vacuum Freezer"] = {
 
 machines["Industrial Wire Factory"] = {
     overclocker: StandardOverclocker.onlyNormal(),
-    speed: 3,
+    speed: (recipe, choices) => 1 +  0.5*(choices.tier + 1),
     power: 0.75,
     parallels: (recipe) => (recipe.voltageTier + 1) * 4,
+    choices: {tier: PipeItemCasingTierChoice},
 };
 
 machines["Digester"] = {
@@ -1345,14 +1382,15 @@ machines["Industrial Electrolyzer"] = {
     overclocker: StandardOverclocker.onlyNormal(),
     speed: 2.8,
     power: 0.9,
-    parallels: (recipe) => (recipe.voltageTier + 1) * 2,
+    parallels: (recipe) => (recipe.voltageTier + 1) * 4,
 };
 
 machines["Industrial Mixing Machine"] = {
     overclocker: StandardOverclocker.onlyNormal(),
-    speed: 3.5,
+    speed: (recipe, choices) => 2 + choices.tier,
     power: 1,
     parallels: (recipe) => (recipe.voltageTier + 1) * 8,
+    choices: {tier: PipeItemCasingTierChoice},
 };
 
 machines["Nuclear Salt Processing Plant"] = {
