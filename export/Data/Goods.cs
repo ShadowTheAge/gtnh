@@ -31,11 +31,12 @@ namespace Source.Data
         public string internalName;
         public int numericId;
         public int iconId;
-        public string tooltip;
+        public List<string> tooltipParts = new List<string>();
         public string unlocalizedName;
         public string nbt;
         public int[] production = Array.Empty<int>();
         public int[] consumption = Array.Empty<int>();
+        public string tooltip => string.Join('\n', tooltipParts);
     }
 
     [Serializable]

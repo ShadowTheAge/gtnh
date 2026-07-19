@@ -16,8 +16,6 @@ namespace Source
             Console.WriteLine("Processing tooltips...");
             ProcessToolTips(repository.items);
             ProcessToolTips(repository.fluids);
-            Console.WriteLine("Calculating index bits");
-            CalculateIndexBits(repository);
             Console.WriteLine("Calculating production/consumption");
             CalculateProductionConsumption(repository);
             Console.WriteLine("Calculating containers");
@@ -31,8 +29,8 @@ namespace Source
         {
             foreach (var item in repository.items)
             {
-                if (item.container != null && item.container.empty.name == "Empty Cell" && !string.IsNullOrEmpty(item.tooltip))
-                    item.container.fluid.tooltip = item.tooltip;
+                if (item.container != null && item.container.empty.name == "Empty Cell" && item.tooltipParts.Count > 0)
+                    item.container.fluid.tooltipParts = item.tooltipParts;
             }
         }
 
@@ -51,7 +49,7 @@ namespace Source
         private static bool GetSingleBlockVoltageTier(Item item, out int tier)
         {
             tier = 0;
-            if (!item.tooltip.Contains("Voltage IN"))
+            if (!item.tooltipParts.Contains("Voltage IN"))
                 return false;
             
             var cleanedTooltip = Regex.Replace(item.tooltip, "§.", "");
@@ -82,7 +80,7 @@ namespace Source
                     fallbackCrafter = crafter;
                     if (!item.Contains(crafter))
                     {
-                        if (!crafter.tooltip.Contains("DEPRECATED"))
+                        if (!crafter.tooltipParts.Contains("DEPRECATED"))
                             item.Add(crafter);
                     }
                 }
@@ -133,25 +131,23 @@ namespace Source
 
         private static void ProcessToolTips<T>(List<T> goods) where T:Goods
         {
-            var builder = new StringBuilder();
             foreach (var item in goods)
             {
-                item.tooltip ??= "";
-                var parts = item.tooltip.Split('\n');
-                builder.Clear();
-                for (var i = 1; i < parts.Length-1; i++)
+                var parts = item.tooltipParts;
+                if (parts.Count > 0 && parts[0].StartsWith(item.name))
+                    parts.RemoveAt(0);
+                for (var i = parts.Count - 1 - 1; i >= 0; i--)
                 {
                     var part = parts[i];
-                    if ((part.Contains("press", StringComparison.OrdinalIgnoreCase) || part.Contains("hold", StringComparison.OrdinalIgnoreCase)) &&
-                        (part.Contains("ctrl", StringComparison.OrdinalIgnoreCase) || part.Contains("shift", StringComparison.OrdinalIgnoreCase) || part.Contains("control", StringComparison.OrdinalIgnoreCase)))
-                        continue;
-                    if (i == 1 && part == "")
-                        continue;
-
-                    builder.Append(part).Append('\n');
+                    var remove = (part.Contains("press", StringComparison.OrdinalIgnoreCase) || part.Contains("hold", StringComparison.OrdinalIgnoreCase)) &&
+                                 (part.Contains("ctrl", StringComparison.OrdinalIgnoreCase) || part.Contains("shift", StringComparison.OrdinalIgnoreCase) ||
+                                  part.Contains("control", StringComparison.OrdinalIgnoreCase));
+                    if (remove)
+                        parts.RemoveAt(i);
                 }
 
-                item.tooltip = builder.ToString();
+                while (parts.Count > 0 && parts[0] == "")
+                    parts.RemoveAt(0);
             }
         }
 
@@ -209,35 +205,6 @@ namespace Source
                 TruncateArray(ref fluid.production);
                 TruncateArray(ref fluid.consumption);
                 TruncateArray(ref fluid.containers);
-            }
-        }
-        
-        private static void CalculateIndexBits(Repository repository)
-        {
-            foreach (var oreDict in repository.oreDicts)
-            {
-                foreach (var variant in oreDict.variants)
-                    oreDict.indexBits |= SearchIndex.GetIndexBits(variant.name);
-            }
-
-            foreach (var item in repository.items)
-                item.indexBits = SearchIndex.GetIndexBits(item.name) | SearchIndex.GetIndexBits(item.tooltip);
-            
-            foreach (var fluid in repository.fluids)
-                fluid.indexBits = SearchIndex.GetIndexBits(fluid.name) | SearchIndex.GetIndexBits(fluid.tooltip);
-
-            foreach (var recipe in repository.recipes)
-            {
-                foreach (var input in recipe.fluidInputs)
-                    recipe.indexBits |= SearchIndex.GetIndexBits(input.goods.name);
-                foreach (var input in recipe.itemInputs)
-                    recipe.indexBits |= SearchIndex.GetIndexBits(input.goods.name);
-                foreach (var input in recipe.oreDictInputs)
-                    recipe.indexBits |= input.goods.indexBits;
-                foreach (var output in recipe.fluidOutputs)
-                    recipe.indexBits |= SearchIndex.GetIndexBits(output.goods.name);
-                foreach (var output in recipe.itemOutputs)
-                    recipe.indexBits |= SearchIndex.GetIndexBits(output.goods.name);
             }
         }
     }

@@ -2,6 +2,7 @@ import { GetScrollbarWidth, voltageTier, formatAmount, CoilTierNames, TIER_MV, g
 import { Goods, Fluid, Item, Repository, IMemMappedObjectPrototype, Recipe, RecipeType, RecipeIoType, RecipeInOut, RecipeObject, OreDict, GtRecipeMetadata } from "./repository.js";
 import { SearchQuery } from "./searchQuery.js";
 import { ShowTooltip, HideTooltip } from "./tooltip.js";
+import { SearchLocale } from "./locale.js";
 
 const repository = Repository.current;
 const nei = document.getElementById("nei")!;
@@ -283,15 +284,15 @@ let itemAllocator = new ItemAllocator();
 var FillNeiAllItems:NeiFiller = function(grid:NeiGrid, search : SearchQuery | null)
 {
     var allocator = grid.BeginAllocation(itemAllocator);
-    FillNeiItemsWith(allocator, search, Repository.current.fluids, Fluid);
-    FillNeiItemsWith(allocator, search, Repository.current.items, Item);
+    FillNeiItemsWith(allocator, search);
 }
 
-function FillNeiItemsWith<T extends Goods>(grid:NeiGridAllocator<Goods>, search: SearchQuery | null, arr:Int32Array, proto:IMemMappedObjectPrototype<T>):void
+function FillNeiItemsWith(grid:NeiGridAllocator<Goods>, search: SearchQuery | null):void
 {
-    var len = arr.length;
+    var foundObjects = search ? SearchLocale(search) : Repository.current.listAllGoods;
+    var len = foundObjects.length;
     for (var i=0; i<len; i++) {
-        var element = repository.GetObjectIfMatchingSearch(search, arr[i], proto);
+        var element = repository.GetById<Goods>(foundObjects[i]);
         if (element !== null)
             grid.Add(element);
     }

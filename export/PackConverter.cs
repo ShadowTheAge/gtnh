@@ -17,6 +17,7 @@ namespace Source
         public static readonly TypeSchema<GregTechRecipeModel> gregTechRecipe = new ("GREG_TECH_RECIPE");
         public static readonly TypeSchema<GregTechRecipeItemModel> gregTechRecipeItem = new ("GREG_TECH_RECIPE_ITEM");
         public static readonly TypeSchema<ItemModel> item = new ("ITEM");
+        public static readonly TypeSchema<ItemTooltipModel> itemTooltip = new ("ITEM_TOOLTIP");
         public static readonly TypeSchema<ItemGroupModel> itemGroup = new ("ITEM_GROUP");
         public static readonly TypeSchema<ItemGroupItemStacksModel> itemGroupItemStacks = new ("ITEM_GROUP_ITEM_STACKS");
         public static readonly TypeSchema<ItemToolClassesModel> itemToolClasses = new ("ITEM_TOOL_CLASSES");
@@ -50,7 +51,7 @@ namespace Source
 
         public static readonly TypeSchema[] All = 
         {
-            aspect, aspectAspect, aspectEntry, fluid, fluidBlock, fluidContainer, fluidGroupFluidStacks, fluidGroup, gregTechRecipe, gregTechRecipeItem, item, itemGroup,
+            aspect, aspectAspect, aspectEntry, fluid, fluidBlock, fluidContainer, fluidGroupFluidStacks, fluidGroup, gregTechRecipe, gregTechRecipeItem, item, itemTooltip, itemGroup,
             itemGroupItemStacks, itemToolClasses, mob, mobInfo, mobInfoDrops, mobInfoSpawnInfo, oreDictionary, quest, questLine, questLineQuest, questLineQuestLineEntries,
             questQuest, questReward, questTask, recipe, recipeFluidGroup, recipeFluidInputsFluids, recipeFluidOutputs, recipeItemGroup, recipeItemInputsItems,
             recipeItemOutputs, recipeType, reward, rewardItemGroup, task, taskFluids, taskItemGroup, recipeTypeItem, recipeMetadata
@@ -214,10 +215,16 @@ namespace Source
                 {
                     items[item.Id] = new Item
                     {
-                        name = item.LocalizedName, id = item.Id, tooltip = item.Tooltip, stackSize = item.MaxStackSize, mod = item.ModId,
+                        name = item.LocalizedName, id = item.Id, stackSize = item.MaxStackSize, mod = item.ModId,
                         internalName = item.InternalName, damage = item.ItemDamage, numericId = item.ItemId, unlocalizedName = item.UnlocalizedName, nbt = item.Nbt
                     };
                 }
+            }
+
+            foreach (var tooltip in generator.GetTableContents(itemTooltip))
+            {
+                if (items.TryGetValue(tooltip.ItemId, out var item) && item != null)
+                    item.tooltipParts.Add(tooltip.Tooltip);
             }
 
             foreach (var container in generator.GetTableContents(fluidContainer))

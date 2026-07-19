@@ -5,14 +5,19 @@ try {
     atlas.src = "./data/atlas.webp";
 
     // Load repository and data in parallel
-    const [repositoryModule, response] = await Promise.all([
+    const [repositoryModule, localeModule, response, localeResponse] = await Promise.all([
         import("./repository.js"),
-        fetch(import.meta.resolve("./data/data.bin"))
+        import("./locale.js"),
+        fetch(import.meta.resolve("./data/data.bin")),
+        fetch(import.meta.resolve("./data/en_US.json"))
     ]);
     const stream = response.body!.pipeThrough(new DecompressionStream("gzip"));
     const buffer = await new Response(stream).arrayBuffer();
     repositoryModule.Repository.load(buffer);
     console.log("Repository loaded", repositoryModule.Repository.current);
+
+    await localeModule.LoadLocale(localeResponse);
+
 
     // Then load other modules
     await Promise.all([

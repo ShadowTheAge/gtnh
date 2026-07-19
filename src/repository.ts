@@ -1,10 +1,11 @@
+import { GetObjectName, GetObjectTooltip } from "./locale.js";
 import { SearchQuery } from "./searchQuery.js";
 
 const charCodeItem = "i".charCodeAt(0);
 const charCodeFluid = "f".charCodeAt(0);
 const charCodeRecipe = "r".charCodeAt(0);
 
-const DATA_VERSION = 5;
+const DATA_VERSION = 6;
 export class Repository
 {
     static current:Repository;
@@ -22,6 +23,7 @@ export class Repository
     service:Int32Array;
 
     objectPositionMap: {[id:string]:number} = {};
+    listAllGoods: string[] = [];
 
     constructor(data: ArrayBuffer)
     {
@@ -39,10 +41,10 @@ export class Repository
         this.recipeTypes = this.GetSlice(this.elements[4]);
         this.recipes = this.GetSlice(this.elements[5]);
         this.service = this.GetSlice(this.elements[6]);
-        this.FillObjectPositionMap(this.items);
-        this.FillObjectPositionMap(this.fluids);
-        this.FillObjectPositionMap(this.oreDicts);
-        this.FillObjectPositionMap(this.recipes);
+        this.FillObjectPositionMap(this.items, true);
+        this.FillObjectPositionMap(this.fluids, true);
+        this.FillObjectPositionMap(this.oreDicts, false);
+        this.FillObjectPositionMap(this.recipes, false);
 
         let remap = this.ReadSlice(this.elements[7]);
         this.FillRecipesRemap(remap);
@@ -62,10 +64,12 @@ export class Repository
         }
     }
 
-    private FillObjectPositionMap(elements:Int32Array) {
+    private FillObjectPositionMap(elements:Int32Array, addToList:boolean = false) {
         for (var i=0; i<elements.length; i++) {
-            var id = this.GetString(this.elements[elements[i]+4]);
+            var id = this.GetString(this.elements[elements[i]]);
             this.objectPositionMap[id] = elements[i];
+            if (addToList)
+                this.listAllGoods.push(id);
         }
     }
 
@@ -78,16 +82,6 @@ export class Repository
         if (!this.objectPositionMap[id])
             return null;
         return this.GetObject(this.objectPositionMap[id], type) as T;
-    }
-
-    public ObjectMatchQueryBits(query:SearchQuery, pointer:number):boolean
-    {
-        var arr = query.indexBits;
-        for (var i=0; i<4; i++) {
-            if ((this.elements[pointer+i] & arr[i]) !== arr[i])
-                return false;
-        }
-        return true;
     }
 
     GetString(pointer:number):string
@@ -127,24 +121,10 @@ export class Repository
         return new prototype(this, pointer);
     }
 
-    GetObjectIfMatchingSearch<T extends SearchableObject>(query:SearchQuery | null, pointer:number, prototype:IMemMappedObjectPrototype<T>):T | null
-    {
-        if (query === null)
-            return this.GetObject(pointer, prototype);
-        if (!this.ObjectMatchQueryBits(query, pointer))
-            return null;
-        var inst = this.GetObject(pointer, prototype);
-        if (query.original.length === 1)
-            return inst;
-        return inst.MatchSearchText(query) ? inst : null;
-    }
-
     IsObjectMatchingSearch(obj:SearchableObject, query:SearchQuery | null):boolean
     {
         if (query === null)
             return true;
-        if (!this.ObjectMatchQueryBits(query, obj.objectOffset))
-            return false;
         if (query.original.length === 1)
             return true;
         return obj.MatchSearchText(query);
@@ -205,8 +185,7 @@ class MemMappedObject
 
 abstract class SearchableObject extends MemMappedObject
 {
-    id:string = this.GetString(4);
-    // Elements 0-3 are reserved for 128-bit index
+    id:string = this.GetString(0);
     abstract MatchSearchText(query:SearchQuery):boolean;
 }
 
@@ -214,15 +193,13 @@ export abstract class RecipeObject extends SearchableObject{}
 
 export abstract class Goods extends RecipeObject
 {
-    get name(): string {return this.GetString(5);}
-    get mod(): string {return this.GetString(6);}
-    get internalName(): string {return this.GetString(7);}
-    get iconId(): number {return this.GetInt(9);}
-    get tooltip(): string | null {return this.GetString(10);}
-    get unlocalizedName(): string {return this.GetString(11);}
-    get nbt(): string | null {return this.GetString(12);}
-    get production(): Int32Array {return this.GetSlice(13);}
-    get consumption(): Int32Array {return this.GetSlice(14);}
+    get mod(): string {return this.GetString(1);}
+    get internalName(): string {return this.GetString(2);}
+    get iconId(): number {return this.GetInt(3);}
+    get unlocalizedName(): string {return this.GetString(4);}
+    get nbt(): string | null {return this.GetString(5);}
+    get production(): Int32Array {return this.GetSlice(6);}
+    get consumption(): Int32Array {return this.GetSlice(7);}
 
     abstract get tooltipDebugInfo():string;
 
@@ -230,15 +207,15 @@ export abstract class Goods extends RecipeObject
         if (query.mod !== null && !this.mod.toLowerCase().includes(query.mod)) {
             return false;
         }
-        return query.Match(this.name) || query.Match(this.tooltip);
+        return query.Match(GetObjectName(this.id)) || query.Match(GetObjectTooltip(this.id));
     }
 }
 
 export class Item extends Goods
 {
-    get stackSize():number {return this.GetInt(15);}
-    get damage():number {return this.GetInt(16);}
-    get container():FluidContainer | null {return this.GetObject(17, FluidContainer);}
+    get stackSize():number {return this.GetInt(8);}
+    get damage():number {return this.GetInt(9);}
+    get container():FluidContainer | null {return this.GetObject(10, FluidContainer);}
     
     get tooltipDebugInfo(): string {
         var baseInfo = `${this.mod}:${this.internalName}:${this.damage}`;
@@ -258,8 +235,8 @@ export class FluidContainer extends MemMappedObject
 
 export class Fluid extends Goods
 {
-    get isGas():boolean {return this.GetInt(15) === 1;}
-    get containers():Int32Array {return this.GetSlice(16);}
+    get isGas():boolean {return this.GetInt(8) === 1;}
+    get containers():Int32Array {return this.GetSlice(9);}
     get tooltipDebugInfo(): string {
         return `${this.mod}:${this.internalName}`;
     }
@@ -271,7 +248,7 @@ export class OreDict extends RecipeObject
 
     constructor(repository:Repository, offset:number) {
         super(repository, offset);
-        this.items = this.GetArray(5, Item);
+        this.items = this.GetArray(1, Item);
     }
 
     MatchSearchText(query: SearchQuery): boolean
@@ -279,7 +256,7 @@ export class OreDict extends RecipeObject
         var items = this.items;
         for (var i = 0; i < items.length; i++) {
             var item = items[i];
-            if (this.repository.ObjectMatchQueryBits(query, item.objectOffset) && item.MatchSearchText(query))
+            if (item.MatchSearchText(query))
                 return true;
         }
         return false;
@@ -356,15 +333,15 @@ const RecipeIoTypePrototypes:IMemMappedObjectPrototype<RecipeObject>[] = [Item, 
 
 export class Recipe extends SearchableObject
 {
-    readonly recipeType:RecipeType = this.GetObject(6, RecipeType);
-    get gtRecipe():GtRecipe {return this.GetObject(7, GtRecipe)}
+    readonly recipeType:RecipeType = this.GetObject(2, RecipeType);
+    get gtRecipe():GtRecipe {return this.GetObject(3, GtRecipe)}
     private computedIo:RecipeInOut[] | undefined;
 
     get items():RecipeInOut[] { return this.computedIo ?? (this.computedIo = this.ComputeItems());}
 
     private ComputeItems():RecipeInOut[]
     {
-        var slice = this.GetSlice(5);
+        var slice = this.GetSlice(1);
         var elements = slice.length / 5;
         var result:RecipeInOut[] = new Array(elements);
         var index = 0;
@@ -385,13 +362,11 @@ export class Recipe extends SearchableObject
 
     MatchSearchText(query: SearchQuery): boolean 
     {
-        var slice = this.GetSlice(5);
+        var slice = this.GetSlice(1);
         var count = slice.length / 5;
         for (var i=0; i<count; i++) 
         {
             var pointer = slice[i*5+1];
-            if (!this.repository.ObjectMatchQueryBits(query, pointer))
-                continue;
             var objType = RecipeIoTypePrototypes[slice[i*5]];
             var obj = this.repository.GetObject<RecipeObject>(pointer, objType);
             if (obj.MatchSearchText(query))

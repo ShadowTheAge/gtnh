@@ -1,3 +1,4 @@
+import { GetObjectName } from '../locale';
 import { Repository, Item, Fluid, Recipe, OreDict } from '../repository';
 import { setupRepository } from './setup';
 
@@ -13,12 +14,12 @@ describe('Repository', () => {
     it('should find items by id', () => {
         const item = Repository.current.GetById<Item>('i:gregtech:gt.blockmachines:1000');
         expect(item).toBeDefined();
-        expect(item?.name).toBe('Electric Blast Furnace');
+        expect(GetObjectName(item!.id)).toBe('Electric Blast Furnace');
     });
 
     it('should find fluids by id', () => {
         const fluid = Repository.current.GetById<Fluid>('f:IC2:ic2steam');
         expect(fluid).toBeDefined();
-        expect(fluid?.name).toBe('Steam');
+        expect(GetObjectName(fluid!.id)).toBe('Steam');
     });
 }); 
