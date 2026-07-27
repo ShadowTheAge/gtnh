@@ -1271,9 +1271,25 @@ machines["Mega Alloy Blast Smelter"] = {
 machines["Industrial Coke Oven"] = {
     overclocker: StandardOverclocker.onlyNormal(),
     speed: 1,
-    power: (recipe, choices) => 1 - (recipe.voltageTier + 1) * 0.04,
-    parallels: (recipe, choices) => choices.casingType == 1 ? 30 : 18,
-    choices: {casingType: {description: "Casing Type", choices: ["Heat Resistant Casings", "Heat Proof Casings"]}},
+    power: (recipe, choices) => 0.98 ** (choices.coilTier - 1), // -2% multiplicatively
+    parallels: (recipe, choices) => {
+        let tier = choices.casingType == 1;
+        let base = tier ? 32 : 16;
+        let perSlice = tier ? 16 : 8;
+
+        return base + ((choices.slices - 1) * perSlice);
+    },
+    choices: {
+        casingType: {description: "Casing Type", choices: ["Heat Resistant Casings", "Heat Proof Casings"]},
+        slices:{description: "Number of slices", min:1,max:999},
+        coilTier: CoilTierChoice
+    },
+    enforceChoiceConstraints: (recipe, choices) => {
+        if(choices.coilTier != 13 && choices.slices > 15){
+            choices.slices = 15;
+        }
+    },
+    info: "Eternal coils needed for more than 15 slices",
 };
 
 machines["Cryogenic Freezer"] = {
