@@ -148,7 +148,7 @@ export const singleBlockMachine:Machine = {
     power: 1,
     parallels: 1,
     excludesRecipe: (recipe:Recipe) => {
-        return (recipe.gtRecipe.MetadataByKey("compression_tier") ?? 0) > 0;
+        return (recipe.gtRecipe?.MetadataByKey("compression_tier") ?? 0) > 0;
     }
 };
 
@@ -272,14 +272,14 @@ machines["Circuit Assembly Line"] = {
 machines["Component Assembly Line"] = {
     overclocker: StandardOverclocker.onlyNormal(),
     speed: (recipeModel, choices) => {
-        const recipeCoalTier = recipeModel.recipe?.gtRecipe.MetadataByKey("coal_casing_tier") ?? 1;
+        const recipeCoalTier = recipeModel.recipe?.gtRecipe?.MetadataByKey("coal_casing_tier") ?? 1;
         const actualCoalTier = choices.componentTier + 1;
         return Math.pow(2, actualCoalTier - recipeCoalTier);
     },
     power: 1,
     parallels: 1,
     enforceChoiceConstraints: (recipeModel, choices) => {
-        const recipeCoalTier = recipeModel.recipe?.gtRecipe.MetadataByKey("coal_casing_tier") ?? 1;
+        const recipeCoalTier = recipeModel.recipe?.gtRecipe?.MetadataByKey("coal_casing_tier") ?? 1;
         choices.componentTier = Math.max(choices.componentTier, recipeCoalTier - 1);
     },
     choices: {
@@ -303,7 +303,7 @@ machines["Naquadah Fuel Refinery"] = {
     parallels: (recipe, choices) => (choices.coils + 1) * 4,
     overclocker: (recipeModel, choices) => {
         const buildingTierCoil = choices.coils + 1;
-        const recipeTierCoil = recipeModel.recipe?.gtRecipe.MetadataByKey("nfr_coil_tier") ?? 1;
+        const recipeTierCoil = recipeModel.recipe?.gtRecipe?.MetadataByKey("nfr_coil_tier") ?? 1;
         const maxPerfectOverclocks = Math.max(0, buildingTierCoil - recipeTierCoil);
         return StandardOverclocker.onlyPerfect(maxPerfectOverclocks);
     },
@@ -312,7 +312,7 @@ machines["Naquadah Fuel Refinery"] = {
         choices: ["T1 Field Restriction Coil", "T2 Advanced Field Restriction Coil", "T3 Ultimate Field Restriction Coil", "T4 Temporal Field Restriction Coil"],
     }},
     enforceChoiceConstraints: (recipe, choices) => {
-        const recipeTier = recipe.recipe?.gtRecipe.MetadataByKey("nfr_coil_tier") ?? 1;
+        const recipeTier = recipe.recipe?.gtRecipe?.MetadataByKey("nfr_coil_tier") ?? 1;
         choices.coils = Math.max(choices.coils, recipeTier - 1);
     }
 };
@@ -327,7 +327,7 @@ machines["Neutron Activator"] = {
         min: 4,
     }},
     info: (recipeModel, choices) => {
-        const nke = recipeModel.recipe?.gtRecipe.MetadataByKey("nke_range") ?? 0;
+        const nke = recipeModel.recipe?.gtRecipe?.MetadataByKey("nke_range") ?? 0;
         const nkeMin = nke % 10000;
         const nkeMax = Math.floor(nke / 10000);
         const nkeRange = nkeMax - nkeMin;
@@ -417,7 +417,7 @@ machines["Large Scale Auto-Assembler v1.01"] = {
 };
 
 function makeSpaceAssemblerRecipeExcluder(tier:number) {
-    return (recipe:Recipe) => recipe.gtRecipe.MetadataByKey("space_elevator_module_tier") > tier;
+    return (recipe:Recipe) => (recipe.gtRecipe?.MetadataByKey("space_elevator_module_tier") ?? 0) > tier;
 }
 
 machines["Space Assembler Module MK-I"] = {
@@ -467,7 +467,7 @@ machines["Industrial Autoclave"] = {
 };
 
 function getEbfExcessHeat(recipe:RecipeModel, choices:{[key:string]:number}) {
-    const recipeHeat = recipe.recipe?.gtRecipe.specialValue ?? 0;
+    const recipeHeat = recipe.recipe?.gtRecipe?.specialValue ?? 0;
     const coilHeat = 1801 + choices.coilTier * 900;
     const voltageHeat = Math.max(0, recipe.voltageTier - TIER_MV) * 100;
     const actualHeat = coilHeat + voltageHeat;
@@ -649,7 +649,7 @@ function laserOverclockCalculator(recipeModel:RecipeModel, overclockTiers:number
     
     // We will need to limit to 1 per tick at most for AAL.
     const parallel = recipeModel.getItemInputCount();
-    const durationTicks = (recipeModel.recipe?.gtRecipe.durationTicks || Number.POSITIVE_INFINITY);
+    const durationTicks = (recipeModel.recipe?.gtRecipe?.durationTicks || Number.POSITIVE_INFINITY);
 
     let overclockSpeed = 1;
     let overclockPower = 1;
@@ -837,7 +837,7 @@ machines["Nano Forge"] = {
         //     OCFactor = 4.0;
         // }
         // where specialValue is required tier, specialTier is building tier
-        const neededTier = recipeModel.recipe?.gtRecipe.MetadataByKey("nano_forge_tier") ?? 1;
+        const neededTier = recipeModel.recipe?.gtRecipe?.MetadataByKey("nano_forge_tier") ?? 1;
         const buildingTier = choices.tier + 1;
         if ((buildingTier < 4 || neededTier < 3) && buildingTier > neededTier)
             return StandardOverclocker.onlyPerfect();
@@ -890,7 +890,7 @@ machines["Nano Forge"] = {
         parallels: {description: "Parallels", min: 1}
     },
     enforceChoiceConstraints: (recipeModel, choices) => {
-        const tier = recipeModel.recipe?.gtRecipe.MetadataByKey("nano_forge_tier") ?? 1;
+        const tier = recipeModel.recipe?.gtRecipe?.MetadataByKey("nano_forge_tier") ?? 1;
         choices.tier = Math.max(choices.tier, tier - 1);
 
         if (choices.tier != 3) {
@@ -900,7 +900,7 @@ machines["Nano Forge"] = {
 };
 
 function makeCompressorRecipeExcluder(tier:number) {
-    return (recipe:Recipe) => tier < (recipe.gtRecipe.MetadataByKey("compression_tier") ?? 0);
+    return (recipe:Recipe) => tier < (recipe.gtRecipe?.MetadataByKey("compression_tier") ?? 0);
 }
 
 machines["Neutronium Compressor"] = {
@@ -1006,10 +1006,10 @@ machines["Dimensionally Transcendent Plasma Forge"] = {
 
         if (choices.convergence > 0) {
             // Logic based on https://github.com/GTNewHorizons/GT5-Unofficial/blob/bdfefcfc4f851a07303cfdde21c26767210ebf57/src/main/java/gregtech/common/tileentities/machines/multi/MTEPlasmaForge.java#L1035-L1041
-            let amperage = recipe.recipe?.gtRecipe.amperage || 1;
-            let voltage = recipe.recipe?.gtRecipe.voltage || TIER_LV;
+            let amperage = recipe.recipe?.gtRecipe?.amperage || 1;
+            let voltage = recipe.recipe?.gtRecipe?.voltage || TIER_LV;
             let machineConsumption = amperage * voltage * Math.pow(4, recipe.overclockTiers);
-            let durationTicks = (recipe.recipe?.gtRecipe.durationTicks || 1) / Math.pow(4, recipe.overclockTiers);
+            let durationTicks = (recipe.recipe?.gtRecipe?.durationTicks || 1) / Math.pow(4, recipe.overclockTiers);
             let requiredCatalystEu = (Math.pow(2, recipe.overclockTiers) - 1) * machineConsumption * durationTicks;
 
             let catalyst = findDtpfCatalyst(items) || DtpfCatalysts[choices.catalyst];
@@ -1443,7 +1443,7 @@ machines["Quantum Force Transformer"] = {
             return recipe.recipe?.items ?? [];
         }
         
-        const focusTier = recipe.recipe?.gtRecipe.MetadataByKey("qft_focus_tier") ?? 1;
+        const focusTier = recipe.recipe?.gtRecipe?.MetadataByKey("qft_focus_tier") ?? 1;
 
         const baseProbability = 1.0 / numOutputs;
         
@@ -1527,7 +1527,7 @@ machines["Quantum Force Transformer"] = {
         focusedAll: {description: "Focus All", choices: ["No", "Yes"]}
     },    
     enforceChoiceConstraints: (recipe, choices) => {
-        const focusTier = recipe.recipe?.gtRecipe.MetadataByKey("qft_focus_tier") ?? 1;
+        const focusTier = recipe.recipe?.gtRecipe?.MetadataByKey("qft_focus_tier") ?? 1;
         choices.manipulator = Math.max(choices.manipulator, focusTier - 1);
 
         if (choices.shielding + 1 < focusTier) {
@@ -1588,7 +1588,7 @@ machines["Tree Growth Simulator"] = {
 machines["Draconic Evolution Fusion Crafter"] = {
     overclocker: (recipe, choices) => {
         const buildingTierCoil = choices.casings + 1;
-        const recipeTierCoil = recipe.recipe?.gtRecipe.MetadataByKey("defc_casing_tier") ?? 1;
+        const recipeTierCoil = recipe.recipe?.gtRecipe?.MetadataByKey("defc_casing_tier") ?? 1;
         const maxPerfectOverclocks = Math.max(0, buildingTierCoil - recipeTierCoil);
         return StandardOverclocker.perfectThenNormal(maxPerfectOverclocks);
     },
@@ -1597,7 +1597,7 @@ machines["Draconic Evolution Fusion Crafter"] = {
     parallels: 1,
     choices: {casings: {description:"Fusion casings", choices:["Bloody Ichorium", "Draconium", "Wyvern", "Awakened Draconium", "Chaotic"]}},
     enforceChoiceConstraints: (recipe, choices) => {
-        const recipeTier = recipe.recipe?.gtRecipe.MetadataByKey("defc_casing_tier") ?? 1;
+        const recipeTier = recipe.recipe?.gtRecipe?.MetadataByKey("defc_casing_tier") ?? 1;
         choices.casings = Math.max(choices.casings, recipeTier - 1);
     }
 };
@@ -1610,10 +1610,10 @@ machines["Large Sifter Control Block"] = {
 };
 
 function getFusionTier(recipe:Recipe): number {
-    const cost = recipe.gtRecipe.MetadataByKey("fusion_threshold") ?? 0;
-    const plasmaTier = recipe.gtRecipe.MetadataByKey("fog_plasma_tier") ?? 0;
+    const cost = recipe.gtRecipe?.MetadataByKey("fusion_threshold") ?? 0;
+    const plasmaTier = recipe.gtRecipe?.MetadataByKey("fog_plasma_tier") ?? 0;
     const costTier = getFusionTierByStartupCost(cost);
-    const voltageTier = (recipe.gtRecipe.voltageTier - TIER_LUV + 1) || 0;
+    const voltageTier = ((recipe.gtRecipe?.voltageTier ?? 0) - TIER_LUV + 1) || 0;
     return Math.max(plasmaTier, costTier, voltageTier);
 }
 
@@ -1873,7 +1873,7 @@ machines["Eye of Harmony"] = {
         };
         items.push(spacetimeFluid);
 
-        const recipeDurationSeconds = (recipeModel.recipe?.gtRecipe.durationSeconds || 1) / getEyeOfHarmonySpeed(recipeModel, choices);
+        const recipeDurationSeconds = (recipeModel.recipe?.gtRecipe?.durationSeconds || 1) / getEyeOfHarmonySpeed(recipeModel, choices);
 
         // TODO: either remove as we agreed not to calculate such things, or provide display via some means
         const parallel = getEyeOfHarmonyParallel(choices.astralArrays);
