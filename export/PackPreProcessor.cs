@@ -51,10 +51,11 @@ namespace Source
         private static bool GetSingleBlockVoltageTier(Item item, out int tier)
         {
             tier = 0;
-            if (!item.tooltipParts.Contains("Voltage IN"))
+            var voltageTooltip = item.tooltipParts.FirstOrDefault(x => x.Contains("Voltage IN"));
+            if (voltageTooltip == null)
                 return false;
             
-            var cleanedTooltip = Regex.Replace(item.tooltip, "§.", "");
+            var cleanedTooltip = Regex.Replace(voltageTooltip, "§.", "");
             
             foreach (var vtier in VoltageTiers.voltageTiers)
             {

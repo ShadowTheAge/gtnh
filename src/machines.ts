@@ -544,6 +544,13 @@ machines["Ore Washing Plant"] = {
     parallels: (recipe) => (recipe.voltageTier + 1) * 4,
 };
 
+machines["Industrial Chemical Bath"] = {
+    overclocker: StandardOverclocker.onlyNormal(),
+    speed: 5,
+    power: 1,
+    parallels: (recipe) => (recipe.voltageTier + 1) * 4,
+};
+
 machines["Oil Cracking Unit"] = {
     overclocker: StandardOverclocker.onlyNormal(),
     speed: 1,
@@ -822,11 +829,18 @@ machines["Industrial Maceration Stack"] = {
     choices: {upgradeChip: {description: "Upgrade Chip", choices: ["No Upgrade", "Maceration Upgrade Chip"]}},
 };
 
-machines["Industrial Material Press"] = {
+machines["Industrial Bending Machine"] = {
     overclocker: StandardOverclocker.onlyNormal(),
     speed: 6,
     power: 1,
-    parallels: (recipe) => (recipe.voltageTier + 1) * 4,
+    parallels: (recipe) => (recipe.voltageTier + 1) * 6,
+};
+
+machines["Industrial Forming Press"] = {
+    overclocker: StandardOverclocker.onlyNormal(),
+    speed: 6,
+    power: 1,
+    parallels: (recipe) => (recipe.voltageTier + 1) * 6,
 };
 
 machines["Nano Forge"] = {
