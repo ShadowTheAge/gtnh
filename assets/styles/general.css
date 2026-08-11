@@ -17,7 +17,7 @@ body {
     background-color: #212121;
     word-break: break-word;
     height: 100vh;
-    min-width: 800px;
+    /* min-width: 800px; */
     overflow-y: hidden;
     overflow-x: auto;
 }
@@ -260,4 +260,19 @@ a:hover {
     color: #FFD700;
     text-decoration: underline;
     text-decoration-thickness: 2px;
+}
+
+.accessible-hover-btn-container {
+  z-index: 1000;
+  position: fixed;
+  right: 10px;
+  top: 10px;
+}
+
+.accessible-hover-btn {
+  background-color: rgba(114, 114, 114, 0.5)
+}
+
+.accessible-hover-btn.active {
+  color: red !important;
 }

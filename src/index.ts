@@ -22,6 +22,15 @@ try {
         import("./menu.js"),
         import("./recipeList.js")
     ]);
+    // Load accessible button
+    const accessibleBtn = document.querySelector('#accessible-hover');
+    window.accessibleMode = false;
+    if (accessibleBtn) {
+        accessibleBtn.addEventListener('click', () => {
+            window.accessibleMode = !window.accessibleMode;
+            accessibleBtn.className = `accessible-hover-btn ${window.accessibleMode ? 'active': ''}`;
+        });
+    }
     let page = await import("./page.js");
     page.UpdateProject();
     loading.remove();

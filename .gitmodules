@@ -1,4 +1,4 @@
 [submodule "data"]
 	path = data
-	url = git@github.com:ShadowTheAge/gtnh-data.git
+	url = https://github.com/ShadowTheAge/gtnh-data.git
 	branch = 2.8.0-v4

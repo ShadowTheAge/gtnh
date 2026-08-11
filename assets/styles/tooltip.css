@@ -57,6 +57,12 @@
     white-space: pre-line;
 }
 
+@media screen and (max-width: 800px) {
+  #tooltip-action {
+    display: none !important;
+  }
+}
+
 #tooltip-mod
 {
     color: #5457FA;

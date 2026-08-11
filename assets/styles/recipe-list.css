@@ -8,7 +8,7 @@
     flex-direction: column;
     gap: 8px;
     width: 100%;
-    min-width: 800px;
+    /* min-width: 800px; */
 }
 
 .product-items {
@@ -56,9 +56,18 @@
     flex-shrink: 0;
 }
 
+@media screen and (max-width: 1200px) {
+  .optional-pc {
+    display: none;
+  }
+}
+
 /* Base table layout */
+.recipe-table-container {
+  overflow-x: auto;
+}
 .recipe-table {
-    width: 100%;
+    width: max(800px, 100%);
     border-collapse: collapse;
     border-spacing: 0;
     color: #888888;
@@ -263,7 +272,7 @@ select:hover {
     padding: 8px;
     border-radius: 4px;
     position: relative;
-    width: calc(100% - 350px);
+    /* width: calc(100% - 350px); */
 }
 
 .status-message:not(.solved) {

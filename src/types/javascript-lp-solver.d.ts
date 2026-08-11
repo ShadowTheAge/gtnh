@@ -2,7 +2,8 @@ declare global {
     interface Window {
         solver: {
             Solve: (model: Model) => Solution;
-        }
+        },
+        accessibleMode: boolean;
     }
 }
 
